@@ -65,20 +65,20 @@ namespace Enigma.Modelling
                     var propertyMap = (IPropertyMap)Activator.CreateInstance(genericPropertyMapType, property, propertyIndex);
                     propertyMappings.Add(property.Name, propertyMap);
 
-                    var extended = new ExtendedType(property.PropertyType);
+                    var extended = new WrappedType(property.PropertyType);
                     if (extended.Class == TypeClass.Collection) {
                         var collectionInfo = extended.Container.AsCollection();
-                        var extendedElementType = new ExtendedType(collectionInfo.ElementType);
+                        var extendedElementType = new WrappedType(collectionInfo.ElementType);
                         if (extendedElementType.Class == TypeClass.Complex)
                             relationTypes.Add(collectionInfo.ElementType);
                     }
                     else if (extended.Class == TypeClass.Dictionary) {
                         var dictionaryInfo = extended.Container.AsDictionary();
-                        var extendedKeyType = new ExtendedType(dictionaryInfo.KeyType);
+                        var extendedKeyType = new WrappedType(dictionaryInfo.KeyType);
                         if (extendedKeyType.Class == TypeClass.Complex)
                             relationTypes.Add(dictionaryInfo.KeyType);
 
-                        var extendedValueType = new ExtendedType(dictionaryInfo.ValueType);
+                        var extendedValueType = new WrappedType(dictionaryInfo.ValueType);
                         if (extendedValueType.Class == TypeClass.Complex)
                             relationTypes.Add(dictionaryInfo.ValueType);
                     }

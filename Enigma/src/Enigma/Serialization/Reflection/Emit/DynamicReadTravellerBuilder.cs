@@ -153,7 +153,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private ILCodeParameter GenerateCollectionContent(ExtendedType target, string refName)
+        private ILCodeParameter GenerateCollectionContent(WrappedType target, string refName)
         {
             var collectionMembers = new CollectionMembers(target);
             var isValueType = collectionMembers.ElementType.GetTypeInfo().IsValueType;
@@ -279,7 +279,7 @@ namespace Enigma.Serialization.Reflection.Emit
             NullableMembers valueNullableMembers;
             var hasNullableMembers = Members.Nullable.TryGetValue(dictionaryMembers.ValueType, out valueNullableMembers);
             var valueType = dictionaryMembers.ValueType;
-            var extValueType = valueType.Extend();
+            var extValueType = valueType.Wrap();
 
             if (extValueType.IsValueOrNullableOfValue()) {
                 var loadTrueLabel = _il.DefineLabel();
@@ -402,7 +402,7 @@ namespace Enigma.Serialization.Reflection.Emit
         private void GenerateLoadParamValueCode(ILCodeParameter param)
         {
             var type = param.ParameterType;
-            var extType = type.Extend();
+            var extType = type.Wrap();
             if (extType.Class == TypeClass.Nullable)
                 type = extType.Container.AsNullable().ElementType;
 
@@ -416,7 +416,7 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             var type = local.VariableType;
 
-            var constructor = type.GetConstructor(Type.EmptyTypes);
+            var constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (constructor == null)
                 throw InvalidGraphException.NoParameterLessConstructor(type);
 

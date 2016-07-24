@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Enigma.Reflection
 {
-    public class ExtendedType
+    public class WrappedType
     {
         private static readonly IList<Type> SystemValueClasses = new[] {
             typeof (DateTime), typeof (String), typeof (TimeSpan), typeof(Guid), typeof(Decimal), typeof(byte[])
@@ -13,7 +13,7 @@ namespace Enigma.Reflection
         private readonly Lazy<IContainerTypeInfo> _containerTypeInfo;
         private readonly Lazy<TypeClass> _class;
 
-        public ExtendedType(Type type)
+        public WrappedType(Type type)
         {
             Ref = type;
             Info = type.GetTypeInfo();
@@ -31,12 +31,12 @@ namespace Enigma.Reflection
         {
             if (Class == TypeClass.Value) return true;
             if (Class != TypeClass.Nullable) return false;
-            return Container.AsNullable().ElementType.Extend().Class == TypeClass.Value;
+            return Container.AsNullable().ElementType.Wrap().Class == TypeClass.Value;
         }
 
         public bool IsEnum()
         {
-            return Ref.GetTypeInfo().IsEnum || (Class == TypeClass.Nullable && Container.AsNullable().ElementType.GetTypeInfo().IsEnum);
+            return Info.IsEnum || (Class == TypeClass.Nullable && Container.AsNullable().ElementType.GetTypeInfo().IsEnum);
         }
 
         public Type GetUnderlyingEnumType()

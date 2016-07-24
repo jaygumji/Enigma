@@ -17,8 +17,10 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             VisitArgsType = typeof (VisitArgs);
             VisitArgsFactoryType = typeof (IVisitArgsFactory);
-            ConstructVisitArgsMethod = VisitArgsFactoryType.GetMethod("Construct");
-            ConstructVisitArgsWithTypeMethod = VisitArgsFactoryType.GetMethod("ConstructWith");
+
+            var visitArgsFactoryTypeInfo = VisitArgsFactoryType.GetTypeInfo();
+            ConstructVisitArgsMethod = visitArgsFactoryTypeInfo.GetMethod("Construct");
+            ConstructVisitArgsWithTypeMethod = visitArgsFactoryTypeInfo.GetMethod("ConstructWith");
 
             TravellerConstructorTypes = new[] {VisitArgsFactoryType};
         }

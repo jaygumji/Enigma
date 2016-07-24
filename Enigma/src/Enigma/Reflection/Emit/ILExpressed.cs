@@ -7,7 +7,8 @@ namespace Enigma.Reflection.Emit
     public sealed class ILExpressed
     {
 
-        private static readonly MethodInfo MethodGetTypeFromHandleToken = typeof (Type).GetMethod("GetTypeFromHandle", new[] {typeof (RuntimeTypeHandle)});
+        private static readonly MethodInfo MethodGetTypeFromHandleToken =
+            typeof (Type).GetTypeInfo().GetMethod("GetTypeFromHandle", new[] {typeof (RuntimeTypeHandle)});
 
         private readonly ILGenerator _il;
         private readonly TypeCache _typeCache;

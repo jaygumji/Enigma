@@ -1,0 +1,23 @@
+﻿{
+  "version": "0.1.0-*",
+  "description": "Enigma Embedded Database Engine",
+  "authors": [ "Johan Johnsson" ],
+
+  "packOptions": {
+    "tags": [ "Serialization", "IL", "Lock" ],
+    "projectUrl": "https://github.com/Jaygumji/Enigma",
+    "licenseUrl": "https://raw.githubusercontent.com/jaygumji/Enigma/master/LICENSE",
+    "requireLicenseAcceptance": true
+  },
+
+  "dependencies": {
+    "NETStandard.Library": "1.6.0",
+    "Enigma": "0.1.0-*"
+  },
+
+  "frameworks": {
+    "netstandard1.6": {
+      "imports": "dnxcore50"
+    }
+  }
+}

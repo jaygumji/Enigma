@@ -40,10 +40,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public void Leave(object level, VisitArgs args)
         {
-            if (args.Type == LevelType.Root) {
-                _buffer.Flush();
-                return;
-            }
+            if (args.Type == LevelType.Root) return;
 
             if (level != null) {
                 var reservation = _reservations.Pop();
@@ -78,8 +75,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetSLength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackS(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackS(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(int? value, VisitArgs args)
@@ -94,8 +91,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetSLength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackS(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackS(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(long? value, VisitArgs args)
@@ -110,8 +107,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetSLength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackS(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackS(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(ushort? value, VisitArgs args)
@@ -126,8 +123,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetULength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackU(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackU(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(uint? value, VisitArgs args)
@@ -142,8 +139,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetULength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackU(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackU(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(ulong? value, VisitArgs args)
@@ -158,8 +155,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetULength(value.Value);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackU(_buffer.Buffer, _buffer.Position, value.Value, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackU(_buffer.Buffer, offset, value.Value, length);
         }
 
         public void VisitValue(bool? value, VisitArgs args)
@@ -234,8 +231,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetSLength(value.Value.Ticks);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackS(_buffer.Buffer, _buffer.Position, value.Value.Ticks, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackS(_buffer.Buffer, offset, value.Value.Ticks, length);
         }
 
         public void VisitValue(DateTime? value, VisitArgs args)
@@ -253,8 +250,8 @@ namespace Enigma.Serialization.PackedBinary
 
             var length = BinaryPV64Packer.GetSLength(value.Value.Ticks);
             _buffer.WriteByte(length);
-            BinaryPV64Packer.PackS(_buffer.Buffer, _buffer.Position, value.Value.Ticks, length);
-            _buffer.Advance(length);
+            var offset = _buffer.Advance(length);
+            BinaryPV64Packer.PackS(_buffer.Buffer, offset, value.Value.Ticks, length);
         }
 
         public void VisitValue(string value, VisitArgs args)
@@ -276,8 +273,7 @@ namespace Enigma.Serialization.PackedBinary
                 BinaryV32Packer.PackU(_buffer, (uint)value.Length);
             }
 
-            var position = _buffer.Position;
-            _buffer.Advance(length);
+            var position = _buffer.Advance(length);
             Encoding.GetBytes(value, 0, value.Length, _buffer.Buffer, position);
         }
 
@@ -291,7 +287,7 @@ namespace Enigma.Serialization.PackedBinary
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Guid.FixedLength);
+            _buffer.WriteByte((byte)BinaryInformation.Guid.FixedLength);
             var bytes = BinaryInformation.Guid.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }

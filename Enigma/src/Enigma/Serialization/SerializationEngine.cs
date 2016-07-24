@@ -43,7 +43,7 @@ namespace Enigma.Serialization
             if (visitor.TryVisit(args) != ValueState.Found)
                 return null;
 
-            var constructor = type.GetConstructor(Type.EmptyTypes);
+            var constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (constructor == null)
                 throw InvalidGraphException.NoParameterLessConstructor(type);
             var graph = constructor.Invoke(EmptyParameters);
@@ -65,7 +65,7 @@ namespace Enigma.Serialization
             if (visitor.TryVisit(args) != ValueState.Found)
                 return default(T);
 
-            var constructor = type.GetConstructor(Type.EmptyTypes);
+            var constructor = type.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (constructor == null)
                 throw InvalidGraphException.NoParameterLessConstructor(type);
             var graph = (T) constructor.Invoke(EmptyParameters);

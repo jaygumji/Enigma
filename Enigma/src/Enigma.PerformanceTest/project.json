@@ -1,35 +1,22 @@
-{
+﻿{
   "version": "1.0.0-*",
-  "description": "Enigma.PerformanceTest Console Application",
-  "authors": [ "johan" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true
   },
 
   "dependencies": {
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0"
+    },
     "Enigma": "0.1.0-*",
-    "protobuf-net": "2.1.0-alpha-1"
-  },
-
-  "commands": {
-    "Enigma.PerformanceTest": "Enigma.PerformanceTest"
+    "Enigma.Db.Embedded": "0.1.0-*",
+    "protobuf-net": "2.1.0"
   },
 
   "frameworks": {
-    "dnxcore50": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Console": "4.0.0-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Threading.Thread": "4.0.0-beta-23516",
-        "System.AppContext": "4.0.1-beta-23516"
-      }
+    "netcoreapp1.0": {
+      "imports": "dnxcore50"
     }
   }
 }

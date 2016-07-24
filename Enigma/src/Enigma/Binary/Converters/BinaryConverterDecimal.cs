@@ -109,14 +109,25 @@ namespace Enigma.Binary.Converters
             GetBytes(value, buffer, offset);
         }
 
-        public void Convert(object value, byte[] buffer)
+        void IBinaryConverter.Convert(object value, byte[] buffer)
         {
             Convert((Decimal)value, buffer, 0);
         }
 
-        public void Convert(object value, byte[] buffer, int offset)
+        void IBinaryConverter.Convert(object value, byte[] buffer, int offset)
         {
             Convert((Decimal)value, buffer, offset);
+        }
+
+        public void Convert(Decimal value, BinaryBuffer buffer)
+        {
+            var offset = buffer.Advance(16);
+            Convert(value, buffer.Buffer, offset);
+        }
+
+        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        {
+            Convert((Decimal)value, buffer);
         }
 
     }

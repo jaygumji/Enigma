@@ -57,8 +57,9 @@ namespace Enigma.Binary
             if (value > ZMaxValue)
                 throw new ArgumentOutOfRangeException("value", value, "Must be between 0 and " + ZMaxValue);
 
-            var buffer = new byte[4];
-            var length = Pack(null, buffer, 0, value);
+            var length = GetLength(value);
+            var buffer = new byte[length];
+            Pack(buffer, 0, length, value);
             stream.Write(buffer, 0, length);
         }
 
@@ -73,37 +74,31 @@ namespace Enigma.Binary
             if (value > ZMaxValue)
                 throw new ArgumentOutOfRangeException("value", value, "Must be between 0 and " + ZMaxValue);
 
-            Pack(buffer, buffer.Buffer, buffer.Position, value);
+            var length = GetLength(value);
+            var position = buffer.Advance(length);
+            Pack(buffer.Buffer, position, length, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int Pack(BinaryBuffer buffer, byte[] bufferData, int offset, UInt32 value)
+        private static void Pack(byte[] buffer, int offset, int length, uint value)
         {
             if (value > ZMaxValue)
                 throw new ArgumentOutOfRangeException("value", value, "Must be between 0 and " + ZMaxValue);
 
-            var length = GetLength(value);
             var lengthMask = length - 1;
 
-            buffer?.Advance(length);
+            buffer[offset] = (byte)((byte)(value << 26 >> 24) | lengthMask);
 
-            var b = (byte)(value << 26 >> 24);
-            b = (byte)(b | lengthMask);
-            bufferData[offset++] = b;
+            if (length == 1) return;
+            buffer[offset+1] = (byte)(value << 18 >> 24);
 
-            if (length == 1) return length;
-            b = (byte)(value << 18 >> 24);
-            bufferData[offset++] = b;
+            if (length == 2) return;
+            buffer[offset+2] = (byte)(value << 10 >> 24);
 
-            if (length == 2) return length;
-            b = (byte)(value << 10 >> 24);
-            bufferData[offset++] = b;
+            if (length == 3) return;
+            buffer[offset+3] = (byte)(value << 2 >> 24);
 
-            if (length == 3) return length;
-            b = (byte)(value << 2 >> 24);
-            bufferData[offset] = b;
-
-            return length;
+            return;
         }
 
         /// <summary>

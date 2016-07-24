@@ -55,20 +55,29 @@ namespace Enigma.Binary.Converters
         public void Convert(SByte value, byte[] buffer, int offset)
         {
             if (buffer == null) throw new ArgumentNullException("buffer");
-            var bytes = Convert(value);
-            if (buffer.Length < offset + bytes.Length)
-                throw new BufferOverflowException("The buffer can not contain the value");
-            Array.Copy(bytes, 0, buffer, offset, bytes.Length);
+            var b = (byte) value;
+            buffer[offset] = b;
         }
 
-        public void Convert(object value, byte[] buffer)
+        void IBinaryConverter.Convert(object value, byte[] buffer)
         {
             Convert((SByte)value, buffer, 0);
         }
 
-        public void Convert(object value, byte[] buffer, int offset)
+        void IBinaryConverter.Convert(object value, byte[] buffer, int offset)
         {
             Convert((SByte)value, buffer, offset);
+        }
+
+        public void Convert(SByte value, BinaryBuffer buffer)
+        {
+            var offset = buffer.Advance(1);
+            Convert(value, buffer.Buffer, offset);
+        }
+
+        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        {
+            Convert((SByte)value, buffer);
         }
 
     }

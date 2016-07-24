@@ -17,8 +17,9 @@ namespace Enigma.Binary
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void PackU(Stream stream, UInt32? nullableValue)
         {
-            var buffer = new byte[5];
-            var length = PackU(null, buffer, 0, nullableValue);
+            var length = nullableValue.HasValue ? GetULength(nullableValue.Value) : 1;
+            var buffer = new byte[length];
+            PackU(buffer, 0, length, nullableValue);
             stream.Write(buffer, 0, length);
         }
 
@@ -30,53 +31,43 @@ namespace Enigma.Binary
         /// <exception cref="System.ArgumentOutOfRangeException">value;Must be between 0 and  + ZMaxValue</exception>
         public static void PackU(BinaryBuffer buffer, UInt32? nullableValue)
         {
-            PackU(buffer, buffer.Buffer, buffer.Position, nullableValue);
+            var length = nullableValue.HasValue ? GetULength(nullableValue.Value) : 1;
+            var position = buffer.Advance(length);
+            PackU(buffer.Buffer, position, length, nullableValue);
         }
 
         /// <summary>
         /// Makes the value take variable length, it takes as much as it needs ranging from 1-5 bytes
         /// </summary>
         /// <param name="buffer">The buffer where we write the value to</param>
-        /// <param name="bufferData">The buffer where we write the value to</param>
         /// <param name="offset">The offset.</param>
+        /// <param name="length">The length.</param>
         /// <param name="nullableValue">The value to pack</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int PackU(BinaryBuffer buffer, byte[] bufferData, int offset, UInt32? nullableValue)
+        private static void PackU(byte[] buffer, int offset, int length, uint? nullableValue)
         {
             if (!nullableValue.HasValue) {
-                bufferData[offset] = 7;
+                buffer[offset] = 7;
 
-                buffer?.Advance(1);
-                return 1;
+                return;
             }
             var value = nullableValue.Value;
 
-            var length = GetULength(value);
             var lengthMask = length - 1;
 
-            buffer?.Advance(length);
+            buffer[offset] = (byte)((byte)(value << 27 >> 24) | lengthMask);
 
-            var b = (byte)(value << 27 >> 24);
-            b = (byte)(b | lengthMask);
-            bufferData[offset] = b;
+            if (length == 1) return;
+            buffer[offset + 1] = (byte)(value << 19 >> 24);
 
-            if (length == 1) return length;
-            b = (byte)(value << 19 >> 24);
-            bufferData[offset + 1] = b;
+            if (length == 2) return;
+            buffer[offset + 2] = (byte)(value << 11 >> 24);
 
-            if (length == 2) return length;
-            b = (byte)(value << 11 >> 24);
-            bufferData[offset + 2] = b;
+            if (length == 3) return;
+            buffer[offset + 3] = (byte)(value << 3 >> 24);
 
-            if (length == 3) return length;
-            b = (byte)(value << 3 >> 24);
-            bufferData[offset + 3] = b;
-
-            if (length == 4) return length;
-            b = (byte)(value >> 29);
-            bufferData[offset + 4] = b;
-
-            return length;
+            if (length == 4) return;
+            buffer[offset + 4] = (byte)(value >> 29);
         }
 
         /// <summary>

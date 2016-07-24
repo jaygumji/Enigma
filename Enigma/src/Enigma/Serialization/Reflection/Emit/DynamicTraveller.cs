@@ -32,10 +32,12 @@ namespace Enigma.Serialization.Reflection.Emit
 
         public void Complete(Type actualTravellerType)
         {
+            var actualTravellerTypeInfo = actualTravellerType.GetTypeInfo();
+
             _travellerType = actualTravellerType;
-            _constructor = actualTravellerType.GetConstructor(_members.TravellerConstructorTypes);
-            _travelWriteMethod = actualTravellerType.GetMethod("Travel", _travelWriteMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-            _travelReadMethod = actualTravellerType.GetMethod("Travel", _travelReadMethod.GetParameters().Select(p => p.ParameterType).ToArray());
+            _constructor = actualTravellerTypeInfo.GetConstructor(_members.TravellerConstructorTypes);
+            _travelWriteMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelWriteMethod.GetParameters().Select(p => p.ParameterType).ToArray());
+            _travelReadMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelReadMethod.GetParameters().Select(p => p.ParameterType).ToArray());
             _isConstructing = false;
         }
 

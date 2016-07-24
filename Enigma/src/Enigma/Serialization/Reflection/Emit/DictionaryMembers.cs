@@ -14,7 +14,7 @@ namespace Enigma.Serialization.Reflection.Emit
         public readonly MethodInfo Add;
         public readonly ConstructorInfo Constructor;
 
-        public DictionaryMembers(ExtendedType dictionaryType)
+        public DictionaryMembers(WrappedType dictionaryType)
         {
             var container = dictionaryType.Container.AsDictionary();
             KeyType = container.KeyType;
@@ -22,11 +22,11 @@ namespace Enigma.Serialization.Reflection.Emit
             ElementType = container.ElementType;
             VariableType = typeof (IDictionary<,>).MakeGenericType(KeyType, ValueType);
 
-            Add = VariableType.GetMethod("Add", new[] {KeyType, ValueType});
+            Add = VariableType.GetTypeInfo().GetMethod("Add", new[] {KeyType, ValueType});
             var instanceType = dictionaryType.Info.IsInterface
                 ? typeof (Dictionary<,>).MakeGenericType(KeyType, ValueType)
                 : dictionaryType.Ref;
-            Constructor = instanceType.GetConstructor(Type.EmptyTypes);
+            Constructor = instanceType.GetTypeInfo().GetConstructor(Type.EmptyTypes);
             if (Constructor == null) throw InvalidGraphException.NoParameterLessConstructor(dictionaryType.Ref);
         }
 

@@ -6,9 +6,9 @@ namespace Enigma
     public static class TypeExtensions
     {
 
-        public static ExtendedType Extend(this Type type)
+        public static WrappedType Wrap(this Type type)
         {
-            return new ExtendedType(type);
+            return new WrappedType(type);
         }
 
     }

@@ -30,7 +30,7 @@ namespace Enigma.Serialization.Reflection
 
         private SerializableType Build(Type type)
         {
-            var properties = type.GetProperties(PropertyFlags);
+            var properties = type.GetTypeInfo().GetProperties(PropertyFlags);
 
             UInt32 nextIndex = 1;
 

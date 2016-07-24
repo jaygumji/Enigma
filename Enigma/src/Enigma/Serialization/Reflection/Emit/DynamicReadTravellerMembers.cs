@@ -34,7 +34,8 @@ namespace Enigma.Serialization.Reflection.Emit
 
         public DynamicReadTravellerMembers()
         {
-            var visitArgsType = typeof(VisitArgs);
+            var visitArgsType = typeof(VisitArgs).GetTypeInfo();
+
             VisitArgsCollectionItem = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionItem"));
             VisitArgsDictionaryKey = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryKey"));
             VisitArgsDictionaryValue = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryValue"));
@@ -45,7 +46,7 @@ namespace Enigma.Serialization.Reflection.Emit
             VisitArgsCollectionInDictionaryKey = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionInDictionaryKey"));
             VisitArgsCollectionInDictionaryValue = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionInDictionaryValue"));
 
-            var readVisitorType = typeof(IReadVisitor);
+            var readVisitorType = typeof(IReadVisitor).GetTypeInfo();
             VisitorTryVisit = readVisitorType.GetMethod("TryVisit");
             VisitorLeave = readVisitorType.GetMethod("Leave");
 
@@ -57,7 +58,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 var valueType = method.GetParameters()[1].ParameterType;
                 if (valueType.IsByRef) valueType = valueType.GetElementType();
-                var valueTypeExt = valueType.Extend();
+                var valueTypeExt = valueType.Wrap();
 
                 VisitorTryVisitValue.Add(valueType, method);
                 if (valueTypeExt.Class == TypeClass.Nullable) {
@@ -70,10 +71,10 @@ namespace Enigma.Serialization.Reflection.Emit
                 }
             }
 
-            EnumeratorMoveNext = typeof(IEnumerator).GetMethod("MoveNext");
-            DisposableDispose = typeof(IDisposable).GetMethod("Dispose");
+            EnumeratorMoveNext = typeof(IEnumerator).GetTypeInfo().GetMethod("MoveNext");
+            DisposableDispose = typeof(IDisposable).GetTypeInfo().GetMethod("Dispose");
 
-            ExceptionNoDictionaryValue = typeof (InvalidGraphException).GetMethod("NoDictionaryValue");
+            ExceptionNoDictionaryValue = typeof (InvalidGraphException).GetTypeInfo().GetMethod("NoDictionaryValue");
         }
 
     }

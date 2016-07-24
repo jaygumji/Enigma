@@ -100,9 +100,10 @@ namespace Enigma.Serialization.Reflection.Emit
 
         private void GenerateDictionaryCode(ILCodeVariable dictionary, Type elementType)
         {
+            var elementTypeInfo = elementType.GetTypeInfo();
             var enumerateCode = new ILEnumerateCode(dictionary, (il, it) => {
-                GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementType.GetProperty("Key")), LevelType.DictionaryKey);
-                GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementType.GetProperty("Value")), LevelType.DictionaryValue);
+                GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementTypeInfo.GetProperty("Key")), LevelType.DictionaryKey);
+                GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementTypeInfo.GetProperty("Value")), LevelType.DictionaryValue);
             });
             _il.Generate(enumerateCode);
         }
@@ -128,9 +129,10 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 _il.Snippets.InvokeMethod(_visitorVariable, Members.VisitorVisit, dictionaryLocal, visitArgs);
 
+                var elementTypeInfo = elementType.GetTypeInfo();
                 var part = new ILEnumerateCode(dictionaryLocal, (il, it) => {
-                    GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementType.GetProperty("Key")), LevelType.DictionaryKey);
-                    GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementType.GetProperty("Value")), LevelType.DictionaryValue);
+                    GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementTypeInfo.GetProperty("Key")), LevelType.DictionaryKey);
+                    GenerateEnumerateContentCode(new InstancePropertyILCodeVariable(it, elementTypeInfo.GetProperty("Value")), LevelType.DictionaryValue);
                 });
                 _il.Generate(part);
 
@@ -160,7 +162,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private void GenerateEnumerateCollectionContentCode(ExtendedType target, ILCodeParameter collectionParameter)
+        private void GenerateEnumerateCollectionContentCode(WrappedType target, ILCodeParameter collectionParameter)
         {
             ArrayContainerTypeInfo arrayTypeInfo;
             if (target.TryGetArrayTypeInfo(out arrayTypeInfo) && arrayTypeInfo.Ranks > 1) {
@@ -177,13 +179,13 @@ namespace Enigma.Serialization.Reflection.Emit
 
                                     _il.Snippets.ForLoop(0, new CallMethodILCode(collectionParameter, Members.ArrayGetLength, 1), 1,
                                         r2 => GenerateEnumerateContentCode(
-                                            new CallMethodILCode(collectionParameter, target.Ref.GetMethod("Get"), r0, r1, r2),
+                                            new CallMethodILCode(collectionParameter, target.Info.GetMethod("Get"), r0, r1, r2),
                                             LevelType.CollectionItem));
 
                                     _il.Snippets.InvokeMethod(_visitorVariable, Members.VisitorLeave, collectionParameter, Members.VisitArgsCollectionInCollection);
                                 }
                                 else {
-                                    GenerateEnumerateContentCode(new CallMethodILCode(collectionParameter, target.Ref.GetMethod("Get"), r0, r1), LevelType.CollectionItem);
+                                    GenerateEnumerateContentCode(new CallMethodILCode(collectionParameter, target.Info.GetMethod("Get"), r0, r1), LevelType.CollectionItem);
                                 }
                             });
                         _il.Snippets.InvokeMethod(_visitorVariable, Members.VisitorLeave, collectionParameter, Members.VisitArgsCollectionInCollection);
@@ -195,7 +197,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private ILCodeParameter GetContentVisitArgs(ExtendedType type, LevelType level)
+        private ILCodeParameter GetContentVisitArgs(WrappedType type, LevelType level)
         {
             if (!type.IsValueOrNullableOfValue()) {
                 if (type.Class == TypeClass.Dictionary) {

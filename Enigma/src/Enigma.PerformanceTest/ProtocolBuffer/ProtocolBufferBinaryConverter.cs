@@ -1,12 +1,7 @@
-﻿using System.Collections.Concurrent;
-using System.Runtime.InteropServices;
-using Enigma.Binary;
+﻿using Enigma.Binary;
 using Enigma.Modelling;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ProtoBuf.Meta;
 
 namespace Enigma.ProtocolBuffer
@@ -106,5 +101,22 @@ namespace Enigma.ProtocolBuffer
         {
             Convert((T)value, buffer, offset);
         }
+
+        public void Convert(T value, BinaryBuffer buffer)
+        {
+            byte[] data;
+            using (var stream = new MemoryStream())
+            {
+                _typeModel.Serialize(stream, value);
+                data = stream.ToArray();
+            }
+            buffer.Write(data, 0, data.Length);
+        }
+
+        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        {
+            Convert((T)value, buffer);
+        }
+
     }
 }

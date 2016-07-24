@@ -60,15 +60,25 @@ namespace Enigma.Binary.Converters
             buffer[offset] = value ? (byte) 1 : (byte) 0;
         }
 
-        public void Convert(object value, byte[] buffer)
+        void IBinaryConverter.Convert(object value, byte[] buffer)
         {
             Convert((Boolean)value, buffer, 0);
         }
 
-        public void Convert(object value, byte[] buffer, int offset)
+        void IBinaryConverter.Convert(object value, byte[] buffer, int offset)
         {
             Convert((Boolean)value, buffer, offset);
         }
 
+        public void Convert(bool value, BinaryBuffer buffer)
+        {
+            var offset = buffer.Advance(1);
+            Convert(value, buffer.Buffer, offset);
+        }
+
+        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        {
+            Convert((Boolean) value, buffer);
+        }
     }
 }

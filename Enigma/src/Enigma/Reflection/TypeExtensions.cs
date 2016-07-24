@@ -19,27 +19,29 @@ namespace Enigma.Reflection
                 return new ArrayContainerTypeInfo(elementType, ranks);
             }
 
+            var typeInfo = type.GetTypeInfo();
             if (type.GetTypeInfo().IsGenericType) {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 if (genericTypeDefinition == DictionaryType) {
-                    var arguments = type.GetGenericArguments();
+                    var arguments = typeInfo.GetGenericArguments();
                     return new DictionaryContainerTypeInfo(arguments[0], arguments[1]);
                 }
 
                 if (genericTypeDefinition == CollectionType)
-                    return new CollectionContainerTypeInfo(type.GetGenericArguments()[0]);
+                    return new CollectionContainerTypeInfo(typeInfo.GetGenericArguments()[0]);
 
                 if (genericTypeDefinition == NullableType)
-                    return new NullableContainerTypeInfo(type, type.GetGenericArguments()[0]);
+                    return new NullableContainerTypeInfo(type, typeInfo.GetGenericArguments()[0]);
             }
 
-            var interfaceTypes = type.GetInterfaces();
+            var interfaceTypes = typeInfo.GetInterfaces();
             foreach (var interfaceType in interfaceTypes.Where(interfaceType => interfaceType.GetTypeInfo().IsGenericType)) {
                 var genericTypeDefinition = interfaceType.GetGenericTypeDefinition();
+                var interfaceTypeInfo = interfaceType.GetTypeInfo();
                 if (genericTypeDefinition == CollectionType)
-                    return new CollectionContainerTypeInfo(interfaceType.GetGenericArguments()[0]);
+                    return new CollectionContainerTypeInfo(interfaceTypeInfo.GetGenericArguments()[0]);
                 if (genericTypeDefinition == DictionaryType) {
-                    var arguments = interfaceType.GetGenericArguments();
+                    var arguments = interfaceTypeInfo.GetGenericArguments();
                     return new DictionaryContainerTypeInfo(arguments[0], arguments[1]);
                 }
             }

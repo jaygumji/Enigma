@@ -12,8 +12,9 @@ namespace Enigma.Reflection
         public NullableContainerTypeInfo(Type type, Type elementType)
         {
             _elementType = elementType;
-            _constructor = new Lazy<ConstructorInfo>(() => type.GetConstructor(new[] {elementType}));
-            _getHasValueMethod = new Lazy<MethodInfo>(() => type.GetProperty("HasValue").GetGetMethod());
+            var typeInfo = type.GetTypeInfo();
+            _constructor = new Lazy<ConstructorInfo>(() => typeInfo.GetConstructor(new[] {elementType}));
+            _getHasValueMethod = new Lazy<MethodInfo>(() => typeInfo.GetProperty("HasValue").GetGetMethod());
         }
 
         public Type ElementType { get { return _elementType; } }

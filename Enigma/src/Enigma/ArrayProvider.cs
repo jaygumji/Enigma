@@ -9,7 +9,7 @@ namespace Enigma
 
         public static T[] ToArray<T>(ICollection<T> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             if (collection.Count == 0) return new T[0];
 
@@ -20,7 +20,7 @@ namespace Enigma
 
         public static T[,] To2DArray<T>(ICollection<ICollection<T>> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             var size0 = collection.Count;
             if (size0 == 0) return new T[0,0];
@@ -47,7 +47,7 @@ namespace Enigma
 
         public static T[,,] To3DArray<T>(ICollection<ICollection<ICollection<T>>> collection)
         {
-            if (collection == null) throw new ArgumentNullException("collection");
+            if (collection == null) throw new ArgumentNullException(nameof(collection));
 
             var size0 = collection.Count;
             if (size0 == 0) return new T[0, 0, 0];

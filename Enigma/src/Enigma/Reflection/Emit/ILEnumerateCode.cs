@@ -16,8 +16,8 @@ namespace Enigma.Reflection.Emit
 
         static ILEnumerateCode()
         {
-            EnumeratorMoveNext = typeof(IEnumerator).GetMethod("MoveNext");
-            DisposableDispose = typeof(IDisposable).GetMethod("Dispose");
+            EnumeratorMoveNext = typeof(IEnumerator).GetTypeInfo().GetMethod("MoveNext");
+            DisposableDispose = typeof(IDisposable).GetTypeInfo().GetMethod("Dispose");
         }
 
         public ILEnumerateCode(ILCodeParameter enumerable, Action<ILExpressed, ILCodeVariable> iterateBody)
@@ -38,7 +38,7 @@ namespace Enigma.Reflection.Emit
             il.Var.Load(_enumerable);
 
             var enumerableType = typeof(IEnumerable<>).MakeGenericType(elementType);
-            var getEnumeratorMethod = enumerableType.GetMethod("GetEnumerator");
+            var getEnumeratorMethod = enumerableType.GetTypeInfo().GetMethod("GetEnumerator");
             il.CallVirt(getEnumeratorMethod);
 
             var enumeratorType = typeof(IEnumerator<>).MakeGenericType(elementType);
@@ -51,7 +51,7 @@ namespace Enigma.Reflection.Emit
             var itBodyLabel = il.DefineLabel();
             il.TransferLong(itHeadLabel);
             var itVarLocal = il.DeclareLocal("cv", elementType);
-            var getCurrentMethod = enumeratorType.GetProperty("Current").GetGetMethod();
+            var getCurrentMethod = enumeratorType.GetTypeInfo().GetProperty("Current").GetGetMethod();
             il.MarkLabel(itBodyLabel);
             il.Var.Load(itLocal);
             il.Call(getCurrentMethod);

@@ -26,7 +26,7 @@ namespace Enigma.Serialization.Reflection.Emit
             _type = type;
             _constructorBuilder = _classBuilder.DefineConstructor(typeof(IVisitArgsFactory));
             _constructorBuilder.IL.Var.Load(_constructorBuilder.IL.Var.This());
-            _constructorBuilder.IL.CallBaseConstructor(typeof(object).GetConstructor(new Type[] { }));
+            _constructorBuilder.IL.CallBaseConstructor(typeof(object).GetTypeInfo().GetConstructor(new Type[] { }));
             //_constructorBuilder.IL.Return();
 
             _travelWriteMethod = _classBuilder.DefineOverloadMethod("Travel", typeof(void), new[] { typeof(IWriteVisitor), _type });

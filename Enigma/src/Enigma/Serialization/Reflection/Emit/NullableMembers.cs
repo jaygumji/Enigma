@@ -15,9 +15,11 @@ namespace Enigma.Serialization.Reflection.Emit
         public NullableMembers(Type elementType)
         {
             NullableType = NullableTypeDefinition.MakeGenericType(elementType);
-            Constructor = NullableType.GetConstructor(new[] { elementType });
-            GetHasValue = NullableType.GetProperty("HasValue").GetGetMethod();
-            GetValue = NullableType.GetProperty("Value").GetGetMethod();
+
+            var typeInfo = NullableType.GetTypeInfo();
+            Constructor = typeInfo.GetConstructor(new[] { elementType });
+            GetHasValue = typeInfo.GetProperty("HasValue").GetGetMethod();
+            GetValue = typeInfo.GetProperty("Value").GetGetMethod();
         }
     }
 }

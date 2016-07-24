@@ -1,0 +1,45 @@
+﻿using System;
+using Enigma.Data.Tracking;
+using Enigma.Db.Modelling;
+
+namespace Enigma.Db
+{
+    public class EnigmaUnitOfWork : IEnigmaUnitOfWork, IDisposable
+    {
+        private readonly IEnigmaConnection _connection;
+        private readonly EntityChangeTracker _changeTracker;
+        private readonly EnigmaSchemaModel _model;
+        private readonly IBinaryConverterProvider _binaryConverterProvider;
+
+        public EnigmaUnitOfWork(IEnigmaConnection connection)
+        {
+            _connection = connection;
+        }
+
+        protected virtual void OnModelBuilding(IEnigmaSchemaModelBuilder modelBuilder)
+        {
+        }
+
+        public void CommitChanges()
+        {
+            var cmd = _connection.CreateCommand();
+            foreach (var entry in _changeTracker.Entries) {
+                var entityBinaryConverter = _binaryConverterProvider.Get(entry.EntityType);
+                var schema = _model.SchemaFor(entry.EntityType);
+
+                if (entry.State == EntityState.New)
+                    cmd.Add(schema.Name, buffer => entityBinaryConverter.EntityConverter.Convert(entry.Entity, buffer));
+                else if (entry.State == EntityState.Modified)
+                    cmd.Modify(schema.Name, buffer => entityBinaryConverter.EntityConverter.Convert(entry.Entity, buffer));
+                else
+                    cmd.Remove(schema.Name, buffer => entityBinaryConverter.KeyConverter.Convert(entry.Key, buffer));
+            }
+            (cmd as IDisposable)?.Dispose();
+        }
+
+        public void Dispose()
+        {
+            (_connection as IDisposable)?.Dispose();
+        }
+    }
+}

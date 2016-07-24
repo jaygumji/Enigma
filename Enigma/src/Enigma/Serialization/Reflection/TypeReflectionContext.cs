@@ -19,18 +19,18 @@ namespace Enigma.Serialization.Reflection
 
         private readonly Type _type;
         private readonly Lazy<IList<PropertyReflectionContext>> _properties;
-        private readonly ExtendedType _extended;
+        private readonly WrappedType _extended;
 
         private TypeReflectionContext(Type type)
         {
             _type = type;
-            _extended = type.Extend();
+            _extended = type.Wrap();
             _properties = new Lazy<IList<PropertyReflectionContext>>(() => ParseProperties(type));
         }
 
         private static IList<PropertyReflectionContext> ParseProperties(Type type)
         {
-            var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+            var properties = type.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(p => p.CanRead && p.CanWrite)
                 .Select(p => new PropertyReflectionContext(p))
                 .ToList();
@@ -43,7 +43,7 @@ namespace Enigma.Serialization.Reflection
         }
 
         public Type Type { get { return _type; } }
-        public ExtendedType Extended { get { return _extended; } }
+        public WrappedType Extended { get { return _extended; } }
         public IEnumerable<PropertyReflectionContext> SerializableProperties { get { return _properties.Value; } }
 
     }

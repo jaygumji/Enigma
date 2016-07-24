@@ -34,7 +34,6 @@ namespace Enigma.Binary
         }
 
         public byte[] Buffer => _buffer;
-        public int Position => _position;
         private bool HasReservations => _firstReservation != null;
 
         public void RequestSpace(int length)
@@ -147,13 +146,15 @@ namespace Enigma.Binary
             _position += length;
         }
 
-        public void Advance(int length)
+        public int Advance(int length)
         {
             if (_isDisposed)
                 throw new ObjectDisposedException("BufferPool");
 
             RequestSpace(length);
+            var position = _position;
             _position += length;
+            return position;
         }
 
         public void Dispose()

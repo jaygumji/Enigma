@@ -65,14 +65,26 @@ namespace Enigma.Binary.Converters
             Encoding.GetBytes(value, 0, value.Length, buffer, offset);
         }
 
-        public void Convert(object value, byte[] buffer)
+        void IBinaryConverter.Convert(object value, byte[] buffer)
         {
             Convert((String)value, buffer, 0);
         }
 
-        public void Convert(object value, byte[] buffer, int offset)
+        void IBinaryConverter.Convert(object value, byte[] buffer, int offset)
         {
             Convert((String)value, buffer, offset);
+        }
+
+        public void Convert(String value, BinaryBuffer buffer)
+        {
+            var length = Encoding.GetByteCount(value);
+            var offset = buffer.Advance(length);
+            Convert(value, buffer.Buffer, offset);
+        }
+
+        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        {
+            Convert((String)value, buffer);
         }
 
     }
