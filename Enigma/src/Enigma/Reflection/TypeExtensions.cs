@@ -11,12 +11,12 @@ namespace Enigma.Reflection
         public static readonly Type DictionaryType = typeof (IDictionary<,>);
         public static readonly Type NullableType = typeof (Nullable<>);
 
-        public static IContainerTypeInfo GetContainerTypeInfo(this Type type)
+        public static IContainerTypeInfo GetContainerTypeInfo(this Type type, ITypeProvider provider)
         {
             if (type.IsArray) {
                 var ranks = type.GetArrayRank();
                 var elementType = type.GetElementType();
-                return new ArrayContainerTypeInfo(elementType, ranks);
+                return new ArrayContainerTypeInfo(elementType, ranks, provider);
             }
 
             var typeInfo = type.GetTypeInfo();
@@ -24,14 +24,14 @@ namespace Enigma.Reflection
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 if (genericTypeDefinition == DictionaryType) {
                     var arguments = typeInfo.GetGenericArguments();
-                    return new DictionaryContainerTypeInfo(arguments[0], arguments[1]);
+                    return new DictionaryContainerTypeInfo(arguments[0], arguments[1], provider);
                 }
 
                 if (genericTypeDefinition == CollectionType)
-                    return new CollectionContainerTypeInfo(typeInfo.GetGenericArguments()[0]);
+                    return new CollectionContainerTypeInfo(typeInfo.GetGenericArguments()[0], provider);
 
                 if (genericTypeDefinition == NullableType)
-                    return new NullableContainerTypeInfo(type, typeInfo.GetGenericArguments()[0]);
+                    return new NullableContainerTypeInfo(type, typeInfo.GetGenericArguments()[0], provider);
             }
 
             var interfaceTypes = typeInfo.GetInterfaces();
@@ -39,10 +39,10 @@ namespace Enigma.Reflection
                 var genericTypeDefinition = interfaceType.GetGenericTypeDefinition();
                 var interfaceTypeInfo = interfaceType.GetTypeInfo();
                 if (genericTypeDefinition == CollectionType)
-                    return new CollectionContainerTypeInfo(interfaceTypeInfo.GetGenericArguments()[0]);
+                    return new CollectionContainerTypeInfo(interfaceTypeInfo.GetGenericArguments()[0], provider);
                 if (genericTypeDefinition == DictionaryType) {
                     var arguments = interfaceTypeInfo.GetGenericArguments();
-                    return new DictionaryContainerTypeInfo(arguments[0], arguments[1]);
+                    return new DictionaryContainerTypeInfo(arguments[0], arguments[1], provider);
                 }
             }
 

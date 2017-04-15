@@ -9,7 +9,7 @@ namespace Enigma.Serialization.Reflection.Emit
     public class DynamicReadTravellerBuilder
     {
 
-        private static readonly DynamicReadTravellerMembers Members = new DynamicReadTravellerMembers();
+        private static readonly DynamicReadTravellerMembers Members = new DynamicReadTravellerMembers(FactoryTypeProvider.Instance);
 
         private readonly SerializableType _target;
         private readonly TravellerContext _context;
@@ -153,7 +153,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private ILCodeParameter GenerateCollectionContent(WrappedType target, string refName)
+        private ILCodeParameter GenerateCollectionContent(ExtendedType target, string refName)
         {
             var collectionMembers = new CollectionMembers(target);
             var isValueType = collectionMembers.ElementType.GetTypeInfo().IsValueType;
@@ -232,7 +232,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
         private LocalILCodeVariable GenerateDictionaryEnumerateCode(Type type, string refName)
         {
-            var extType = _il.TypeCache.Extend(type);
+            var extType = _il.Provider.Extend(type);
             var dictionaryMembers = new DictionaryMembers(extType);
 
             var local = _il.DeclareLocal("dictionary", dictionaryMembers.VariableType);
@@ -245,7 +245,7 @@ namespace Enigma.Serialization.Reflection.Emit
             var conditionLabel = _il.DefineLabel();
             var bodyLabel = _il.DefineLabel();
             var keyType = Members.Nullable.TryGetValue(dictionaryMembers.KeyType, out keyNullableMembers) ? keyNullableMembers.NullableType : dictionaryMembers.KeyType;
-            var keyTypeExt = _il.TypeCache.Extend(keyType);
+            var keyTypeExt = _il.Provider.Extend(keyType);
 
             // First of all, transfer to the condition part
             _il.TransferLong(conditionLabel);
@@ -279,7 +279,7 @@ namespace Enigma.Serialization.Reflection.Emit
             NullableMembers valueNullableMembers;
             var hasNullableMembers = Members.Nullable.TryGetValue(dictionaryMembers.ValueType, out valueNullableMembers);
             var valueType = dictionaryMembers.ValueType;
-            var extValueType = valueType.Wrap();
+            var extValueType = _il.Provider.Extend(valueType);
 
             if (extValueType.IsValueOrNullableOfValue()) {
                 var loadTrueLabel = _il.DefineLabel();
@@ -316,7 +316,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 _il.Snippets.AreEqual(callTryVisit, (int)ValueState.Found);
                 _il.TransferLongIfFalse(throwExceptionLabel);
 
-                valueParam = GenerateCollectionContent(_il.TypeCache.Extend(valueType), refName);
+                valueParam = GenerateCollectionContent(_il.Provider.Extend(valueType), refName);
 
                 _il.Snippets.InvokeMethod(_visitorVariable, Members.VisitorLeave, Members.VisitArgsCollectionInDictionaryValue);
             }
@@ -402,7 +402,7 @@ namespace Enigma.Serialization.Reflection.Emit
         private void GenerateLoadParamValueCode(ILCodeParameter param)
         {
             var type = param.ParameterType;
-            var extType = type.Wrap();
+            var extType = _il.Provider.Extend(type);
             if (extType.Class == TypeClass.Nullable)
                 type = extType.Container.AsNullable().ElementType;
 

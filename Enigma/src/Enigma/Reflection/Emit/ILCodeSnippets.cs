@@ -58,10 +58,10 @@ namespace Enigma.Reflection.Emit
         public void AsNullable(Type type)
         {
             if (type.GetTypeInfo().IsEnum) {
-                type = _il.TypeCache.Extend(type).GetUnderlyingEnumType();
+                type = _il.Provider.Extend(type).GetUnderlyingEnumType();
             }
 
-            var container = _il.TypeCache.Extend(type.AsNullable())
+            var container = _il.Provider.Extend(type.AsNullable())
                 .Container.AsNullable();
 
             _il.Construct(container.Constructor);

@@ -21,7 +21,7 @@ namespace Enigma.Modelling
         {
             _uniqueName = uniqueName;
 
-            var extendedValueType = new WrappedType(valueType);
+            var extendedValueType = new ExtendedType(valueType);
             switch (extendedValueType.Class) {
                 case TypeClass.Complex:
                     throw new ArgumentException("Only values is accepted as an index");

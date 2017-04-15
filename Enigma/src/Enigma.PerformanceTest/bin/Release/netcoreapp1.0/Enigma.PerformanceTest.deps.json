@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v1.0": {
-      "Enigma.PerformanceTest/1.0.0": {
+      "enigma.performancetest/1.0.0": {
         "dependencies": {
           "Enigma": "0.1.0",
           "Enigma.Db.Embedded": "0.1.0",
@@ -25,22 +25,22 @@
           "lib/netstandard1.5/protobuf-net.dll": {}
         }
       },
-      "System.Runtime.Serialization.Primitives/4.1.1": {
+      "system.runtime.serialization.primitives/4.1.1": {
         "runtime": {
           "lib/netstandard1.3/System.Runtime.Serialization.Primitives.dll": {}
         }
       },
-      "System.Xml.XmlSerializer/4.0.11": {
+      "system.xml.xmlserializer/4.0.11": {
         "runtime": {
           "lib/netstandard1.3/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Enigma/0.1.0": {
+      "enigma/0.1.0": {
         "runtime": {
           "Enigma.dll": {}
         }
       },
-      "Enigma.Db.Embedded/0.1.0": {
+      "enigma.db.embedded/0.1.0": {
         "dependencies": {
           "Enigma": "0.1.0"
         },
@@ -51,7 +51,7 @@
     }
   },
   "libraries": {
-    "Enigma.PerformanceTest/1.0.0": {
+    "enigma.performancetest/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -59,24 +59,30 @@
     "protobuf-net/2.1.0": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-8ijiRUzGcB9SYo2ohIujk5s93MeaXF+/xd9WBGCgS1SqQyOC5gUTnCKIXZPlf8a6UROkK70McJloL4P19IvghQ=="
+      "sha512": "sha512-8ijiRUzGcB9SYo2ohIujk5s93MeaXF+/xd9WBGCgS1SqQyOC5gUTnCKIXZPlf8a6UROkK70McJloL4P19IvghQ==",
+      "path": "protobuf-net/2.1.0",
+      "hashPath": "protobuf-net.2.1.0.nupkg.sha512"
     },
-    "System.Runtime.Serialization.Primitives/4.1.1": {
+    "system.runtime.serialization.primitives/4.1.1": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-HZ6Du5QrTG8MNJbf4e4qMO3JRAkIboGT5Fk804uZtg3Gq516S7hAqTm2UZKUHa7/6HUGdVy3AqMQKbns06G/cg=="
+      "sha512": "sha512-HZ6Du5QrTG8MNJbf4e4qMO3JRAkIboGT5Fk804uZtg3Gq516S7hAqTm2UZKUHa7/6HUGdVy3AqMQKbns06G/cg==",
+      "path": "system.runtime.serialization.primitives/4.1.1",
+      "hashPath": "system.runtime.serialization.primitives.4.1.1.nupkg.sha512"
     },
-    "System.Xml.XmlSerializer/4.0.11": {
+    "system.xml.xmlserializer/4.0.11": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-FrazwwqfIXTfq23mfv4zH+BjqkSFNaNFBtjzu3I9NRmG8EELYyrv/fJnttCIwRMFRR/YKXF1hmsMmMEnl55HGw=="
+      "sha512": "sha512-FrazwwqfIXTfq23mfv4zH+BjqkSFNaNFBtjzu3I9NRmG8EELYyrv/fJnttCIwRMFRR/YKXF1hmsMmMEnl55HGw==",
+      "path": "system.xml.xmlserializer/4.0.11",
+      "hashPath": "system.xml.xmlserializer.4.0.11.nupkg.sha512"
     },
-    "Enigma/0.1.0": {
+    "enigma/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
     },
-    "Enigma.Db.Embedded/0.1.0": {
+    "enigma.db.embedded/0.1.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

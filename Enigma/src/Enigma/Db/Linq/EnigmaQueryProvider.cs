@@ -41,7 +41,8 @@ namespace Enigma.Db.Linq
 
         public TResult Execute<TResult>(Expression expression)
         {
-            return (TResult)_executor.Execute(expression, typeof(TResult).Wrap().Class == TypeClass.Collection);
+            return (TResult)_executor.Execute(expression,
+                FactoryTypeProvider.Instance.Extend(typeof(TResult)).Class == TypeClass.Collection);
         }
     }
 

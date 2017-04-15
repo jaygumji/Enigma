@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Runtime.Serialization;
 using System.Linq;
 using System;
 using System.Reflection;
@@ -65,20 +62,20 @@ namespace Enigma.Modelling
                     var propertyMap = (IPropertyMap)Activator.CreateInstance(genericPropertyMapType, property, propertyIndex);
                     propertyMappings.Add(property.Name, propertyMap);
 
-                    var extended = new WrappedType(property.PropertyType);
+                    var extended = new ExtendedType(property.PropertyType);
                     if (extended.Class == TypeClass.Collection) {
                         var collectionInfo = extended.Container.AsCollection();
-                        var extendedElementType = new WrappedType(collectionInfo.ElementType);
+                        var extendedElementType = new ExtendedType(collectionInfo.ElementType);
                         if (extendedElementType.Class == TypeClass.Complex)
                             relationTypes.Add(collectionInfo.ElementType);
                     }
                     else if (extended.Class == TypeClass.Dictionary) {
                         var dictionaryInfo = extended.Container.AsDictionary();
-                        var extendedKeyType = new WrappedType(dictionaryInfo.KeyType);
+                        var extendedKeyType = new ExtendedType(dictionaryInfo.KeyType);
                         if (extendedKeyType.Class == TypeClass.Complex)
                             relationTypes.Add(dictionaryInfo.KeyType);
 
-                        var extendedValueType = new WrappedType(dictionaryInfo.ValueType);
+                        var extendedValueType = new ExtendedType(dictionaryInfo.ValueType);
                         if (extendedValueType.Class == TypeClass.Complex)
                             relationTypes.Add(dictionaryInfo.ValueType);
                     }

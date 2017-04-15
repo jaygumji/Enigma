@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Enigma.Serialization;
 using Enigma.Serialization.Reflection;
 using Enigma.Testing.Fakes.Entities;
+using Enigma.Reflection;
 
 namespace Enigma.Test.Serialization.HardCoded
 {
@@ -371,7 +372,9 @@ namespace Enigma.Test.Serialization.HardCoded
 
         public static DataBlockHardCodedTraveller Create()
         {
-            var factory = new VisitArgsFactory(new SerializableTypeProvider(new SerializationReflectionInspector()), typeof(DataBlock));
+            var factory = new VisitArgsFactory(new SerializableTypeProvider(
+                new SerializationReflectionInspector(),
+                FactoryTypeProvider.Instance), typeof(DataBlock));
             return new DataBlockHardCodedTraveller(factory);
         }
     }

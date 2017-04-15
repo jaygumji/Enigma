@@ -10,24 +10,11 @@ namespace Enigma.Test.Db.Linq
 {
     public class FakeEnigmaQueryableSet<T> : IQueryableSet<T>
     {
-        public Type ElementType
-        {
-            get {
-                return typeof(T);
-            }
-        }
+        public Type ElementType => typeof(T);
 
-        public Expression Expression
-        {
-            get {
-                return Expression.Constant(this);
-            }
-        }
+        public Expression Expression => Expression.Constant(this);
 
-        public IQueryProvider Provider
-        {
-            get { return new EnigmaQueryProvider(new FakeEnigmaQueryExecutor()); }
-        }
+        public IQueryProvider Provider => new EnigmaQueryProvider(new FakeEnigmaQueryExecutor());
 
         public void Add(T entity)
         {

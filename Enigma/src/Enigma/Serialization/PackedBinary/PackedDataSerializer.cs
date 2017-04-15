@@ -8,7 +8,7 @@ namespace Enigma.Serialization.PackedBinary
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
-        public PackedDataSerializer() : this(new BinaryBufferFactory())
+        public PackedDataSerializer() : this(new BinaryBufferPoolFactory())
         {
         } 
 

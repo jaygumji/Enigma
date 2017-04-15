@@ -34,12 +34,12 @@
         /// <summary>
         /// Represents an empty data size
         /// </summary>
-        public static readonly DataSize Empty = new DataSize(-long.MaxValue);
+        public static readonly DataSize Zero = new DataSize(0);
 
         /// <summary>
         /// Whether this instance is empty
         /// </summary>
-        public bool IsEmpty { get { return Value == -long.MaxValue; } }
+        public bool IsZero { get { return Value == 0; } }
 
         /// <summary>
         /// Creates a new instance of <see cref="DataSize"/>
@@ -140,6 +140,56 @@
         public static DataSize FromBytes(byte[] value)
         {
             return new DataSize(value.Length);
+        }
+
+        public static bool operator==(DataSize left, DataSize right)
+        {
+            return left.Value == right.Value;
+        }
+
+        public static bool operator !=(DataSize left, DataSize right)
+        {
+            return left.Value != right.Value;
+        }
+
+        public static bool operator >(DataSize left, DataSize right)
+        {
+            return left.Value > right.Value;
+        }
+
+        public static bool operator <(DataSize left, DataSize right)
+        {
+            return left.Value < right.Value;
+        }
+
+        public static bool operator >=(DataSize left, DataSize right)
+        {
+            return left.Value >= right.Value;
+        }
+
+        public static bool operator <=(DataSize left, DataSize right)
+        {
+            return left.Value <= right.Value;
+        }
+
+        public static DataSize operator +(DataSize left, DataSize right)
+        {
+            return new DataSize(left.Value + right.Value);
+        }
+
+        public static DataSize operator -(DataSize left, DataSize right)
+        {
+            return new DataSize(left.Value - right.Value);
+        }
+
+        public static DataSize operator *(DataSize left, DataSize right)
+        {
+            return new DataSize(left.Value * right.Value);
+        }
+
+        public static DataSize operator /(DataSize left, DataSize right)
+        {
+            return new DataSize(left.Value / right.Value);
         }
 
     }

@@ -6,7 +6,7 @@ namespace Enigma.Reflection
     {
         private readonly int _ranks;
 
-        public ArrayContainerTypeInfo(Type elementType, int ranks) : base(elementType)
+        public ArrayContainerTypeInfo(Type elementType, int ranks, ITypeProvider provider) : base(elementType, provider)
         {
             _ranks = ranks;
         }

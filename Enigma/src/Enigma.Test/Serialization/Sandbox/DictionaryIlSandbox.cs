@@ -1,6 +1,7 @@
 ﻿using System;
 using Enigma.Reflection.Emit;
 using Enigma.Serialization;
+using Enigma.Reflection;
 
 namespace Enigma.Test.Serialization.Sandbox
 {
@@ -12,7 +13,7 @@ namespace Enigma.Test.Serialization.Sandbox
 
         public DictionaryIlSandbox()
         {
-            _assemblyBuilder = new AssemblyBuilder();
+            _assemblyBuilder = new AssemblyBuilder(new CachedTypeProvider());
             _classBuilder = _assemblyBuilder.DefineClass("SandboxClass", typeof(object), Type.EmptyTypes);
             _methodBuilder = _classBuilder.DefineMethod("Execute", typeof(void), new [] {typeof(IReadVisitor), typeof(Fakes.ValueDictionary)});
 

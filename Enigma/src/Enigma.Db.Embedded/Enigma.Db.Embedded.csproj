@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Enigma Embedded Database Engine</Description>
+    <VersionPrefix>0.1.0</VersionPrefix>
+    <Authors>Johan Johnsson</Authors>
+    <TargetFramework>netstandard1.6</TargetFramework>
+    <AssemblyName>Enigma.Db.Embedded</AssemblyName>
+    <PackageId>Enigma.Db.Embedded</PackageId>
+    <PackageTags>Serialization;IL;Lock</PackageTags>
+    <PackageProjectUrl>https://github.com/Jaygumji/Enigma</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/jaygumji/Enigma/master/LICENSE</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Enigma\Enigma.csproj" />
+  </ItemGroup>
+
+</Project>

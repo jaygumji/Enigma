@@ -11,6 +11,7 @@ using Enigma.Test.Serialization.Fakes;
 using Enigma.Test.Serialization.HardCoded;
 using Enigma.Testing.Fakes.Entities;
 using Xunit;
+using Enigma.Reflection;
 
 namespace Enigma.Test.Serialization
 {
@@ -20,7 +21,7 @@ namespace Enigma.Test.Serialization
 
         public SerializationTestContext()
         {
-            _travellerContext = new DynamicTravellerContext(new SerializableTypeProvider(new SerializationReflectionInspector()));
+            _travellerContext = new DynamicTravellerContext(new SerializableTypeProvider(new SerializationReflectionInspector(), FactoryTypeProvider.Instance));
         }
 
         public IGraphTraveller<T> CreateTraveller<T>()

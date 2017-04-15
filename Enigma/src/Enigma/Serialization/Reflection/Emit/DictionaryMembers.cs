@@ -14,7 +14,7 @@ namespace Enigma.Serialization.Reflection.Emit
         public readonly MethodInfo Add;
         public readonly ConstructorInfo Constructor;
 
-        public DictionaryMembers(WrappedType dictionaryType)
+        public DictionaryMembers(ExtendedType dictionaryType)
         {
             var container = dictionaryType.Container.AsDictionary();
             KeyType = container.KeyType;

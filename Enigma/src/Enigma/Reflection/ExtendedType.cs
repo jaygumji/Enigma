@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Enigma.Reflection
 {
-    public class WrappedType
+    public class ExtendedType
     {
         private static readonly IList<Type> SystemValueClasses = new[] {
             typeof (DateTime), typeof (String), typeof (TimeSpan), typeof(Guid), typeof(Decimal), typeof(byte[])
@@ -13,12 +13,18 @@ namespace Enigma.Reflection
         private readonly Lazy<IContainerTypeInfo> _containerTypeInfo;
         private readonly Lazy<TypeClass> _class;
 
-        public WrappedType(Type type)
+        public ExtendedType(Type type) : this(type, FactoryTypeProvider.Instance)
+        {
+
+        }
+
+        public ExtendedType(Type type, ITypeProvider provider)
         {
             Ref = type;
             Info = type.GetTypeInfo();
-            _containerTypeInfo = new Lazy<IContainerTypeInfo>(type.GetContainerTypeInfo);
+            _containerTypeInfo = new Lazy<IContainerTypeInfo>(() => type.GetContainerTypeInfo(provider));
             _class = new Lazy<TypeClass>(() => GetTypeClass(type, _containerTypeInfo.Value));
+            Provider = provider;
         }
 
         public Type Ref { get; }
@@ -27,11 +33,14 @@ namespace Enigma.Reflection
         public IContainerTypeInfo Container => _containerTypeInfo.Value;
         public bool ImplementsCollection => Class == TypeClass.Collection || Class == TypeClass.Dictionary;
 
+        public ITypeProvider Provider { get; }
+
         public bool IsValueOrNullableOfValue()
         {
             if (Class == TypeClass.Value) return true;
             if (Class != TypeClass.Nullable) return false;
-            return Container.AsNullable().ElementType.Wrap().Class == TypeClass.Value;
+            var elementExt = Provider.Extend(Container.AsNullable().ElementType);
+            return elementExt.Class == TypeClass.Value;
         }
 
         public bool IsEnum()

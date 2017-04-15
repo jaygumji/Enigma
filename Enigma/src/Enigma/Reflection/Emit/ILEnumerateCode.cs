@@ -28,7 +28,7 @@ namespace Enigma.Reflection.Emit
 
         void IILCode.Generate(ILExpressed il)
         {
-            var variableType = il.TypeCache.Extend(_enumerable.ParameterType);
+            var variableType = il.Provider.Extend(_enumerable.ParameterType);
             var collectionContainer = variableType.Container.AsCollection();
 
             if (collectionContainer == null)

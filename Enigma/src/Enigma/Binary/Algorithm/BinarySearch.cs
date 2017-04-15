@@ -14,23 +14,36 @@ namespace Enigma.Binary.Algorithm
             return Search<T>(list, 0, list.Count, value, Comparer<T>.Default);
         }
 
-        public static int Search<T>(IList<T> list, int startIndex, int lengthToSearch, T value, IComparer<T> comparer)
+        public static int Search<T>(IList<T> list, int index, int length, T value, IComparer<T> comparer)
         {
-            if (list == null) throw new ArgumentNullException("list");
+            if (list == null) throw new ArgumentNullException(nameof(list));
 
-            if (startIndex < 0)
+            if (index < 0)
                 throw new ArgumentOutOfRangeException();
 
-            if (lengthToSearch < 0 || list.Count - startIndex < lengthToSearch)
-                throw new ArgumentException("Invalid lengthToSearch, must be a valid length between startIndex and the count of the list");
+            if (length < 0 || list.Count - index < length)
+                throw new ArgumentException("Invalid length, must be a valid length between index and the size of the list");
 
             if (comparer == null) comparer = Comparer<T>.Default;
 
-            int left = startIndex;
-            int right = startIndex + lengthToSearch - 1;
-            while (left <= right) {
+            return Search<T>(idx => list[idx], index, length, value, comparer);
+        }
+
+        public static int Search<T>(Func<int, T> valueAccessor, int index, int length, T value, IComparer<T> comparer)
+        {
+            if (valueAccessor == null) throw new ArgumentNullException(nameof(valueAccessor));
+
+            if (index < 0)
+                throw new ArgumentOutOfRangeException();
+
+            if (comparer == null) comparer = Comparer<T>.Default;
+
+            int left = index;
+            int right = index + length - 1;
+            while (left <= right)
+            {
                 int median = left + (right - left >> 1);
-                var compareResult = comparer.Compare(list[median], value);
+                var compareResult = comparer.Compare(valueAccessor.Invoke(median), value);
                 if (compareResult == 0) return median;
 
                 if (compareResult < 0)
@@ -41,6 +54,6 @@ namespace Enigma.Binary.Algorithm
 
             return ~left;
         }
-
     }
+
 }

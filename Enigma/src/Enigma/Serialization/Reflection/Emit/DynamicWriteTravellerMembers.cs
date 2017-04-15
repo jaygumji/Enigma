@@ -32,7 +32,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
         public readonly MethodInfo ArrayGetLength;
 
-        public DynamicWriteTravellerMembers()
+        public DynamicWriteTravellerMembers(ITypeProvider provider)
         {
             var visitArgsType = typeof (VisitArgs);
             var visitArgsTypeInfo = visitArgsType.GetTypeInfo();
@@ -58,7 +58,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 .Where(m => m.Name == "VisitValue")) {
 
                 var valueType = method.GetParameters()[0].ParameterType;
-                var valueTypeExt = valueType.Wrap();
+                var valueTypeExt = provider.Extend(valueType);
 
                 VisitorVisitValue.Add(valueType, method);
                 if (valueTypeExt.Class == TypeClass.Nullable) {

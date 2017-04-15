@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Enigma.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -6,15 +7,17 @@ namespace Enigma.Serialization.Reflection
 {
     public class SerializableTypeProvider
     {
-        private readonly SerializationReflectionInspector _inspector;
         private const BindingFlags PropertyFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
-        private readonly Dictionary<Type, SerializableType> _types; 
+        private readonly SerializationReflectionInspector _inspector;
+        private readonly Dictionary<Type, SerializableType> _types;
+        public ITypeProvider Provider { get; }
 
-        public SerializableTypeProvider(SerializationReflectionInspector inspector)
+        public SerializableTypeProvider(SerializationReflectionInspector inspector, ITypeProvider provider)
         {
             _inspector = inspector;
             _types = new Dictionary<Type, SerializableType>();
+            Provider = provider;
         }
 
         public SerializableType GetOrCreate(Type type)
@@ -42,7 +45,7 @@ namespace Enigma.Serialization.Reflection
 
                 var metadata = _inspector.AcquirePropertyMetadata(type, property, ref nextIndex);
                 
-                var ser = new SerializableProperty(property, metadata);
+                var ser = new SerializableProperty(property, metadata, Provider);
                 serializableProperties.Add(property.Name, ser);
             }
             return new SerializableType(type, serializableProperties);

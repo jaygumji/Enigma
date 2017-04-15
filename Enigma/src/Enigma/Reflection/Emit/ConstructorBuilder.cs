@@ -8,10 +8,10 @@ namespace Enigma.Reflection.Emit
         private readonly System.Reflection.Emit.ConstructorBuilder _builder;
         private readonly ILExpressed _il;
 
-        public ConstructorBuilder(System.Reflection.Emit.ConstructorBuilder builder)
+        public ConstructorBuilder(System.Reflection.Emit.ConstructorBuilder builder, ITypeProvider provider)
         {
             _builder = builder;
-            _il = new ILExpressed(builder.GetILGenerator());
+            _il = new ILExpressed(builder.GetILGenerator(), provider);
         }
 
         public ILExpressed IL { get { return _il; } }

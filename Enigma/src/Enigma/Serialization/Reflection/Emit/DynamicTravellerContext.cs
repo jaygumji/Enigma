@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Enigma.Reflection.Emit;
+using Enigma.Reflection;
 
 namespace Enigma.Serialization.Reflection.Emit
 {
@@ -10,7 +11,8 @@ namespace Enigma.Serialization.Reflection.Emit
         private readonly Dictionary<Type, DynamicTraveller> _travellers;
         private readonly AssemblyBuilder _assemblyBuilder;
 
-        public DynamicTravellerContext() : this(new SerializableTypeProvider(new SerializationReflectionInspector()))
+        public DynamicTravellerContext() : this(
+            new SerializableTypeProvider(new SerializationReflectionInspector(), new CachedTypeProvider()))
         {
         }
 
@@ -18,7 +20,7 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             _typeProvider = typeProvider;
             _travellers = new Dictionary<Type, DynamicTraveller>();
-            _assemblyBuilder = new AssemblyBuilder();
+            _assemblyBuilder = new AssemblyBuilder(typeProvider.Provider);
             Members = new DynamicTravellerMembers();
         }
 

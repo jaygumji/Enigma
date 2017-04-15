@@ -1,22 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{64C09DED-14DD-49C0-B3D0-529548E50DDE}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{615F55BF-E9A1-49AE-85E5-BBB73E305C36}"
-	ProjectSection(SolutionItems) = preProject
-		global.json = global.json
-	EndProjectSection
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Enigma", "src\Enigma\Enigma.xproj", "{4979C2C2-0149-49FA-93CC-9777527972AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enigma", "src\Enigma\Enigma.csproj", "{4979C2C2-0149-49FA-93CC-9777527972AF}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Enigma.Db.Embedded", "src\Enigma.Db.Embedded\Enigma.Db.Embedded.xproj", "{B0B3AFDE-967A-4A58-8CC8-E702863EAA1E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enigma.Db.Embedded", "src\Enigma.Db.Embedded\Enigma.Db.Embedded.csproj", "{B0B3AFDE-967A-4A58-8CC8-E702863EAA1E}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Enigma.PerformanceTest", "src\Enigma.PerformanceTest\Enigma.PerformanceTest.xproj", "{320DD957-53CD-46EF-B3AF-FA62D75A5144}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enigma.PerformanceTest", "src\Enigma.PerformanceTest\Enigma.PerformanceTest.csproj", "{320DD957-53CD-46EF-B3AF-FA62D75A5144}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Enigma.Test", "src\Enigma.Test\Enigma.Test.xproj", "{73B58B64-6BCA-44AB-9B63-7A4B164FB1F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Enigma.Test", "src\Enigma.Test\Enigma.Test.csproj", "{73B58B64-6BCA-44AB-9B63-7A4B164FB1F8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

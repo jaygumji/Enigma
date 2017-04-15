@@ -10,37 +10,28 @@ namespace Enigma.Reflection.Emit
         private static readonly MethodInfo MethodGetTypeFromHandleToken =
             typeof (Type).GetTypeInfo().GetMethod("GetTypeFromHandle", new[] {typeof (RuntimeTypeHandle)});
 
-        private readonly ILGenerator _il;
-        private readonly TypeCache _typeCache;
-        private readonly ILCodeSnippets _snippets;
-        private readonly ILCodeVariableGenerator _var;
-
-        public ILExpressed(ILGenerator il) : this(il, new TypeCache())
+        public ILExpressed(ILGenerator il, ITypeProvider provider)
         {
+            Gen = il;
+            Provider = provider;
+            Snippets = new ILCodeSnippets(this);
+            Var = new ILCodeVariableGenerator(this);
         }
 
-        public ILExpressed(ILGenerator il, TypeCache typeCache)
-        {
-            _il = il;
-            _typeCache = typeCache;
-            _snippets = new ILCodeSnippets(this);
-            _var = new ILCodeVariableGenerator(this);
-        }
-
-        public ILGenerator Gen { get { return _il; } }
-        public TypeCache TypeCache { get { return _typeCache; } }
-        public ILCodeSnippets Snippets { get { return _snippets; } }
-        public ILCodeVariableGenerator Var { get { return _var; } }
+        public ILGenerator Gen { get; }
+        public ITypeProvider Provider { get; }
+        public ILCodeSnippets Snippets { get; }
+        public ILCodeVariableGenerator Var { get; }
 
         public void LoadValue(int value)
         {
             OpCode opCode;
             if (OpCodesLookups.LoadInt32.TryGetValue(value, out opCode)) {
-                _il.Emit(opCode);
+                Gen.Emit(opCode);
                 return;
             }
 
-            _il.Emit(OpCodes.Ldc_I4_S, value);
+            Gen.Emit(OpCodes.Ldc_I4_S, value);
         }
 
         public void LoadValue(bool value)
@@ -55,32 +46,32 @@ namespace Enigma.Reflection.Emit
 
         public void LoadValue(string value)
         {
-            _il.Emit(OpCodes.Ldstr, value);
+            Gen.Emit(OpCodes.Ldstr, value);
         }
 
         public void Call(MethodInfo method)
         {
-            _il.EmitCall(OpCodes.Call, method, null);
+            Gen.EmitCall(OpCodes.Call, method, null);
         }
 
         public void CallVirt(MethodInfo method)
         {
-            _il.EmitCall(OpCodes.Callvirt, method, null);
+            Gen.EmitCall(OpCodes.Callvirt, method, null);
         }
 
         public void CallBaseConstructor(ConstructorInfo constructor)
         {
-            _il.Emit(OpCodes.Call, constructor);
+            Gen.Emit(OpCodes.Call, constructor);
         }
 
         public void Return()
         {
-            _il.Emit(OpCodes.Ret);
+            Gen.Emit(OpCodes.Ret);
         }
 
         public void Cast(Type type)
         {
-            _il.Emit(OpCodes.Castclass, type);
+            Gen.Emit(OpCodes.Castclass, type);
         }
 
         public LocalILCodeVariable DeclareLocal(string name, Type type)
@@ -93,70 +84,70 @@ namespace Enigma.Reflection.Emit
             //    index = 0;
             //    _locals.Add(name, index);
             //}
-            var local = _il.DeclareLocal(type);
+            var local = Gen.DeclareLocal(type);
             return local;
         }
 
         public Label DefineLabel()
         {
-            return _il.DefineLabel();
+            return Gen.DefineLabel();
         }
 
         public void MarkLabel(Label label)
         {
-            _il.MarkLabel(label);
+            Gen.MarkLabel(label);
         }
 
         public Label DefineAndMarkLabel()
         {
-            var label = _il.DefineLabel();
-            _il.MarkLabel(label);
+            var label = Gen.DefineLabel();
+            Gen.MarkLabel(label);
             return label;
         }
 
         public void LoadField(FieldInfo field)
         {
-            _il.Emit(OpCodes.Ldfld, field);
+            Gen.Emit(OpCodes.Ldfld, field);
         }
 
         public void LoadStaticField(FieldInfo field)
         {
-            _il.Emit(OpCodes.Ldsfld, field);
+            Gen.Emit(OpCodes.Ldsfld, field);
         }
 
         public void TransferLong(Label label)
         {
-            _il.Emit(OpCodes.Br, label);
+            Gen.Emit(OpCodes.Br, label);
         }
 
         public void TransferLongIfFalse(Label label)
         {
-            _il.Emit(OpCodes.Brfalse, label);
+            Gen.Emit(OpCodes.Brfalse, label);
         }
 
         public void TransferLongIfTrue(Label label)
         {
-            _il.Emit(OpCodes.Brtrue, label);
+            Gen.Emit(OpCodes.Brtrue, label);
         }
 
         public void TransferShort(Label label)
         {
-            _il.Emit(OpCodes.Br_S, label);
+            Gen.Emit(OpCodes.Br_S, label);
         }
 
         public void TransferShortIfFalse(Label label)
         {
-            _il.Emit(OpCodes.Brfalse_S, label);
+            Gen.Emit(OpCodes.Brfalse_S, label);
         }
 
         public void TransferShortIfTrue(Label label)
         {
-            _il.Emit(OpCodes.Brtrue_S, label);
+            Gen.Emit(OpCodes.Brtrue_S, label);
         }
 
         public void TransferIfNull(ILCodeVariable reference, Label label)
         {
-            _var.Load(reference);
+            Var.Load(reference);
             LoadNull();
             CompareEquals();
             TransferLongIfTrue(label);
@@ -164,7 +155,7 @@ namespace Enigma.Reflection.Emit
 
         public void TransferIfNotNull(ILCodeVariable reference, Label label)
         {
-            _var.Load(reference);
+            Var.Load(reference);
             LoadNull();
             CompareEquals();
             TransferLongIfFalse(label);
@@ -172,66 +163,66 @@ namespace Enigma.Reflection.Emit
 
         public Label Try()
         {
-            return _il.BeginExceptionBlock();
+            return Gen.BeginExceptionBlock();
         }
 
         public void Catch(Type exceptionType)
         {
-            _il.BeginCatchBlock(exceptionType);
+            Gen.BeginCatchBlock(exceptionType);
         }
 
         public void Finally()
         {
-            _il.BeginFinallyBlock();
+            Gen.BeginFinallyBlock();
         }
 
         public void EndTry()
         {
-            _il.EndExceptionBlock();
+            Gen.EndExceptionBlock();
         }
 
         public void LoadNull()
         {
-            _il.Emit(OpCodes.Ldnull);
+            Gen.Emit(OpCodes.Ldnull);
         }
 
         public void CompareEquals()
         {
-            _il.Emit(OpCodes.Ceq);
+            Gen.Emit(OpCodes.Ceq);
         }
 
         public void SetField(FieldInfo field, IILCode value)
         {
             LoadThis();
             value.Generate(this);
-            _il.Emit(OpCodes.Stfld, field);
+            Gen.Emit(OpCodes.Stfld, field);
         }
 
         public void SetFieldWithDefaultConstructor(FieldInfo field, ConstructorInfo constructor)
         {
             LoadThis();
-            _il.Emit(OpCodes.Newobj, constructor);
-            _il.Emit(OpCodes.Stfld, field);
+            Gen.Emit(OpCodes.Newobj, constructor);
+            Gen.Emit(OpCodes.Stfld, field);
         }
 
         public void LoadThis()
         {
-            _il.Emit(OpCodes.Ldarg_0);
+            Gen.Emit(OpCodes.Ldarg_0);
         }
 
         public void Construct(ConstructorInfo constructor)
         {
-            _il.Emit(OpCodes.Newobj, constructor);
+            Gen.Emit(OpCodes.Newobj, constructor);
         }
 
         public void Constrained(Type type)
         {
-            _il.Emit(OpCodes.Constrained, type);
+            Gen.Emit(OpCodes.Constrained, type);
         }
 
         public void Throw()
         {
-            _il.Emit(OpCodes.Throw);
+            Gen.Emit(OpCodes.Throw);
         }
 
         public void Generate(IILCode code)
@@ -247,7 +238,7 @@ namespace Enigma.Reflection.Emit
 
         public void LoadRef(Type type)
         {
-            _il.Emit(OpCodes.Ldtoken, type);
+            Gen.Emit(OpCodes.Ldtoken, type);
             Call(MethodGetTypeFromHandleToken);
         }
 

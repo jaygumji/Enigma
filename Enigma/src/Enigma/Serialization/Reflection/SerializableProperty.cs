@@ -7,13 +7,13 @@ namespace Enigma.Serialization.Reflection
     {
         private readonly PropertyInfo _ref;
         private readonly SerializationMetadata _metadata;
-        private readonly WrappedType _ext;
+        private readonly ExtendedType _ext;
 
-        public SerializableProperty(PropertyInfo @ref, SerializationMetadata metadata)
+        public SerializableProperty(PropertyInfo @ref, SerializationMetadata metadata, ITypeProvider provider)
         {
             _ref = @ref;
             _metadata = metadata;
-            _ext = _ref.PropertyType.Wrap();
+            _ext = provider.Extend(_ref.PropertyType);
         }
 
         public PropertyInfo Ref
@@ -26,7 +26,7 @@ namespace Enigma.Serialization.Reflection
             get { return _metadata; }
         }
 
-        public WrappedType Ext
+        public ExtendedType Ext
         {
             get { return _ext; }
         }

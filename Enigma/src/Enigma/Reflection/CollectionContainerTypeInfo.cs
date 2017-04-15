@@ -4,16 +4,19 @@ namespace Enigma.Reflection
 {
     public class CollectionContainerTypeInfo : IContainerTypeInfo
     {
-        private readonly Type _elementType;
         private readonly Lazy<Type> _collectionInterfaceType;
 
-        public CollectionContainerTypeInfo(Type elementType)
+        public CollectionContainerTypeInfo(Type elementType, ITypeProvider provider)
         {
-            _elementType = elementType;
+            ElementType = elementType;
             _collectionInterfaceType = new Lazy<Type>(() => TypeExtensions.CollectionType.MakeGenericType(elementType));
+            Provider = provider;
         }
 
-        public Type ElementType { get { return _elementType; } }
-        public Type CollectionInterfaceType { get { return _collectionInterfaceType.Value; } }
+        protected ITypeProvider Provider { get; }
+
+        public Type ElementType { get; }
+        public ExtendedType ElementTypeExt => Provider.Extend(ElementType);
+        public Type CollectionInterfaceType => _collectionInterfaceType.Value;
     }
 }

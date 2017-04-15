@@ -8,7 +8,7 @@ namespace Enigma.Serialization.Reflection.Emit
 {
     public class DynamicWriteTravellerBuilder
     {
-        private static readonly DynamicWriteTravellerMembers Members = new DynamicWriteTravellerMembers();
+        private static readonly DynamicWriteTravellerMembers Members = new DynamicWriteTravellerMembers(FactoryTypeProvider.Instance);
 
         private readonly ILCodeVariable _visitorVariable;
         private readonly SerializableType _target;
@@ -111,7 +111,7 @@ namespace Enigma.Serialization.Reflection.Emit
         private void GenerateEnumerateContentCode(ILCodeParameter valueParam, LevelType level)
         {
             var type = valueParam.ParameterType;
-            var extType = _il.TypeCache.Extend(type);
+            var extType = _il.Provider.Extend(type);
 
             var visitArgs = GetContentVisitArgs(extType, level);
 
@@ -162,7 +162,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private void GenerateEnumerateCollectionContentCode(WrappedType target, ILCodeParameter collectionParameter)
+        private void GenerateEnumerateCollectionContentCode(ExtendedType target, ILCodeParameter collectionParameter)
         {
             ArrayContainerTypeInfo arrayTypeInfo;
             if (target.TryGetArrayTypeInfo(out arrayTypeInfo) && arrayTypeInfo.Ranks > 1) {
@@ -197,7 +197,7 @@ namespace Enigma.Serialization.Reflection.Emit
             }
         }
 
-        private ILCodeParameter GetContentVisitArgs(WrappedType type, LevelType level)
+        private ILCodeParameter GetContentVisitArgs(ExtendedType type, LevelType level)
         {
             if (!type.IsValueOrNullableOfValue()) {
                 if (type.Class == TypeClass.Dictionary) {

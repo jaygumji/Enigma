@@ -15,13 +15,13 @@ namespace Enigma.Reflection
             return result;
         } 
 
-        public static void Resolve(Type type, string path, Action<PropertyInfo, WrappedType> action)
+        public static void Resolve(Type type, string path, Action<PropertyInfo, ExtendedType> action)
         {
             var propertyNames = path.Split('.');
             var containerType = type;
             foreach (var propertyName in propertyNames) {
                 var property = containerType.GetTypeInfo().GetProperty(propertyName);
-                var extendedPropertyType = new WrappedType(property.PropertyType);
+                var extendedPropertyType = new ExtendedType(property.PropertyType);
 
                 containerType = extendedPropertyType.Class == TypeClass.Collection
                     ? extendedPropertyType.Container.AsCollection().ElementType

@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Enigma
 {
-    public class ArrayProvider
+    public static class ArrayProvider
     {
 
         public static T[] ToArray<T>(ICollection<T> collection)

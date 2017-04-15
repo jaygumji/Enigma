@@ -8,10 +8,10 @@ namespace Enigma.Reflection.Emit
         private readonly System.Reflection.Emit.MethodBuilder _methodBuilder;
         private readonly ILExpressed _il;
 
-        public MethodBuilder(System.Reflection.Emit.MethodBuilder methodBuilder)
+        public MethodBuilder(System.Reflection.Emit.MethodBuilder methodBuilder, ITypeProvider provider)
         {
             _methodBuilder = methodBuilder;
-            _il = new ILExpressed(_methodBuilder.GetILGenerator());
+            _il = new ILExpressed(_methodBuilder.GetILGenerator(), provider);
         }
 
         public MethodInfo Method { get { return _methodBuilder; } }

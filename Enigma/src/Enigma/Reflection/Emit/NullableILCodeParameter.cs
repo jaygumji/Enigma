@@ -28,7 +28,7 @@ namespace Enigma.Reflection.Emit
 
             if (!type.GetTypeInfo().IsValueType) return;
 
-            var ext = il.TypeCache.Extend(type);
+            var ext = il.Provider.Extend(type);
             if (ext.Class == TypeClass.Nullable) return;
 
             il.Snippets.AsNullable(type);

@@ -32,7 +32,7 @@ namespace Enigma.Serialization.Reflection.Emit
         
         public readonly MethodInfo ExceptionNoDictionaryValue;
 
-        public DynamicReadTravellerMembers()
+        public DynamicReadTravellerMembers(ITypeProvider provider)
         {
             var visitArgsType = typeof(VisitArgs).GetTypeInfo();
 
@@ -58,7 +58,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 var valueType = method.GetParameters()[1].ParameterType;
                 if (valueType.IsByRef) valueType = valueType.GetElementType();
-                var valueTypeExt = valueType.Wrap();
+                var valueTypeExt = provider.Extend(valueType);
 
                 VisitorTryVisitValue.Add(valueType, method);
                 if (valueTypeExt.Class == TypeClass.Nullable) {

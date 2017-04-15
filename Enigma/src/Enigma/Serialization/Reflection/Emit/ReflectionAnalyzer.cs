@@ -7,23 +7,23 @@ namespace Enigma.Serialization.Reflection.Emit
     public static class ReflectionAnalyzer
     {
 
-        public static bool TryGetComplexTypes(WrappedType type, out Type[] types)
+        public static bool TryGetComplexTypes(ExtendedType type, out Type[] types)
         {
             if (type.Class == TypeClass.Complex) {
                 types = new[] { type.Ref };
                 return true;
             }
             if (type.Class == TypeClass.Nullable) {
-                var elementType = type.Container.AsNullable().ElementType.Wrap();
+                var elementType = type.Container.AsNullable().ElementTypeExt;
                 return TryGetComplexTypes(elementType, out types);
             }
             if (type.Class == TypeClass.Dictionary) {
                 var container = type.Container.AsDictionary();
                 Type[] keyTypes;
-                var hasKeyTypes = TryGetComplexTypes(container.KeyType.Wrap(), out keyTypes);
+                var hasKeyTypes = TryGetComplexTypes(container.KeyTypeExt, out keyTypes);
 
                 Type[] valueTypes;
-                var hasValueTypes = TryGetComplexTypes(container.ValueType.Wrap(), out valueTypes);
+                var hasValueTypes = TryGetComplexTypes(container.ValueTypeExt, out valueTypes);
 
                 if (!hasKeyTypes && !hasValueTypes) {
                     types = null;
@@ -37,7 +37,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 return true;
             }
             if (type.Class == TypeClass.Collection) {
-                var elementType = type.Container.AsCollection().ElementType.Wrap();
+                var elementType = type.Container.AsCollection().ElementTypeExt;
                 return TryGetComplexTypes(elementType, out types);
             }
 

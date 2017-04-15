@@ -12,10 +12,10 @@ namespace Enigma.Serialization.Reflection.Emit
         public readonly Type ElementType;
         public readonly MethodInfo Add;
         public readonly ConstructorInfo Constructor;
-        public readonly WrappedType ElementTypeExt;
+        public readonly ExtendedType ElementTypeExt;
         public readonly MethodInfo ToArray;
 
-        public CollectionMembers(WrappedType collectionType)
+        public CollectionMembers(ExtendedType collectionType)
         {
             ArrayContainerTypeInfo arrayTypeInfo;
             if (collectionType.TryGetArrayTypeInfo(out arrayTypeInfo)) {
@@ -39,7 +39,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 ElementType = collectionType.Container.AsCollection().ElementType;
             }
 
-            ElementTypeExt = ElementType.Wrap();
+            ElementTypeExt = collectionType.Provider.Extend(ElementType);
             VariableType = typeof (ICollection<>).MakeGenericType(ElementType);
 
             Add = VariableType.GetTypeInfo().GetMethod("Add", new[] { ElementType });

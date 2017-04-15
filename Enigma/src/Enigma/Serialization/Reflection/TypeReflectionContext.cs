@@ -12,27 +12,27 @@ namespace Enigma.Serialization.Reflection
 
         private static readonly ConcurrentDictionary<Type, TypeReflectionContext> Cache = new ConcurrentDictionary<Type, TypeReflectionContext>();
 
-        public static TypeReflectionContext Get(Type type)
+        public static TypeReflectionContext Get(Type type, ITypeProvider provider)
         {
-            return Cache.GetOrAdd(type, t => new TypeReflectionContext(t));
+            return Cache.GetOrAdd(type, t => new TypeReflectionContext(t, provider));
         }
 
         private readonly Type _type;
         private readonly Lazy<IList<PropertyReflectionContext>> _properties;
-        private readonly WrappedType _extended;
+        private readonly ExtendedType _extended;
 
-        private TypeReflectionContext(Type type)
+        private TypeReflectionContext(Type type, ITypeProvider provider)
         {
             _type = type;
-            _extended = type.Wrap();
-            _properties = new Lazy<IList<PropertyReflectionContext>>(() => ParseProperties(type));
+            _extended = provider.Extend(type);
+            _properties = new Lazy<IList<PropertyReflectionContext>>(() => ParseProperties(type, provider));
         }
 
-        private static IList<PropertyReflectionContext> ParseProperties(Type type)
+        private static IList<PropertyReflectionContext> ParseProperties(Type type, ITypeProvider provider)
         {
             var properties = type.GetTypeInfo().GetProperties(BindingFlags.Instance | BindingFlags.Public)
                 .Where(p => p.CanRead && p.CanWrite)
-                .Select(p => new PropertyReflectionContext(p))
+                .Select(p => new PropertyReflectionContext(p, provider))
                 .ToList();
 
             uint index = 0;
@@ -43,7 +43,7 @@ namespace Enigma.Serialization.Reflection
         }
 
         public Type Type { get { return _type; } }
-        public WrappedType Extended { get { return _extended; } }
+        public ExtendedType Extended { get { return _extended; } }
         public IEnumerable<PropertyReflectionContext> SerializableProperties { get { return _properties.Value; } }
 
     }
@@ -53,10 +53,10 @@ namespace Enigma.Serialization.Reflection
         private readonly PropertyInfo _property;
         private readonly TypeReflectionContext _propertyTypeContext;
 
-        public PropertyReflectionContext(PropertyInfo property)
+        public PropertyReflectionContext(PropertyInfo property, ITypeProvider provider)
         {
             _property = property;
-            _propertyTypeContext = TypeReflectionContext.Get(property.PropertyType);
+            _propertyTypeContext = TypeReflectionContext.Get(property.PropertyType, provider);
         }
 
         public TypeReflectionContext PropertyTypeContext
