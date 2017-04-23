@@ -1,0 +1,9 @@
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\bin\Debug\netstandard1.6\Enigma.Db.Embedded.deps.json
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\bin\Debug\netstandard1.6\Enigma.Db.Embedded.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\bin\Debug\netstandard1.6\Enigma.Db.Embedded.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\bin\Debug\netstandard1.6\Enigma.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\bin\Debug\netstandard1.6\Enigma.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Debug\netstandard1.6\Enigma.Db.Embedded.csprojResolveAssemblyReference.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Debug\netstandard1.6\Enigma.Db.Embedded.AssemblyInfo.cs
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Debug\netstandard1.6\Enigma.Db.Embedded.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Debug\netstandard1.6\Enigma.Db.Embedded.pdb

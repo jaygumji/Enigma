@@ -40,6 +40,11 @@ namespace Enigma.Reflection.Emit
             return new MethodArgILCodeVariable(index, argType);
         }
 
+        public ArrayElementILCodeVariable ArrayElement(ILCodeParameter array, int index)
+        {
+            return new ArrayElementILCodeVariable(array, index);
+        }
+
         public MethodArgILCodeVariable This()
         {
             return ThisInstance;

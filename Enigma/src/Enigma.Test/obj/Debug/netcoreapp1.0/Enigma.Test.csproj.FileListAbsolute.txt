@@ -1,0 +1,16 @@
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Test.deps.json
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Test.runtimeconfig.json
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Test.runtimeconfig.dev.json
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Test.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Test.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Db.Embedded.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\Enigma.Db.Embedded.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Debug\netcoreapp1.0\Enigma.Test.csprojResolveAssemblyReference.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Debug\netcoreapp1.0\Enigma.Test.AssemblyInfo.cs
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Debug\netcoreapp1.0\Enigma.Test.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Debug\netcoreapp1.0\Enigma.Test.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\xunit.runner.utility.netstandard15.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Debug\netcoreapp1.0\xunit.runner.reporters.netstandard15.dll

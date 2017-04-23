@@ -1,0 +1,7 @@
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\bin\Debug\netstandard1.6\Enigma.deps.json
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\bin\Debug\netstandard1.6\Enigma.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\bin\Debug\netstandard1.6\Enigma.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard1.6\Enigma.AssemblyInfo.cs
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard1.6\Enigma.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard1.6\Enigma.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard1.6\Enigma.csprojResolveAssemblyReference.cache

@@ -36,8 +36,8 @@ namespace Enigma.Serialization
 
         public object Deserialize(IReadVisitor visitor, Type type)
         {
-            if (visitor == null) throw new ArgumentNullException("visitor");
-            if (type == null) throw new ArgumentNullException("type");
+            if (visitor == null) throw new ArgumentNullException(nameof(visitor));
+            if (type == null) throw new ArgumentNullException(nameof(type));
 
             var args = VisitArgs.Root(type.Name);
             if (visitor.TryVisit(args) != ValueState.Found)

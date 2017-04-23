@@ -1,6 +1,4 @@
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll
-C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\xunit.runner.utility.dotnet.dll
-C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\xunit.runner.reporters.dotnet.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\Enigma.Test.deps.json
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\Enigma.Test.runtimeconfig.json
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\Enigma.Test.runtimeconfig.dev.json
@@ -14,3 +12,5 @@ C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Release\netcoreapp1.0\Eni
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Release\netcoreapp1.0\Enigma.Test.AssemblyInfo.cs
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Release\netcoreapp1.0\Enigma.Test.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\obj\Release\netcoreapp1.0\Enigma.Test.pdb
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\xunit.runner.utility.netstandard15.dll
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Test\bin\Release\netcoreapp1.0\xunit.runner.reporters.netstandard15.dll
