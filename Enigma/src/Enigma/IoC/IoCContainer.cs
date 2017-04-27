@@ -1,19 +1,27 @@
-﻿using System;
+﻿using Enigma.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 
 namespace Enigma.IoC
 {
     public class IoCContainer : IServiceLocator
     {
 
+        private static readonly AsyncLocal<IoCScope> ScopeLocal = new AsyncLocal<IoCScope>();
+
         private readonly Dictionary<Type, IIoCRegistration> _registrations;
         private readonly IoCFactory _factory;
 
-        public IoCContainer()
+        public IoCContainer() : this(new CachedTypeProvider())
+        {
+        }
+
+        public IoCContainer(ITypeProvider provider)
         {
             _registrations = new Dictionary<Type, IIoCRegistration>();
-            _factory = new IoCFactory(_registrations);
+            _factory = new IoCFactory(_registrations, provider);
         }
 
         public void Register<T>(T singleton)
@@ -105,7 +113,22 @@ namespace Enigma.IoC
 
         public T GetInstance<T>()
         {
-            return (T) _factory.GetInstance(typeof(T));
+            var type = typeof(T);
+            var scope = ScopeLocal.Value;
+            if (scope != null && scope.TryGetInstance(type, out object instance)) {
+                return (T)instance;
+            }
+            var newInstance = (T) _factory.GetInstance(type);
+            if (scope != null) {
+                if (TryGetRegistration(type, out IIoCRegistration registration)) {
+                    if (!registration.CanBeScoped) return newInstance;
+                    scope.Register(registration, newInstance);
+                }
+                else {
+                    scope.Register(newInstance);
+                }
+            }
+            return newInstance;
         }
 
         public IIoCRegistration GetRegistration(Type type)
@@ -126,11 +149,42 @@ namespace Enigma.IoC
         {
             if (_registrations.TryGetValue(type, out IIoCRegistration registration)) {
                 instance = registration.GetInstance();
+                if (!registration.CanBeScoped) return true;
+
+                ScopeLocal.Value?.Register(registration, instance);
                 return true;
             }
 
             instance = null;
             return false;
+        }
+
+        public IoCScope BeginScope()
+        {
+            var scope = new IoCScope(this, ScopeLocal.Value);
+            ScopeLocal.Value = scope;
+            return scope;
+        }
+
+        public void EndScope(IoCScope scope)
+        {
+            var storedScope = ScopeLocal.Value;
+            IoCScope childScope = null;
+            while (storedScope != null && !ReferenceEquals(storedScope, scope)) {
+                childScope = storedScope;
+                storedScope = storedScope.Parent;
+            }
+
+            if (storedScope == null) {
+                throw new ArgumentException("The scope could not be found in the scope chain");
+            }
+
+            if (childScope != null) {
+                childScope.Reroute(storedScope.Parent);
+            }
+            else {
+                ScopeLocal.Value = storedScope.Parent;
+            }
         }
     }
 }

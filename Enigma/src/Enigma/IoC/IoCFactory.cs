@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Enigma.Reflection;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -10,14 +11,16 @@ namespace Enigma.IoC
     {
         private readonly IDictionary<Type, IIoCRegistration> _registrations;
         private readonly IDictionary<Type, IInstanceFactory> _typeFactories;
+        private readonly ITypeProvider _provider;
 
-        public IoCFactory(IDictionary<Type, IIoCRegistration> registrations)
+        public IoCFactory(IDictionary<Type, IIoCRegistration> registrations, ITypeProvider provider)
         {
             _registrations = registrations;
             _typeFactories = new Dictionary<Type, IInstanceFactory>();
+            _provider = provider;
         }
 
-        private IInstanceFactory GetFactory(Type type, bool throwError)
+        public IInstanceFactory GetFactory(Type type, bool throwError)
         {
             if (_typeFactories.TryGetValue(type, out IInstanceFactory factory)) {
                 return factory;
@@ -62,30 +65,62 @@ namespace Enigma.IoC
             var constructor = constructors[0];
 
             var parameters = constructor.GetParameters();
+            var paramLength = parameters.Length;
 
-            var factoryParams = new object[parameters.Length+1];
-            var factoryTypes = new Type[parameters.Length+1];
+            var properties = info.GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(p => p.CanWrite && _registrations.ContainsKey(p.PropertyType))
+                .ToArray();
+
+            paramLength += properties.Length;
+
+            var factoryParams = new object[paramLength > 0 ? paramLength+2 : 1];
+            var factoryTypes = new Type[paramLength+1];
             factoryTypes[0] = type;
             factoryParams[0] = constructor;
-            
+
+            if (paramLength > 0) {
+                factoryParams[1] = properties;
+            }
+
             for (var i = 0; i < parameters.Length; i++) {
                 var parameter = parameters[i];
                 var paramFactory = GetFactory(parameter.ParameterType, throwError);
                 if (paramFactory == null) return null;
-                factoryParams[i+1] = paramFactory;
+                factoryParams[i+2] = paramFactory;
                 factoryTypes[i+1] = parameter.ParameterType;
             }
+            
+            if (properties.Length > 0) {
+                var paramIndex = parameters.Length+1;
+                for (var i = 0; i < properties.Length; i++) {
+                    var propertyType = properties[i].PropertyType;
+                    factoryParams[paramIndex + 1] = GetFactory(propertyType, throwError);
+                    factoryTypes[paramIndex++] = propertyType;
+                }
+            }
 
-            var factoryType = GetFactoryType(factoryTypes);
+            var factoryType = GetFactoryType(factoryTypes, out bool useDynamic);
             var factoryConstructor = factoryType.GetTypeInfo().GetConstructors()[0];
-            factory = (IInstanceFactory) factoryConstructor.Invoke(factoryParams);
+
+            if (useDynamic) {
+                factory = (IInstanceFactory)factoryConstructor.Invoke(new object[] {
+                    constructor,
+                    properties,
+                    _provider,
+                    factoryParams.OfType<IInstanceFactory>().ToArray()
+                });
+            }
+            else {
+                factory = (IInstanceFactory)factoryConstructor.Invoke(factoryParams);
+            }
             _typeFactories.Add(type, factory);
 
             return factory;
         }
 
-        private Type GetFactoryType(Type[] types)
+        private Type GetFactoryType(Type[] types, out bool useDynamic)
         {
+            useDynamic = false;
             switch (types.Length) {
                 case 1:
                     return typeof(InstanceFactory<>).MakeGenericType(types);
@@ -122,7 +157,8 @@ namespace Enigma.IoC
                 case 17:
                     return typeof(InstanceFactory<,,,,,,,,,,,,,,,,>).MakeGenericType(types);
             }
-            return typeof(DynamicMethodInstanceFactory<>).MakeGenericType(types[0]);
+            useDynamic = true;
+            return typeof(DynamicActivatorInstanceFactory<>).MakeGenericType(types[0]);
         }
 
         public object GetInstance(Type type)

@@ -15,18 +15,33 @@ namespace Enigma
 
         public Type Type { get; }
 
-        public DynamicActivator(Type type, ConstructorInfo constructor)
-            : this(type, constructor, new FactoryTypeProvider())
+        public DynamicActivator(Type type, params Type[] parameterTypes)
+            : this(type.GetTypeInfo().GetConstructor(parameterTypes))
         {
         }
 
-        public DynamicActivator(Type type, ConstructorInfo constructor, ITypeProvider provider)
+        public DynamicActivator(Type type, ITypeProvider provider, params Type[] parameterTypes)
+            : this(type.GetTypeInfo().GetConstructor(parameterTypes), provider)
         {
-            Type = type ?? throw new ArgumentNullException(nameof(type));
+        }
+
+        public DynamicActivator(ConstructorInfo constructor)
+            : this(constructor, new FactoryTypeProvider())
+        {
+        }
+
+        public DynamicActivator(ConstructorInfo constructor, ITypeProvider provider)
+        {
             if (constructor == null) throw new ArgumentNullException(nameof(constructor));
             if (provider == null) throw new ArgumentNullException(nameof(provider));
+            Type = constructor.DeclaringType;
 
-            var methodName = "D$Activator$" + type.FullName.Replace(".", "_");
+            var methodName = string.Concat(
+                "D$Activator$",
+                Type.FullName.Replace(".", "_"),
+                "$",
+                constructor.GetParameters().Length,
+                Guid.NewGuid());
             var method = new DynamicMethod(methodName, typeof(object), DynConstructorTypes);
 
             var il = method.GetILGenerator();

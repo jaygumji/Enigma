@@ -1,6 +1,8 @@
-﻿namespace Enigma.Test.IoC.Fakes
+﻿using Enigma.Test.Fakes.IoC;
+
+namespace Enigma.Test.IoC.Fakes
 {
-    public class Core
+    public class Core : Command
     {
         private readonly CoreConfig _config;
         private readonly ICoreCalculator _calculator;
@@ -15,8 +17,11 @@
 
         public int Calculate(int x, int y, int z)
         {
+            Initializer?.Init(this);
+            Events?.PreRun(this, _config.Delta);
             var value = _calculator.Calculate(_config.Delta, x, y, z);
             _validator.Validate(value);
+            Events?.PostRun(this, value);
             return value;
         }
 

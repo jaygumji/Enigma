@@ -88,6 +88,9 @@ namespace Enigma.Reflection.Emit
             else if (VariableType == typeof(double)) {
                 il.Gen.Emit(OpCodes.Stelem_R8);
             }
+            else {
+                il.Gen.Emit(OpCodes.Stelem, VariableType);
+            }
         }
 
         protected override void OnGetAddress(ILExpressed il)

@@ -3,68 +3,65 @@ using System.Collections.Generic;
 
 namespace Enigma.IoC
 {
-    public class IoCScope : IServiceLocator, IDisposable
+    public class IoCScope : IDisposable
     {
 
-        private List<IoCScopedInstance> _instances;
+        private Dictionary<Type, IoCScopedInstance> _instances;
 
-        public IoCScope(IoCContainer container)
+        public IoCScope(IoCContainer container, IoCScope parent)
         {
             Container = container;
-            _instances = new List<IoCScopedInstance>();
+            Parent = parent;
+            _instances = new Dictionary<Type, IoCScopedInstance>();
         }
 
         public IoCContainer Container { get; }
+        public IoCScope Parent { get; private set; }
 
-        public T GetInstance<T>()
+        public int InstanceCount => _instances.Count;
+
+        public void Reroute(IoCScope parent)
         {
-            var registration = Container.GetRegistration(typeof(T));
-            var instance = (T)registration.GetInstance();
-
-            if (registration.CanBeScoped) {
-                _instances.Add(new IoCScopedInstance(registration, instance));
-            }
-
-            return instance;
+            Parent = parent;
         }
 
         public void Dispose()
         {
             if (_instances != null) {
-                foreach (var instance in _instances) {
-                    instance.Registration.Unload(instance.Instance);
+                foreach (var instance in _instances.Values) {
+                    if (instance.Registration != null) {
+                        instance.Registration.Unload(instance.Instance);
+                    }
+                    else {
+                        (instance.Instance as IDisposable)?.Dispose();
+                    }
                 }
 
                 _instances = null;
             }
+            Container.EndScope(this);
         }
 
-        public object GetInstance(Type type)
+        public void Register(IIoCRegistration registration, object instance)
         {
-            var registration = Container.GetRegistration(type);
-            var instance = registration.GetInstance();
+            _instances.Add(registration.Type, new IoCScopedInstance(registration, instance));
+        }
 
-            if (registration.CanBeScoped) {
-                _instances.Add(new IoCScopedInstance(registration, instance));
-            }
-
-            return instance;
+        public void Register(object instance)
+        {
+            if (instance == null) return;
+            var type = instance.GetType();
+            _instances.Add(type, new IoCScopedInstance(null, instance));
         }
 
         public bool TryGetInstance(Type type, out object instance)
         {
-            if (!Container.TryGetRegistration(type, out IIoCRegistration registration)) {
-                instance = null;
-                return false;
+            if (_instances.TryGetValue(type, out IoCScopedInstance instReg)) {
+                instance = instReg.Instance;
+                return true;
             }
-
-            instance = registration.GetInstance();
-
-            if (registration.CanBeScoped) {
-                _instances.Add(new IoCScopedInstance(registration, instance));
-            }
-
-            return true;
+            instance = null;
+            return false;
         }
     }
 }

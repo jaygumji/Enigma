@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -7,14 +8,35 @@ namespace Enigma.IoC
 
     public static class InstanceFactory
     {
-        public static T CreateLambda<T>(ConstructorInfo constructor, params Type[] parameterTypes)
+        public static T CreateLambda<T>(ConstructorInfo constructor, PropertyInfo[] properties)
         {
-            var parameters = new ParameterExpression[parameterTypes.Length];
-            for (var i = 0; i < parameterTypes.Length; i++) {
-                parameters[i] = Expression.Parameter(parameterTypes[i]);
+            var conArgs = constructor.GetParameters();
+            var length = conArgs.Length + (properties?.Length ?? 0);
+
+            var parameters = new ParameterExpression[length];
+
+            var conParams = new ParameterExpression[conArgs.Length];
+            for (var i = 0; i < conArgs.Length; i++) {
+                var param = Expression.Parameter(conArgs[i].ParameterType);
+                conParams[i] = param;
+                parameters[i] = param;
             }
-            var constructorExpression = Expression.New(constructor, parameters);
-            var lambda = Expression.Lambda<T>(constructorExpression, parameters);
+            var newExpr = Expression.New(constructor, conParams);
+            Expression expr = newExpr;
+
+            if (properties != null && properties.Length > 0) {
+                var bindingExpressions = new MemberAssignment[properties.Length];
+                var pi = conArgs.Length;
+                for (var i = 0; i < properties.Length; i++) {
+                    var property = properties[i];
+                    var parameter = Expression.Parameter(property.PropertyType);
+                    parameters[pi++] = parameter;
+                    bindingExpressions[i] = Expression.Bind(property, parameter);
+                }
+                expr = Expression.MemberInit(newExpr, bindingExpressions);
+            }
+
+            var lambda = Expression.Lambda<T>(expr, parameters);
             return lambda.Compile();
         }
     }
@@ -25,7 +47,7 @@ namespace Enigma.IoC
 
         public InstanceFactory(ConstructorInfo constructor)
         {
-            _lambda = InstanceFactory.CreateLambda<Func<TInstance>>(constructor);
+            _lambda = InstanceFactory.CreateLambda<Func<TInstance>>(constructor, null);
         }
 
         object IInstanceFactory.GetInstance()
@@ -46,11 +68,10 @@ namespace Enigma.IoC
         private readonly Func<TP1, TInstance> _lambda;
         private readonly IInstanceFactory<TP1> _p1;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TInstance>>(
-                constructor,
-                typeof(TP1)
+                constructor, properties
             );
 
             _p1 = p1;
@@ -74,12 +95,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP1> _p1;
         private readonly IInstanceFactory<TP2> _p2;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2)
+                properties
             );
 
             _p1 = p1;
@@ -105,13 +125,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP2> _p2;
         private readonly IInstanceFactory<TP3> _p3;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3)
+                properties
             );
 
             _p1 = p1;
@@ -139,14 +157,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP3> _p3;
         private readonly IInstanceFactory<TP4> _p4;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4)
+                properties
             );
 
             _p1 = p1;
@@ -176,15 +191,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP4> _p4;
         private readonly IInstanceFactory<TP5> _p5;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5)
+                properties
             );
 
             _p1 = p1;
@@ -216,16 +227,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP5> _p5;
         private readonly IInstanceFactory<TP6> _p6;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6)
+                properties
             );
 
             _p1 = p1;
@@ -259,17 +265,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP6> _p6;
         private readonly IInstanceFactory<TP7> _p7;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7)
+                properties
             );
 
             _p1 = p1;
@@ -305,18 +305,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP7> _p7;
         private readonly IInstanceFactory<TP8> _p8;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8)
+                properties
             );
 
             _p1 = p1;
@@ -354,19 +347,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP8> _p8;
         private readonly IInstanceFactory<TP9> _p9;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9)
+                properties
             );
 
             _p1 = p1;
@@ -406,20 +391,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP9> _p9;
         private readonly IInstanceFactory<TP10> _p10;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10)
+                properties
             );
 
             _p1 = p1;
@@ -461,21 +437,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP10> _p10;
         private readonly IInstanceFactory<TP11> _p11;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11)
+                properties
             );
 
             _p1 = p1;
@@ -519,22 +485,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP11> _p11;
         private readonly IInstanceFactory<TP12> _p12;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TP12, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11),
-                typeof(TP12)
+                properties
             );
 
             _p1 = p1;
@@ -580,23 +535,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP12> _p12;
         private readonly IInstanceFactory<TP13> _p13;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TP12, TP13, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11),
-                typeof(TP12),
-                typeof(TP13)
+                properties
             );
 
             _p1 = p1;
@@ -644,24 +587,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP13> _p13;
         private readonly IInstanceFactory<TP14> _p14;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TP12, TP13, TP14, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11),
-                typeof(TP12),
-                typeof(TP13),
-                typeof(TP14)
+                properties
             );
 
             _p1 = p1;
@@ -711,25 +641,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP14> _p14;
         private readonly IInstanceFactory<TP15> _p15;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14, IInstanceFactory<TP15> p15)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14, IInstanceFactory<TP15> p15)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TP12, TP13, TP14, TP15, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11),
-                typeof(TP12),
-                typeof(TP13),
-                typeof(TP14),
-                typeof(TP15)
+                properties
             );
 
             _p1 = p1;
@@ -781,26 +697,11 @@ namespace Enigma.IoC
         private readonly IInstanceFactory<TP15> _p15;
         private readonly IInstanceFactory<TP16> _p16;
 
-        public InstanceFactory(ConstructorInfo constructor, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14, IInstanceFactory<TP15> p15, IInstanceFactory<TP16> p16)
+        public InstanceFactory(ConstructorInfo constructor, PropertyInfo[] properties, IInstanceFactory<TP1> p1, IInstanceFactory<TP2> p2, IInstanceFactory<TP3> p3, IInstanceFactory<TP4> p4, IInstanceFactory<TP5> p5, IInstanceFactory<TP6> p6, IInstanceFactory<TP7> p7, IInstanceFactory<TP8> p8, IInstanceFactory<TP9> p9, IInstanceFactory<TP10> p10, IInstanceFactory<TP11> p11, IInstanceFactory<TP12> p12, IInstanceFactory<TP13> p13, IInstanceFactory<TP14> p14, IInstanceFactory<TP15> p15, IInstanceFactory<TP16> p16)
         {
             _lambda = InstanceFactory.CreateLambda<Func<TP1, TP2, TP3, TP4, TP5, TP6, TP7, TP8, TP9, TP10, TP11, TP12, TP13, TP14, TP15, TP16, TInstance>>(
                 constructor,
-                typeof(TP1),
-                typeof(TP2),
-                typeof(TP3),
-                typeof(TP4),
-                typeof(TP5),
-                typeof(TP6),
-                typeof(TP7),
-                typeof(TP8),
-                typeof(TP9),
-                typeof(TP10),
-                typeof(TP11),
-                typeof(TP12),
-                typeof(TP13),
-                typeof(TP14),
-                typeof(TP15),
-                typeof(TP16)
+                properties
             );
 
             _p1 = p1;
