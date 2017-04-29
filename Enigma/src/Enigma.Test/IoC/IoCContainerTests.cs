@@ -21,7 +21,7 @@ namespace Enigma.Test.IoC
         [Fact]
         public void CreateParameterlessInstance()
         {
-            var factory = new IoCFactory(new Dictionary<Type, IIoCRegistration>(), new FactoryTypeProvider());
+            var factory = new IoCFactory(new IoCRegistratorMock(), new FactoryTypeProvider());
             for (var i = 0; i < 20; i++) {
                 var instance = factory.GetInstance(typeof(DataBlock));
                 Assert.NotNull(instance);

@@ -6,23 +6,23 @@ namespace Enigma.IoC
     {
         public Type Type { get; }
         public Func<T> Factory { get; }
-        public IoCOptions Options { get; }
 
-        public IoCRegistration(IoCOptions options) : this(null, options)
+        public IoCRegistration() : this(null)
         {
         }
 
-        public IoCRegistration(Func<T> factory, IoCOptions options)
+        public IoCRegistration(Func<T> factory)
         {
             Type = typeof(T);
             Factory = factory;
-            Options = options;
         }
 
         public bool CanBeScoped { get; set; }
         public Action<T> Unloader { get; set; }
 
         public bool HasInstanceGetter => Factory != null;
+
+        public bool MustBeScoped { get; set; }
 
         public object GetInstance()
         {
@@ -43,5 +43,6 @@ namespace Enigma.IoC
 
             (instance as IDisposable)?.Dispose();
         }
+
     }
 }

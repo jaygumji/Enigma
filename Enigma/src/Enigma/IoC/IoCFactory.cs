@@ -9,15 +9,15 @@ namespace Enigma.IoC
 {
     public class IoCFactory
     {
-        private readonly IDictionary<Type, IIoCRegistration> _registrations;
-        private readonly IDictionary<Type, IInstanceFactory> _typeFactories;
+        private readonly IIoCRegistrator _registrator;
         private readonly ITypeProvider _provider;
+        private readonly IDictionary<Type, IInstanceFactory> _typeFactories;
 
-        public IoCFactory(IDictionary<Type, IIoCRegistration> registrations, ITypeProvider provider)
+        public IoCFactory(IIoCRegistrator registrator, ITypeProvider provider)
         {
-            _registrations = registrations;
-            _typeFactories = new Dictionary<Type, IInstanceFactory>();
+            _registrator = registrator;
             _provider = provider;
+            _typeFactories = new Dictionary<Type, IInstanceFactory>();
         }
 
         public IInstanceFactory GetFactory(Type type, bool throwError)
@@ -26,7 +26,7 @@ namespace Enigma.IoC
                 return factory;
             }
 
-            if (_registrations.TryGetValue(type, out IIoCRegistration registration)) {
+            if (_registrator.TryGet(type, out IIoCRegistration registration)) {
                 if (registration.HasInstanceGetter) {
                     if (type == registration.Type) {
                         _typeFactories.Add(type, registration);
@@ -68,7 +68,7 @@ namespace Enigma.IoC
             var paramLength = parameters.Length;
 
             var properties = info.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-                .Where(p => p.CanWrite && _registrations.ContainsKey(p.PropertyType))
+                .Where(p => p.CanWrite && _registrator.Contains(p.PropertyType))
                 .ToArray();
 
             paramLength += properties.Length;

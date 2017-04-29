@@ -1,18 +1,18 @@
 ﻿using Enigma.Reflection;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading;
 
 namespace Enigma.IoC
 {
-    public class IoCContainer : IServiceLocator
+    public class IoCContainer : IIoCRegistrator, IServiceLocator
     {
 
         private static readonly AsyncLocal<IoCScope> ScopeLocal = new AsyncLocal<IoCScope>();
 
         private readonly Dictionary<Type, IIoCRegistration> _registrations;
         private readonly IoCFactory _factory;
+        private readonly IIoCRegistrator _registrator;
 
         public IoCContainer() : this(new CachedTypeProvider())
         {
@@ -20,70 +20,22 @@ namespace Enigma.IoC
 
         public IoCContainer(ITypeProvider provider)
         {
+            _registrator = this;
             _registrations = new Dictionary<Type, IIoCRegistration>();
-            _factory = new IoCFactory(_registrations, provider);
+            _factory = new IoCFactory(_registrator, provider);
         }
 
-        public void Register<T>(T singleton)
-        {
-            Register(singleton, IoCOptions.Default);
-        }
-
-        public void Register<T>(T singleton, IoCOptions options)
-        {
-            var registration = new IoCRegistration<T>(() => singleton, options) {
-                CanBeScoped = false
-            };
-            AddRegistration(registration);
-        }
-
-        public void Register<T, TImplementation>()
-        {
-            Register<T, TImplementation>(IoCOptions.Default);
-        }
-
-        public void Register<T, TImplementation>(IoCOptions options)
-        {
-            var registration = new IoCRegistration<TImplementation>(options) {
-                CanBeScoped = true
-            };
-            AddRegistrationType(typeof(T), registration, overrideExisting: true);
-            AddRegistration(registration);
-        }
-
-        public void Register<T>(Func<T> factory)
-        {
-            Register(factory, IoCOptions.Default);
-        }
-
-        public void Register<T>(Func<T> factory, IoCOptions options)
-        {
-            var registration = new IoCRegistration<T>(factory, options) {
-                CanBeScoped = true
-            };
-            AddRegistration(registration);
-        }
-
-        public void Register<T>(Func<T> factory, Action<T> unloader)
-        {
-            Register(factory, unloader, IoCOptions.Default);
-        }
-
-        public void Register<T>(Func<T> factory, Action<T> unloader, IoCOptions options)
-        {
-            var registration = new IoCRegistration<T>(factory, options) {
-                CanBeScoped = true,
-                Unloader = unloader
-            };
-            AddRegistration(registration);
-        }
-
-        public bool TryGetRegistration(Type type, out IIoCRegistration registration)
+        bool IIoCRegistrator.TryGet(Type type, out IIoCRegistration registration)
         {
             return _registrations.TryGetValue(type, out registration);
         }
 
-        private void AddRegistrationType(Type type, IIoCRegistration registration, bool overrideExisting)
+        void IIoCRegistrator.Register(IIoCRegistration registration)
+        {
+            _registrator.Register(registration.Type, registration);
+        }
+
+        void IIoCRegistrator.Register(Type type, IIoCRegistration registration)
         {
             if (_registrations.ContainsKey(type)) {
                 _registrations[type] = registration;
@@ -93,22 +45,56 @@ namespace Enigma.IoC
             }
         }
 
-        private void AddRegistration(IIoCRegistration registration)
+        bool IIoCRegistrator.Contains(Type type)
         {
-            if (registration.Options.IncludeAllInterfaces) {
-                foreach (var type in registration.Type.GetTypeInfo().GetInterfaces()) {
-                    AddRegistrationType(type, registration, overrideExisting: false);
-                }
-            }
-            if (registration.Options.IncludeAllBaseTypes) {
-                var info = registration.Type.GetTypeInfo();
-                while (info.BaseType != null) {
-                    AddRegistrationType(info.BaseType, registration, overrideExisting: false);
-                    info = info.BaseType.GetTypeInfo();
-                }
+            return _registrations.ContainsKey(type);
+        }
+
+        IIoCRegistration IIoCRegistrator.Get(Type type)
+        {
+            if (_registrations.TryGetValue(type, out IIoCRegistration registration)) {
+                return registration;
             }
 
-            AddRegistrationType(registration.Type, registration, overrideExisting: true);
+            throw new IoCRegistrationNotFoundException(type);
+        }
+
+
+        bool IIoCRegistrator.TryRegister(Type type, IIoCRegistration registration)
+        {
+            if (_registrations.ContainsKey(type)) return false;
+
+            _registrations.Add(type, registration);
+            return true;
+        }
+
+        public IIoCRegistrationSingletonConfigurator<T> Register<T>(T singleton)
+        {
+            var registration = new IoCRegistration<T>(() => singleton) {
+                CanBeScoped = false
+            };
+
+            _registrator.Register(registration);
+            return new IoCRegistrationConfigurator<T>(_registrator, registration);
+        }
+
+        public IIoCRegistrationConfigurator<TImplementation> Register<T, TImplementation>()
+        {
+            var registration = new IoCRegistration<TImplementation>() {
+                CanBeScoped = true
+            };
+            _registrator.Register(typeof(T), registration);
+            _registrator.Register(registration);
+            return new IoCRegistrationConfigurator<TImplementation>(_registrator, registration);
+        }
+
+        public IIoCRegistrationConfigurator<T> Register<T>(Func<T> factory)
+        {
+            var registration = new IoCRegistration<T>(factory) {
+                CanBeScoped = true
+            };
+            _registrator.Register(registration);
+            return new IoCRegistrationConfigurator<T>(_registrator, registration);
         }
 
         public T GetInstance<T>()
@@ -120,7 +106,7 @@ namespace Enigma.IoC
             }
             var newInstance = (T) _factory.GetInstance(type);
             if (scope != null) {
-                if (TryGetRegistration(type, out IIoCRegistration registration)) {
+                if (_registrator.TryGet(type, out IIoCRegistration registration)) {
                     if (!registration.CanBeScoped) return newInstance;
                     scope.Register(registration, newInstance);
                 }
@@ -129,15 +115,6 @@ namespace Enigma.IoC
                 }
             }
             return newInstance;
-        }
-
-        public IIoCRegistration GetRegistration(Type type)
-        {
-            if (_registrations.TryGetValue(type, out IIoCRegistration registration)) {
-                return registration;
-            }
-
-            throw new IoCRegistrationNotFoundException(type);
         }
 
         public object GetInstance(Type type)
@@ -151,7 +128,15 @@ namespace Enigma.IoC
                 instance = registration.GetInstance();
                 if (!registration.CanBeScoped) return true;
 
-                ScopeLocal.Value?.Register(registration, instance);
+                var scope = ScopeLocal.Value;
+                if (scope == null) {
+                    if (registration.MustBeScoped) {
+                        throw new InvalidOperationException($"The requested instance type {type.FullName} must be scoped");
+                    }
+                    return true;
+                }
+
+                scope.Register(registration, instance);
                 return true;
             }
 
