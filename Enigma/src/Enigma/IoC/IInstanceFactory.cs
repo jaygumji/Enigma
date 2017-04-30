@@ -4,4 +4,9 @@
     {
         object GetInstance();
     }
+
+    public interface IInstanceFactory<TInstance> : IInstanceFactory
+    {
+        new TInstance GetInstance();
+    }
 }

@@ -1,14 +1,12 @@
 ﻿using Enigma.Reflection;
 using System;
 using System.Collections.Generic;
-using System.Threading;
+using System.Runtime.CompilerServices;
 
 namespace Enigma.IoC
 {
     public class IoCContainer : IIoCRegistrator, IServiceLocator
     {
-
-        private static readonly AsyncLocal<IoCScope> ScopeLocal = new AsyncLocal<IoCScope>();
 
         private readonly Dictionary<Type, IIoCRegistration> _registrations;
         private readonly IoCFactory _factory;
@@ -99,14 +97,44 @@ namespace Enigma.IoC
 
         public T GetInstance<T>()
         {
-            var type = typeof(T);
-            var scope = ScopeLocal.Value;
-            if (scope != null && scope.TryGetInstance(type, out object instance)) {
-                return (T)instance;
+            return (T)GetInstance(typeof(T), throwError: true);
+        }
+
+        public object GetInstance(Type type)
+        {
+            return GetInstance(type, throwError: true);
+        }
+
+        public bool TryGetInstance(Type type, out object instance)
+        {
+            instance = GetInstance(type, throwError: false);
+            return instance != null;
+        }
+
+        private object GetInstance(Type type, bool throwError)
+        {
+            var scope = IoCScope.GetCurrent();
+            var hasScope = scope != null;
+            if (hasScope && scope.TryGetInstance(type, out object instance)) {
+                return instance;
             }
-            var newInstance = (T) _factory.GetInstance(type);
-            if (scope != null) {
-                if (_registrator.TryGet(type, out IIoCRegistration registration)) {
+
+            var hasRegistration = _registrator.TryGet(type, out IIoCRegistration registration);
+            if (hasRegistration && registration.MustBeScoped && !hasScope) {
+                if (throwError) {
+                    throw new InvalidOperationException($"The type {type.FullName} could not be created since it requires a scope");
+                }
+                else {
+                    return null;
+                }
+            }
+
+            var newInstance = _factory.GetInstance(type, throwError);
+            if (newInstance == null) {
+                return null;
+            }
+            if (hasScope) {
+                if (hasRegistration) {
                     if (!registration.CanBeScoped) return newInstance;
                     scope.Register(registration, newInstance);
                 }
@@ -117,59 +145,5 @@ namespace Enigma.IoC
             return newInstance;
         }
 
-        public object GetInstance(Type type)
-        {
-            return _factory.GetInstance(type);
-        }
-
-        public bool TryGetInstance(Type type, out object instance)
-        {
-            if (_registrations.TryGetValue(type, out IIoCRegistration registration)) {
-                instance = registration.GetInstance();
-                if (!registration.CanBeScoped) return true;
-
-                var scope = ScopeLocal.Value;
-                if (scope == null) {
-                    if (registration.MustBeScoped) {
-                        throw new InvalidOperationException($"The requested instance type {type.FullName} must be scoped");
-                    }
-                    return true;
-                }
-
-                scope.Register(registration, instance);
-                return true;
-            }
-
-            instance = null;
-            return false;
-        }
-
-        public IoCScope BeginScope()
-        {
-            var scope = new IoCScope(this, ScopeLocal.Value);
-            ScopeLocal.Value = scope;
-            return scope;
-        }
-
-        public void EndScope(IoCScope scope)
-        {
-            var storedScope = ScopeLocal.Value;
-            IoCScope childScope = null;
-            while (storedScope != null && !ReferenceEquals(storedScope, scope)) {
-                childScope = storedScope;
-                storedScope = storedScope.Parent;
-            }
-
-            if (storedScope == null) {
-                throw new ArgumentException("The scope could not be found in the scope chain");
-            }
-
-            if (childScope != null) {
-                childScope.Reroute(storedScope.Parent);
-            }
-            else {
-                ScopeLocal.Value = storedScope.Parent;
-            }
-        }
     }
 }

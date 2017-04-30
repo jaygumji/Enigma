@@ -23,7 +23,7 @@ namespace Enigma.Test.IoC
         {
             var factory = new IoCFactory(new IoCRegistratorMock(), new FactoryTypeProvider());
             for (var i = 0; i < 20; i++) {
-                var instance = factory.GetInstance(typeof(DataBlock));
+                var instance = factory.GetInstance(typeof(DataBlock), throwError: true);
                 Assert.NotNull(instance);
             }
         }
@@ -48,7 +48,7 @@ namespace Enigma.Test.IoC
         {
             var container = new IoCContainer();
             AmDisposable disp;
-            using (container.BeginScope()) {
+            using (new IoCScope()) {
                 disp = container.GetInstance<AmDisposable>();
                 Assert.Equal(0, disp.DisposeCalled);
 
@@ -63,7 +63,7 @@ namespace Enigma.Test.IoC
         {
             var container = new IoCContainer();
             AmDisposable disp;
-            using (container.BeginScope()) {
+            using (new IoCScope()) {
                 disp = container.GetInstance<AmDisposable>();
                 Assert.Equal(0, disp.DisposeCalled);
 
@@ -71,7 +71,7 @@ namespace Enigma.Test.IoC
                 Assert.Same(disp, disp2);
 
                 AmDisposable disp3;
-                using (container.BeginScope()) {
+                using (new IoCScope()) {
                     disp3 = container.GetInstance<AmDisposable>();
                     Assert.NotSame(disp, disp3);
 
@@ -81,6 +81,21 @@ namespace Enigma.Test.IoC
                 Assert.Equal(1, disp3.DisposeCalled);
             }
             Assert.Equal(1, disp.DisposeCalled);
+        }
+
+        [Fact]
+        public void MustBeScoped()
+        {
+            var container = new IoCContainer();
+            container.Register<ICoreCalculator, CoreCalculator>()
+                .MustBeScoped();
+
+            var exception = Assert.Throws<InvalidOperationException>(() => {
+                var calc = container.GetInstance<ICoreCalculator>();
+                Assert.NotNull(calc);
+            });
+
+            Assert.Contains("could not be created since it requires a scope", exception.Message);
         }
 
         [Fact]
@@ -143,7 +158,7 @@ namespace Enigma.Test.IoC
             try {
                 var container = new IoCContainer();
                 AmDisposable disp;
-                using (var scope = container.BeginScope()) {
+                using (var scope = new IoCScope()) {
                     disp = container.GetInstance<AmDisposable>();
                     Assert.Equal(0, disp.DisposeCalled);
                     Assert.Equal(1, scope.InstanceCount);

@@ -1,29 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Enigma.IoC
 {
     public class IoCScope : IDisposable
     {
 
+        private static readonly AsyncLocal<IoCScope> ScopeLocal = new AsyncLocal<IoCScope>();
         private Dictionary<Type, IoCScopedInstance> _instances;
 
-        public IoCScope(IoCContainer container, IoCScope parent)
+        public IoCScope()
         {
-            Container = container;
-            Parent = parent;
             _instances = new Dictionary<Type, IoCScopedInstance>();
+
+            Parent = ScopeLocal.Value;
+            ScopeLocal.Value = this;
         }
 
         public IoCContainer Container { get; }
         public IoCScope Parent { get; private set; }
 
         public int InstanceCount => _instances.Count;
-
-        public void Reroute(IoCScope parent)
-        {
-            Parent = parent;
-        }
 
         public void Dispose()
         {
@@ -39,7 +37,24 @@ namespace Enigma.IoC
 
                 _instances = null;
             }
-            Container.EndScope(this);
+
+            var storedScope = ScopeLocal.Value;
+            IoCScope childScope = null;
+            while (storedScope != null && !ReferenceEquals(storedScope, this)) {
+                childScope = storedScope;
+                storedScope = storedScope.Parent;
+            }
+
+            if (storedScope == null) {
+                throw new ArgumentException("The scope could not be found in the scope chain");
+            }
+
+            if (childScope != null) {
+                childScope.Parent = storedScope.Parent;
+            }
+            else {
+                ScopeLocal.Value = storedScope.Parent;
+            }
         }
 
         public void Register(IIoCRegistration registration, object instance)
@@ -62,6 +77,11 @@ namespace Enigma.IoC
             }
             instance = null;
             return false;
+        }
+
+        public static IoCScope GetCurrent()
+        {
+            return ScopeLocal.Value;
         }
     }
 }

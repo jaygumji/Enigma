@@ -161,9 +161,9 @@ namespace Enigma.IoC
             return typeof(DynamicActivatorInstanceFactory<>).MakeGenericType(types[0]);
         }
 
-        public object GetInstance(Type type)
+        public object GetInstance(Type type, bool throwError)
         {
-            return GetFactory(type, throwError: true).GetInstance();
+            return GetFactory(type, throwError).GetInstance();
         }
 
     }
