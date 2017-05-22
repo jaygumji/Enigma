@@ -16,6 +16,11 @@ namespace Enigma.Serialization.Reflection.Emit
         {
         }
 
+        public DynamicTravellerContext(SerializationReflectionInspector inspector)
+            : this(new SerializableTypeProvider(inspector, new CachedTypeProvider()))
+        {
+        }
+
         public DynamicTravellerContext(SerializableTypeProvider typeProvider)
         {
             _typeProvider = typeProvider;

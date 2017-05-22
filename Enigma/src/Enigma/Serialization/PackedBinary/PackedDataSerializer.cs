@@ -1,10 +1,13 @@
 ﻿using System.IO;
 using Enigma.Binary;
+using Enigma.Serialization.Reflection.Emit;
 
 namespace Enigma.Serialization.PackedBinary
 {
     public class PackedDataSerializer<T> : ITypedSerializer<T>
     {
+        private static readonly DynamicTravellerContext Context = new DynamicTravellerContext();
+
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
@@ -15,7 +18,7 @@ namespace Enigma.Serialization.PackedBinary
         public PackedDataSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine();
+            _engine = new SerializationEngine(Context);
         }
 
         void ITypedSerializer.Serialize(Stream stream, object graph)

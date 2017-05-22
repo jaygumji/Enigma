@@ -12,7 +12,7 @@ namespace Enigma.IoC
         private readonly IoCFactory _factory;
         private readonly IIoCRegistrator _registrator;
 
-        public IoCContainer() : this(new CachedTypeProvider())
+        public IoCContainer() : this(new FactoryTypeProvider())
         {
         }
 
