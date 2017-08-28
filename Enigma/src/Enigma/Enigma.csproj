@@ -4,7 +4,7 @@
     <Description>Enigma Class Library. Serialization, locking etc</Description>
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Johan Johnsson</Authors>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Enigma</AssemblyName>
     <PackageId>Enigma</PackageId>
     <PackageTags>Serialization;IL;Lock</PackageTags>
