@@ -5,44 +5,18 @@ namespace Enigma.Serialization.Reflection
 {
     public class SerializableProperty
     {
-        private readonly PropertyInfo _ref;
-        private readonly SerializationMetadata _metadata;
-        private readonly ExtendedType _ext;
-
         public SerializableProperty(PropertyInfo @ref, SerializationMetadata metadata, ITypeProvider provider)
         {
-            _ref = @ref;
-            _metadata = metadata;
-            _ext = provider.Extend(_ref.PropertyType);
+            Ref = @ref;
+            Metadata = metadata;
+            Ext = provider.Extend(Ref.PropertyType);
         }
 
-        public PropertyInfo Ref
-        {
-            get { return _ref; }
-        }
+        public PropertyInfo Ref { get; }
 
-        public SerializationMetadata Metadata
-        {
-            get { return _metadata; }
-        }
+        public SerializationMetadata Metadata { get; }
 
-        public ExtendedType Ext
-        {
-            get { return _ext; }
-        }
+        public ExtendedType Ext { get; }
 
-        public VisitArgs CreateVisitArgs()
-        {
-            if (_ext.Class == TypeClass.Dictionary)
-                return VisitArgs.Dictionary(_ref.Name, _metadata);
-
-            if (_ext.Class == TypeClass.Collection)
-                return VisitArgs.Collection(_ref.Name, _metadata);
-
-            if (_ext.Class == TypeClass.Complex)
-                return VisitArgs.Single(_ref.Name, _metadata);
-
-            return VisitArgs.Value(_ref.Name, _metadata);
-        }
     }
 }

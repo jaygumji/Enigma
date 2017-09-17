@@ -7,17 +7,16 @@ namespace Enigma.Serialization.Reflection.Emit
     public class DynamicTraveller
     {
         private Type _travellerType;
-        private readonly IVisitArgsFactory _factory;
         private ConstructorInfo _constructor;
         private MethodInfo _travelWriteMethod;
         private MethodInfo _travelReadMethod;
         private readonly DynamicTravellerMembers _members;
         private bool _isConstructing;
+        private DynamicActivator _activator;
 
-        public DynamicTraveller(Type travellerType, IVisitArgsFactory factory, ConstructorInfo constructor, MethodInfo travelWriteMethod, MethodInfo travelReadMethod, DynamicTravellerMembers members)
+        public DynamicTraveller(Type travellerType, ConstructorInfo constructor, MethodInfo travelWriteMethod, MethodInfo travelReadMethod, DynamicTravellerMembers members)
         {
             _travellerType = travellerType;
-            _factory = factory;
             _constructor = constructor;
             _travelWriteMethod = travelWriteMethod;
             _travelReadMethod = travelReadMethod;
@@ -25,10 +24,10 @@ namespace Enigma.Serialization.Reflection.Emit
             _isConstructing = true;
         }
 
-        public Type TravellerType { get { return _travellerType; } }
-        public ConstructorInfo Constructor { get { return _constructor; } }
-        public MethodInfo TravelWriteMethod { get { return _travelWriteMethod; } }
-        public MethodInfo TravelReadMethod { get { return _travelReadMethod; } }
+        public Type TravellerType => _travellerType;
+        public ConstructorInfo Constructor => _constructor;
+        public MethodInfo TravelWriteMethod => _travelWriteMethod;
+        public MethodInfo TravelReadMethod => _travelReadMethod;
 
         public void Complete(Type actualTravellerType)
         {
@@ -38,13 +37,15 @@ namespace Enigma.Serialization.Reflection.Emit
             _constructor = actualTravellerTypeInfo.GetConstructor(_members.TravellerConstructorTypes);
             _travelWriteMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelWriteMethod.GetParameters().Select(p => p.ParameterType).ToArray());
             _travelReadMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelReadMethod.GetParameters().Select(p => p.ParameterType).ToArray());
+            _activator = new DynamicActivator(_constructor);
             _isConstructing = false;
         }
 
-        public IGraphTraveller GetInstance()
+        public IGraphTraveller GetInstance(IVisitArgsFactory factory)
         {
             if (_isConstructing) throw new InvalidOperationException("The type is still being constructed");
-            return (IGraphTraveller) _constructor.Invoke(new object[] {_factory});
+
+            return (IGraphTraveller)_activator.Activate(factory);
         }
     }
 }

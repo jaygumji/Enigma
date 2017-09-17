@@ -43,7 +43,7 @@ namespace Enigma.Serialization.Reflection
             var args = new AcquirePropertyMetadataArgs(type, property);
             OnAcquirePropertyMetadata(args);
 
-            var index = args.Index.HasValue ? args.Index.Value : nextIndex++;
+            var index = args.Index ?? nextIndex++;
             var metadata = new SerializationMetadata(index, args.Args);
             return metadata;
         }

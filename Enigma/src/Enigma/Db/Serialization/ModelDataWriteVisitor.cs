@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Enigma.Binary;
 using Enigma.IO;
@@ -10,7 +9,6 @@ namespace Enigma.Db.Serialization
 {
     public sealed class ModelDataWriteVisitor : IWriteVisitor
     {
-
         private static readonly Encoding Encoding = Encoding.UTF8;
         private readonly BinaryDataWriter _writer;
         private readonly Stack<BinaryBufferReservation> _reservations;
@@ -25,10 +23,9 @@ namespace Enigma.Db.Serialization
 
         public void Visit(object level, VisitArgs args)
         {
-            if (args.Type == LevelType.Root) return;
-
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (level == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -36,12 +33,18 @@ namespace Enigma.Db.Serialization
             }
 
             _buffer.WriteByte(BinaryZPacker.VariabelLength);
+
+            if (args.IsRoot) {
+                return;
+            }
             _reservations.Push(_writer.Reserve());
         }
 
         public void Leave(object level, VisitArgs args)
         {
-            if (args.Type == LevelType.Root) return;
+            if (args.IsRoot) {
+                return;
+            }
 
             if (level != null) {
                 var reservation = _reservations.Pop();
@@ -52,22 +55,24 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(byte? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Byte.FixedLength);
+            _buffer.WriteByte((Byte) BinaryInformation.Byte.FixedLength);
             _buffer.WriteByte(value.Value);
         }
 
         public void VisitValue(short? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -82,8 +87,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(int? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -98,8 +103,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(long? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -114,8 +119,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(ushort? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -130,8 +135,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(uint? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -146,8 +151,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(ulong? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -162,68 +167,70 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(bool? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Boolean.FixedLength);
+            _buffer.WriteByte((Byte) BinaryInformation.Boolean.FixedLength);
             var bytes = BinaryInformation.Boolean.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void VisitValue(float? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Single.FixedLength);
+            _buffer.WriteByte((Byte) BinaryInformation.Single.FixedLength);
             var bytes = BinaryInformation.Single.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void VisitValue(double? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Double.FixedLength);
+            _buffer.WriteByte((Byte) BinaryInformation.Double.FixedLength);
             var bytes = BinaryInformation.Double.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void VisitValue(decimal? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((Byte)BinaryInformation.Decimal.FixedLength);
+            _buffer.WriteByte((Byte) BinaryInformation.Decimal.FixedLength);
             var bytes = BinaryInformation.Decimal.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void VisitValue(TimeSpan? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -238,8 +245,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(DateTime? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -257,8 +264,8 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(string value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -268,10 +275,10 @@ namespace Enigma.Db.Serialization
             var length = Encoding.GetByteCount(value);
 
             if (length < BinaryZPacker.VariabelLength)
-                _buffer.WriteByte((byte)length);
+                _buffer.WriteByte((byte) length);
             else {
                 _buffer.WriteByte(BinaryZPacker.VariabelLength);
-                BinaryV32Packer.PackU(_buffer, (uint)value.Length);
+                BinaryV32Packer.PackU(_buffer, (uint) value.Length);
             }
 
             var position = _buffer.Advance(length);
@@ -280,23 +287,23 @@ namespace Enigma.Db.Serialization
 
         public void VisitValue(Guid? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
                 return;
             }
 
-            _buffer.WriteByte((byte)BinaryInformation.Guid.FixedLength);
+            _buffer.WriteByte((byte) BinaryInformation.Guid.FixedLength);
             var bytes = BinaryInformation.Guid.Converter.Convert(value.Value);
             _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void VisitValue(byte[] value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -307,10 +314,9 @@ namespace Enigma.Db.Serialization
                 _buffer.WriteByte((Byte) value.Length);
             else {
                 _buffer.WriteByte(BinaryZPacker.VariabelLength);
-                BinaryV32Packer.PackU(_buffer, (uint)value.Length);
+                BinaryV32Packer.PackU(_buffer, (uint) value.Length);
             }
             _buffer.Write(value, 0, value.Length);
         }
-
     }
 }

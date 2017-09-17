@@ -7,7 +7,7 @@ namespace Enigma.Serialization.Reflection
     {
         private readonly Type _type;
         private readonly PropertyInfo _property;
-        private readonly Arguments _args;
+        private readonly StateBag _args;
 
         public UInt32? Index { get; set; }
 
@@ -15,7 +15,7 @@ namespace Enigma.Serialization.Reflection
         {
             _type = type;
             _property = property;
-            _args = new Arguments();
+            _args = new StateBag();
         }
 
         public Type Type
@@ -28,6 +28,6 @@ namespace Enigma.Serialization.Reflection
             get { return _property; }
         }
 
-        public Arguments Args { get { return _args; } }
+        public StateBag Args { get { return _args; } }
     }
 }

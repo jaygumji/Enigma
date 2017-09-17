@@ -7,12 +7,11 @@ namespace Enigma.Serialization
     {
         Value = 1,
         Single = 2,
-        Root = 4,
-        Collection = 8,
-        CollectionItem = 16,
-        Dictionary = 32,
-        DictionaryKey = 64,
-        DictionaryValue = 128,
+        Collection = 4,
+        CollectionItem = 8,
+        Dictionary = 16,
+        DictionaryKey = 32,
+        DictionaryValue = 64,
 
         CollectionInCollection = Collection | CollectionItem,
         DictionaryInCollection = Dictionary | CollectionItem,

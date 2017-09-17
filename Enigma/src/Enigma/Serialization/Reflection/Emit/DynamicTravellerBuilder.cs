@@ -27,13 +27,11 @@ namespace Enigma.Serialization.Reflection.Emit
             _constructorBuilder = _classBuilder.DefineConstructor(typeof(IVisitArgsFactory));
             _constructorBuilder.IL.Var.Load(_constructorBuilder.IL.Var.This());
             _constructorBuilder.IL.CallBaseConstructor(typeof(object).GetTypeInfo().GetConstructor(new Type[] { }));
-            //_constructorBuilder.IL.Return();
 
             _travelWriteMethod = _classBuilder.DefineOverloadMethod("Travel", typeof(void), new[] { typeof(IWriteVisitor), _type });
             _travelReadMethod = _classBuilder.DefineOverloadMethod("Travel", typeof(void), new[] { typeof(IReadVisitor), _type });
 
-            var factory = new VisitArgsFactory(typeProvider, type);
-            _dynamicTraveller = new DynamicTraveller(_classBuilder.Type, factory, _constructorBuilder.Reference, _travelWriteMethod.Method, _travelReadMethod.Method, dtContext.Members);
+            _dynamicTraveller = new DynamicTraveller(_classBuilder.Type, _constructorBuilder.Reference, _travelWriteMethod.Method, _travelReadMethod.Method, dtContext.Members);
         }
 
         public DynamicTraveller DynamicTraveller { get { return _dynamicTraveller; } }
@@ -74,8 +72,6 @@ namespace Enigma.Serialization.Reflection.Emit
                     var getFactoryCode = new CallMethodILCode(factoryArgument, members.ConstructVisitArgsWithTypeMethod, type);
                     var callConstructorCode = new CallConstructorILCode(dynamicTraveller.Constructor, getFactoryCode);
                     _constructorBuilder.IL.SetField(fieldBuilder, callConstructorCode);
-                    
-                    //_constructorBuilder.IL.SetField(fieldBuilder, dynamicTraveller.Constructor);
                 }
             }
             _constructorBuilder.IL.Return();

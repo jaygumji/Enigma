@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace Enigma.IoC
 {
-    public class IoCContainer : IIoCRegistrator, IServiceLocator
+    public class IoCContainer : IIoCRegistrator, Enigma.IInstanceFactory
     {
 
         private readonly Dictionary<Type, IIoCRegistration> _registrations;

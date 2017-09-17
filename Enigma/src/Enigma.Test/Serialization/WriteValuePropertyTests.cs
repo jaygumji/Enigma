@@ -12,139 +12,122 @@ namespace Enigma.Test.Serialization
     public class WriteValuePropertyTests
     {
 
+        private readonly TravellerTestContext _context = new TravellerTestContext();
+
         [Fact]
         public void WriteInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new Int16Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new Int16Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new Int32Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new Int32Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new Int64Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new Int64Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new UInt16Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new UInt16Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new UInt32Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new UInt32Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new UInt64Graph { Value = 42 });
+            _context.AssertWriteSingleProperty(new UInt64Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteBooleanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new BooleanGraph { Value = true });
+            _context.AssertWriteSingleProperty(new BooleanGraph { Value = true });
         }
 
         [Fact]
         public void WriteSingleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new SingleGraph { Value = 42.3f });
+            _context.AssertWriteSingleProperty(new SingleGraph { Value = 42.3f });
         }
 
         [Fact]
         public void WriteDoubleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new DoubleGraph { Value = 42.7d });
+            _context.AssertWriteSingleProperty(new DoubleGraph { Value = 42.7d });
         }
 
         [Fact]
         public void WriteDecimalTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new DecimalGraph { Value = 42.74343M });
+            _context.AssertWriteSingleProperty(new DecimalGraph { Value = 42.74343M });
         }
 
         [Fact]
         public void WriteTimeSpanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new TimeSpanGraph { Value = new TimeSpan(12, 30, 00) });
+            _context.AssertWriteSingleProperty(new TimeSpanGraph { Value = new TimeSpan(12, 30, 00) });
         }
 
         [Fact]
         public void WriteDateTimeTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new DateTimeGraph { Value = new DateTime(2001, 01, 07, 15, 30, 24) });
+            _context.AssertWriteSingleProperty(new DateTimeGraph { Value = new DateTime(2001, 01, 07, 15, 30, 24) });
         }
 
         [Fact]
         public void WriteStringTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new StringGraph { Value = "Hello World" });
+            _context.AssertWriteSingleProperty(new StringGraph { Value = "Hello World" });
         }
 
         [Fact]
         public void WriteGuidTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new GuidGraph { Value = Guid.Empty });
+            _context.AssertWriteSingleProperty(new GuidGraph { Value = Guid.Empty });
         }
 
         [Fact]
         public void WriteBlobTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new BlobGraph { Value = new byte[]{1,2,3} });
+            _context.AssertWriteSingleProperty(new BlobGraph { Value = new byte[]{1,2,3} });
         }
 
         [Fact]
         public void WriteEnumTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertWriteSingleProperty(new EnumGraph { Value = ApplicationType.Api });
+            _context.AssertWriteSingleProperty(new EnumGraph { Value = ApplicationType.Api });
         }
 
         [Fact]
         public void WriteComplexTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(4, new ComplexGraph { Value = new Relation {Id = Guid.Empty, Name = "Test", Value = 1} });
+            var stats = _context.AssertWrite(4, new ComplexGraph { Value = new Relation {Id = Guid.Empty, Name = "Test", Value = 1} });
             stats.AssertVisitOrderExact(LevelType.Single, LevelType.Value, LevelType.Value, LevelType.Value, LevelType.Value);
         }
 
         [Fact]
         public void WriteDictionaryTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(2, new DictionaryGraph { Value = new Dictionary<int, string> { {2, "Test"}}});
+            var stats = _context.AssertWrite(2, new DictionaryGraph { Value = new Dictionary<int, string> { {2, "Test"}}});
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.DictionaryValue);
         }
 
         [Fact]
         public void WriteDictionaryWithComplexValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(12, new DictionaryWithComplexValueGraph {
+            var stats = _context.AssertWrite(12, new DictionaryWithComplexValueGraph {
                 Value = new Dictionary<string, Category> {
                     {"A", new Category {Name = "Warning", Description = "Warning of something", Image = new byte[]{1, 2, 3, 4, 5}}},
                     {"B", new Category {Name = "Error", Description = "Error of something", Image = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9}}},
@@ -160,8 +143,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithComplexKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(15, new DictionaryWithComplexKeyAndValueGraph {
+            var stats = _context.AssertWrite(15, new DictionaryWithComplexKeyAndValueGraph {
                 Value = new Dictionary<Identifier, Category> {
                     {new Identifier {Id = 1, Type = ApplicationType.Api}, new Category {Name = "Warning", Description = "Warning of something", Image = new byte[]{1, 2, 3, 4, 5}}},
                     {new Identifier {Id = 2, Type = ApplicationType.Api}, new Category {Name = "Error", Description = "Error of something", Image = new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9}}},
@@ -178,8 +160,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithComplexKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(9, new DictionaryWithComplexKeyGraph {
+            var stats = _context.AssertWrite(9, new DictionaryWithComplexKeyGraph {
                 Value = new Dictionary<Identifier, string> {
                     {new Identifier {Id = 1, Type = ApplicationType.Api}, "A"},
                     {new Identifier {Id = 2, Type = ApplicationType.Api}, "B"},
@@ -195,8 +176,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithDictionaryKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(3, new DictionaryWithDictionaryKeyGraph {
+            var stats = _context.AssertWrite(3, new DictionaryWithDictionaryKeyGraph {
                 Value = new Dictionary<Dictionary<int, string>, string> {
                     {new Dictionary<int, string> {{42, "No 42"}}, "Hello World"}
                 }
@@ -208,8 +188,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithDictionaryValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(3, new DictionaryWithDictionaryValueGraph {
+            var stats = _context.AssertWrite(3, new DictionaryWithDictionaryValueGraph {
                 Value = new Dictionary<string, Dictionary<int, string>> {
                     {"X", new Dictionary<int, string> {{42, "No 42"}}}
                 }
@@ -221,8 +200,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithDictionaryKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(4, new DictionaryWithDictionaryKeyAndValueGraph {
+            var stats = _context.AssertWrite(4, new DictionaryWithDictionaryKeyAndValueGraph {
                 Value = new Dictionary<Dictionary<string, int>, Dictionary<int, string>> {
                     {new Dictionary<string, int> {{"No 42", 42}}, new Dictionary<int, string> {{42, "No 42"}}}
                 }
@@ -235,8 +213,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithCollectionKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(2, new DictionaryWithCollectionKeyGraph {
+            var stats = _context.AssertWrite(2, new DictionaryWithCollectionKeyGraph {
                 Value = new Dictionary<List<int>, string> {
                     {new List<int> {42}, "Hello World"}
                 }
@@ -248,8 +225,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithCollectionValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(2, new DictionaryWithCollectionValueGraph {
+            var stats = _context.AssertWrite(2, new DictionaryWithCollectionValueGraph {
                 Value = new Dictionary<string, List<int>> {
                     {"X", new List<int> {42}}
                 }
@@ -261,8 +237,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteDictionaryWithCollectionKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(2, new DictionaryWithCollectionKeyAndValueGraph {
+            var stats = _context.AssertWrite(2, new DictionaryWithCollectionKeyAndValueGraph {
                 Value = new Dictionary<List<int>, List<string>> {
                     {new List<int> {42}, new List<string> {"No 42"}}
                 }
@@ -274,16 +249,14 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteCollectionTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(1, new CollectionGraph {Value = new List<string> {"Test"}});
+            var stats = _context.AssertWrite(1, new CollectionGraph {Value = new List<string> {"Test"}});
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionItem);
         }
 
         [Fact]
         public void WriteCollectionOfComplexTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(4, new CollectionOfComplexGraph {
+            var stats = _context.AssertWrite(4, new CollectionOfComplexGraph {
                 Value = new List<Relation> {new Relation {Id = Guid.Empty, Name = "Test", Value = 1}}
             });
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionItem, LevelType.Value, LevelType.Value,
@@ -293,8 +266,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteCollectionOfDictionaryTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(2, new CollectionOfDictionaryGraph {
+            var stats = _context.AssertWrite(2, new CollectionOfDictionaryGraph {
                 Value = new List<Dictionary<string, int>> {
                     new Dictionary<string, int> {{"Test", 42}}
                 }
@@ -306,8 +278,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteCollectionOfCollectionTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(1, new CollectionOfCollectionGraph {
+            var stats = _context.AssertWrite(1, new CollectionOfCollectionGraph {
                 Value = new List<List<string>> {
                     new List<string> {"Test"}
                 }
@@ -318,8 +289,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteJaggedArrayTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(6, new JaggedArrayGraph {
+            var stats = _context.AssertWrite(6, new JaggedArrayGraph {
                 Value = new[] { new []{5, 2, 3}, new []{1, 2, 3} }
             });
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionInCollection, LevelType.CollectionItem,
@@ -330,8 +300,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void WriteMultidimensionalArrayTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertWrite(6, new MultidimensionalArrayGraph {
+            var stats = _context.AssertWrite(6, new MultidimensionalArrayGraph {
                 Value = new[,] {{5, 2, 3}, {1, 2, 3}}
             });
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionInCollection, LevelType.CollectionItem,

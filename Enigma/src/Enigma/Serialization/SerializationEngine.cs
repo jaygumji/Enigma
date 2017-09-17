@@ -4,26 +4,39 @@ using Enigma.Serialization.Reflection.Emit;
 using Enigma.IoC;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Enigma.Serialization.Reflection;
 
 namespace Enigma.Serialization
 {
     public class SerializationEngine
     {
 
+        private static readonly DynamicTravellerContext SharedContext = new DynamicTravellerContext();
+
         private static readonly ConcurrentDictionary<Type, DynamicActivator> _activators
             = new ConcurrentDictionary<Type, DynamicActivator>();
 
         private readonly DynamicTravellerContext _context;
-        private readonly IServiceLocator _serviceLocator;
+        private readonly IInstanceFactory _instanceFactory;
+
+        public SerializationEngine()
+            : this(SharedContext, new IoCContainer())
+        {
+        }
+
+        public SerializationEngine(IInstanceFactory instanceFactory)
+            : this(SharedContext, instanceFactory)
+        {
+        }
 
         public SerializationEngine(DynamicTravellerContext context)
             : this(context, new IoCContainer())
         {
         }
 
-        public SerializationEngine(DynamicTravellerContext context, IServiceLocator serviceLocator)
+        public SerializationEngine(DynamicTravellerContext context, IInstanceFactory instanceFactory)
         {
-            _serviceLocator = serviceLocator;
+            _instanceFactory = instanceFactory;
             _context = context;
         }
 
@@ -35,7 +48,7 @@ namespace Enigma.Serialization
 
             var traveller = _context.GetInstance(type);
 
-            var rootArgs = VisitArgs.Root(type.Name);
+            var rootArgs = VisitArgs.CreateRoot(LevelType.Single);
             visitor.Visit(graph, rootArgs);
             traveller.Travel(visitor, graph);
             visitor.Leave(graph, rootArgs);
@@ -49,7 +62,7 @@ namespace Enigma.Serialization
 
             var traveller = (IGraphTraveller<T>)_context.GetInstance(type);
 
-            var rootArgs = VisitArgs.Root(type.Name);
+            var rootArgs = VisitArgs.CreateRoot(LevelType.Single);
             visitor.Visit(graph, rootArgs);
             traveller.Travel(visitor, graph);
             visitor.Leave(graph, rootArgs);
@@ -58,8 +71,8 @@ namespace Enigma.Serialization
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private object CreateInstance(Type type)
         {
-            if (_serviceLocator != null
-                && _serviceLocator.TryGetInstance(type, out object instance)) {
+            if (_instanceFactory != null
+                && _instanceFactory.TryGetInstance(type, out object instance)) {
                 return instance;
             }
 
@@ -80,7 +93,7 @@ namespace Enigma.Serialization
             if (visitor == null) throw new ArgumentNullException(nameof(visitor));
             if (type == null) throw new ArgumentNullException(nameof(type));
 
-            var args = VisitArgs.Root(type.Name);
+            var args = VisitArgs.CreateRoot(LevelType.Single);
             if (visitor.TryVisit(args) != ValueState.Found)
                 return null;
 
@@ -99,7 +112,7 @@ namespace Enigma.Serialization
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (graph == null) throw new ArgumentNullException(nameof(graph));
 
-            var args = VisitArgs.Root(type.Name);
+            var args = VisitArgs.CreateRoot(LevelType.Single);
             if (visitor.TryVisit(args) != ValueState.Found)
                 return;
 
@@ -114,7 +127,7 @@ namespace Enigma.Serialization
             if (visitor == null) throw new ArgumentNullException(nameof(visitor));
             var type = typeof(T);
 
-            var args = VisitArgs.Root(type.Name);
+            var args = VisitArgs.CreateRoot(LevelType.Single);
             if (visitor.TryVisit(args) != ValueState.Found)
                 return default(T);
 
@@ -132,9 +145,8 @@ namespace Enigma.Serialization
         {
             if (visitor == null) throw new ArgumentNullException(nameof(visitor));
             if (graph == null) throw new ArgumentNullException(nameof(graph));
-            var type = typeof(T);
 
-            var args = VisitArgs.Root(type.Name);
+            var args = VisitArgs.CreateRoot(LevelType.Single);
             if (visitor.TryVisit(args) != ValueState.Found)
                 return;
 

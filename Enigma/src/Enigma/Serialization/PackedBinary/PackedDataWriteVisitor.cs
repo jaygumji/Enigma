@@ -24,10 +24,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void Visit(object level, VisitArgs args)
         {
-            if (args.Type == LevelType.Root) return;
-
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (level == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -35,12 +34,19 @@ namespace Enigma.Serialization.PackedBinary
             }
 
             _buffer.WriteByte(BinaryZPacker.VariabelLength);
+
+            if (args.IsRoot) {
+                return;
+            }
+
             _reservations.Push(_writer.Reserve());
         }
 
         public void Leave(object level, VisitArgs args)
         {
-            if (args.Type == LevelType.Root) return;
+            if (args.IsRoot) {
+                return;
+            }
 
             if (level != null) {
                 var reservation = _reservations.Pop();
@@ -51,8 +57,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(byte? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -65,8 +71,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(short? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -81,8 +87,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(int? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -97,8 +103,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(long? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -113,8 +119,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(ushort? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -129,8 +135,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(uint? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -145,8 +151,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(ulong? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -161,8 +167,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(bool? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -176,8 +182,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(float? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -191,8 +198,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(double? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -206,8 +214,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(decimal? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -221,8 +230,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(TimeSpan? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -237,8 +247,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(DateTime? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -256,8 +267,9 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(string value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0) {
+                BinaryZPacker.Pack(_buffer, args.Index);
+            }
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -279,8 +291,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(Guid? value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);
@@ -294,8 +306,8 @@ namespace Enigma.Serialization.PackedBinary
 
         public void VisitValue(byte[] value, VisitArgs args)
         {
-            if (args.Metadata.Index > 0)
-                BinaryZPacker.Pack(_buffer, args.Metadata.Index);
+            if (args.Index > 0)
+                BinaryZPacker.Pack(_buffer, args.Index);
 
             if (value == null) {
                 _buffer.WriteByte(BinaryZPacker.Null);

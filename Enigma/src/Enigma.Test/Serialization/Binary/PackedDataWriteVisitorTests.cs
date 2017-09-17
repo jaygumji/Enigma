@@ -9,6 +9,8 @@ namespace Enigma.Test.Serialization.Binary
     public class PackedDataWriteVisitorTests
     {
 
+        private readonly BinarySerializationTestContext _context = new BinarySerializationTestContext();
+
         //[Fact]
         //public void WriteHardCodedTravelTest()
         //{
@@ -19,14 +21,12 @@ namespace Enigma.Test.Serialization.Binary
         [Fact]
         public void WriteDynamicTravelTest()
         {
-            var context = new SerializationTestContext();
-
-            var bytes = context.Pack(DataBlock.Filled());
+            var bytes = _context.Pack(DataBlock.Filled());
             Assert.NotNull(bytes);
             Assert.True(bytes.Length > 0);
             var hex = "0x" + string.Join("", bytes.Select(b => b.ToString("X")));
             Assert.NotNull(hex);
-            var expected = SerializationTestContext.GetFilledDataBlockHexString();
+            var expected = BinarySerializationTestContext.GetFilledDataBlockHexString();
             Assert.Equal(expected, hex);
         }
 

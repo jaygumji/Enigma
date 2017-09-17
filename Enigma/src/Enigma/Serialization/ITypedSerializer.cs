@@ -1,7 +1,14 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Enigma.Serialization
 {
+    public interface ISerializer
+    {
+        void Serialize(Stream stream, object graph);
+        object Deserialize(Type type, Stream stream);
+    }
+
     public interface ITypedSerializer
     {
         void Serialize(Stream stream, object graph);

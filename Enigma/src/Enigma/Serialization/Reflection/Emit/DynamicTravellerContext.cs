@@ -50,16 +50,17 @@ namespace Enigma.Serialization.Reflection.Emit
             return traveller;
         }
 
-        public IGraphTraveller GetInstance(Type graphType)
+        public IGraphTraveller GetInstance(Type graphType, IVisitArgsFactory visitArgsFactory = null)
         {
             var dyn = Get(graphType);
-            return dyn.GetInstance();
+            return dyn.GetInstance(visitArgsFactory ?? new VisitArgsFactory(_typeProvider, graphType));
         }
 
-        public IGraphTraveller<T> GetInstance<T>()
+        public IGraphTraveller<T> GetInstance<T>(IVisitArgsFactory visitArgsFactory = null)
         {
-            var dyn = Get(typeof (T));
-            var instance = (IGraphTraveller<T>) dyn.GetInstance();
+            var graphType = typeof(T);
+            var dyn = Get(graphType);
+            var instance = (IGraphTraveller<T>) dyn.GetInstance(visitArgsFactory ?? new VisitArgsFactory(_typeProvider, graphType));
             return instance;
         }
 

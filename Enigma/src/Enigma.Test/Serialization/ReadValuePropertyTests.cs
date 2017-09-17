@@ -10,131 +10,115 @@ namespace Enigma.Test.Serialization
     public class ReadValuePropertyTests
     {
 
+        private readonly TravellerTestContext _context = new TravellerTestContext();
+
         [Fact]
         public void ReadInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<Int16Graph>();
+            _context.AssertReadSingleProperty<Int16Graph>();
         }
 
         [Fact]
         public void ReadInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<Int32Graph>();
+            _context.AssertReadSingleProperty<Int32Graph>();
         }
 
         [Fact]
         public void ReadInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<Int64Graph>();
+            _context.AssertReadSingleProperty<Int64Graph>();
         }
 
         [Fact]
         public void ReadUInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<UInt16Graph>();
+            _context.AssertReadSingleProperty<UInt16Graph>();
         }
 
         [Fact]
         public void ReadUInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<UInt32Graph>();
+            _context.AssertReadSingleProperty<UInt32Graph>();
         }
 
         [Fact]
         public void ReadUInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<UInt64Graph>();
+            _context.AssertReadSingleProperty<UInt64Graph>();
         }
 
         [Fact]
         public void ReadBooleanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<BooleanGraph>();
+            _context.AssertReadSingleProperty<BooleanGraph>();
         }
 
         [Fact]
         public void ReadSingleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<SingleGraph>();
+            _context.AssertReadSingleProperty<SingleGraph>();
         }
 
         [Fact]
         public void ReadDoubleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<DoubleGraph>();
+            _context.AssertReadSingleProperty<DoubleGraph>();
         }
 
         [Fact]
         public void ReadDecimalTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<DecimalGraph>();
+            _context.AssertReadSingleProperty<DecimalGraph>();
         }
 
         [Fact]
         public void ReadTimeSpanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<TimeSpanGraph>();
+            _context.AssertReadSingleProperty<TimeSpanGraph>();
         }
 
         [Fact]
         public void ReadDateTimeTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<DateTimeGraph>();
+            _context.AssertReadSingleProperty<DateTimeGraph>();
         }
 
         [Fact]
         public void ReadStringTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<StringGraph>();
+            _context.AssertReadSingleProperty<StringGraph>();
         }
 
         [Fact]
         public void ReadGuidTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<GuidGraph>();
+            _context.AssertReadSingleProperty<GuidGraph>();
         }
 
         [Fact]
         public void ReadBlobTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<BlobGraph>();
+            _context.AssertReadSingleProperty<BlobGraph>();
         }
 
         [Fact]
         public void ReadEnumTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertReadSingleProperty<EnumGraph>();
+            _context.AssertReadSingleProperty<EnumGraph>();
         }
 
         [Fact]
         public void ReadComplexTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<ComplexGraph>(4);
+            var stats = _context.AssertRead<ComplexGraph>(4);
             stats.AssertVisitOrderExact(LevelType.Single, LevelType.Value, LevelType.Value, LevelType.Value, LevelType.Value);
         }
 
         [Fact]
         public void ReadDictionaryTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryGraph>(3);
+            var stats = _context.AssertRead<DictionaryGraph>(3);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.DictionaryValue,
                 LevelType.DictionaryKey);
         }
@@ -142,8 +126,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithComplexValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithComplexValueGraph>(5);
+            var stats = _context.AssertRead<DictionaryWithComplexValueGraph>(5);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.DictionaryValue,
                 LevelType.Value, LevelType.Value, LevelType.Value, LevelType.DictionaryKey);
         }
@@ -151,8 +134,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithComplexKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithComplexKeyAndValueGraph>(5);
+            var stats = _context.AssertRead<DictionaryWithComplexKeyAndValueGraph>(5);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.Value, LevelType.Value,
                 LevelType.DictionaryValue, LevelType.Value, LevelType.Value, LevelType.Value,
                 LevelType.DictionaryKey);
@@ -161,8 +143,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryCount3WithComplexKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithComplexKeyAndValueGraph>(15, 3);
+            var stats = _context.AssertRead<DictionaryWithComplexKeyAndValueGraph>(15, 3);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.Value, LevelType.Value,
                 LevelType.DictionaryValue, LevelType.Value, LevelType.Value, LevelType.Value,
                 LevelType.DictionaryKey, LevelType.Value, LevelType.Value,
@@ -175,8 +156,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithComplexKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithComplexKeyGraph>(3);
+            var stats = _context.AssertRead<DictionaryWithComplexKeyGraph>(3);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey, LevelType.Value, LevelType.Value,
                 LevelType.DictionaryValue, LevelType.DictionaryKey);
         }
@@ -184,8 +164,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithDictionaryKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithDictionaryKeyGraph>(4);
+            var stats = _context.AssertRead<DictionaryWithDictionaryKeyGraph>(4);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryInDictionaryKey,
                 LevelType.DictionaryKey, LevelType.DictionaryValue, LevelType.DictionaryKey, LevelType.DictionaryValue,
                 LevelType.DictionaryInDictionaryKey);
@@ -194,8 +173,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithDictionaryValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithDictionaryValueGraph>(5);
+            var stats = _context.AssertRead<DictionaryWithDictionaryValueGraph>(5);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey,
                 LevelType.DictionaryInDictionaryValue, LevelType.DictionaryKey, LevelType.DictionaryValue,
                 LevelType.DictionaryKey, LevelType.DictionaryKey);
@@ -204,8 +182,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithDictionaryKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithDictionaryKeyAndValueGraph>(6);
+            var stats = _context.AssertRead<DictionaryWithDictionaryKeyAndValueGraph>(6);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryInDictionaryKey,
                 LevelType.DictionaryKey, LevelType.DictionaryValue, LevelType.DictionaryKey,
                 LevelType.DictionaryInDictionaryValue, LevelType.DictionaryKey, LevelType.DictionaryValue,
@@ -215,8 +192,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithCollectionKeyTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithCollectionKeyGraph>(3);
+            var stats = _context.AssertRead<DictionaryWithCollectionKeyGraph>(3);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.CollectionInDictionaryKey,
                 LevelType.CollectionItem, LevelType.CollectionItem, LevelType.DictionaryValue,
                 LevelType.CollectionInDictionaryKey);
@@ -225,8 +201,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithCollectionValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithCollectionValueGraph>(4);
+            var stats = _context.AssertRead<DictionaryWithCollectionValueGraph>(4);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.DictionaryKey,
                 LevelType.CollectionInDictionaryValue, LevelType.CollectionItem, LevelType.CollectionItem,
                 LevelType.DictionaryKey);
@@ -235,8 +210,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadDictionaryWithCollectionKeyAndValueTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<DictionaryWithCollectionKeyAndValueGraph>(4);
+            var stats = _context.AssertRead<DictionaryWithCollectionKeyAndValueGraph>(4);
             stats.AssertVisitOrderExact(LevelType.Dictionary, LevelType.CollectionInDictionaryKey,
                 LevelType.CollectionItem, LevelType.CollectionItem, LevelType.CollectionInDictionaryValue,
                 LevelType.CollectionItem, LevelType.CollectionItem, LevelType.CollectionInDictionaryKey);
@@ -245,16 +219,14 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadCollectionTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<CollectionGraph>(2);
+            var stats = _context.AssertRead<CollectionGraph>(2);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionItem, LevelType.CollectionItem);
         }
 
         [Fact]
         public void ReadCollectionOfComplexTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<CollectionOfComplexGraph>(4);
+            var stats = _context.AssertRead<CollectionOfComplexGraph>(4);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionItem, LevelType.Value, LevelType.Value,
                 LevelType.Value, LevelType.Value, LevelType.CollectionItem);
         }
@@ -262,8 +234,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadCollectionOfDictionaryTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<CollectionOfDictionaryGraph>(3);
+            var stats = _context.AssertRead<CollectionOfDictionaryGraph>(3);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.DictionaryInCollection, LevelType.DictionaryKey,
                 LevelType.DictionaryValue, LevelType.DictionaryKey, LevelType.DictionaryInCollection);
         }
@@ -271,8 +242,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadCollectionOfCollectionTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<CollectionOfCollectionGraph>(2);
+            var stats = _context.AssertRead<CollectionOfCollectionGraph>(2);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionInCollection, LevelType.CollectionItem,
                 LevelType.CollectionItem, LevelType.CollectionInCollection);
         }
@@ -280,8 +250,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadJaggedArrayTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<JaggedArrayGraph>(2);
+            var stats = _context.AssertRead<JaggedArrayGraph>(2);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionInCollection, LevelType.CollectionItem,
                 LevelType.CollectionItem, LevelType.CollectionInCollection);
         }
@@ -289,8 +258,7 @@ namespace Enigma.Test.Serialization
         [Fact]
         public void ReadMultidimensionalArrayTest()
         {
-            var context = new SerializationTestContext();
-            var stats = context.AssertRead<MultidimensionalArrayGraph>(2);
+            var stats = _context.AssertRead<MultidimensionalArrayGraph>(2);
             stats.AssertVisitOrderExact(LevelType.Collection, LevelType.CollectionInCollection, LevelType.CollectionItem,
                 LevelType.CollectionItem, LevelType.CollectionInCollection);
         }

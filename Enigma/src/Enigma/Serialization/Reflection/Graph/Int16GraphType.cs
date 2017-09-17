@@ -8,10 +8,10 @@ namespace Enigma.Serialization.Reflection.Graph
         private readonly SerializableProperty _property;
         private readonly VisitArgs _args;
 
-        public Int16GraphProperty(SerializableProperty property)
+        public Int16GraphProperty(SerializableProperty property, VisitArgs args)
         {
             _property = property;
-            _args = property.CreateVisitArgs();
+            _args = args;
         }
 
         public void Visit(object graph, IReadVisitor visitor)

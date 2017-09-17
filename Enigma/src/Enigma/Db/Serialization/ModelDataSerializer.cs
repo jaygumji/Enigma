@@ -5,10 +5,12 @@ using Enigma.Serialization;
 
 namespace Enigma.Db.Serialization
 {
+    internal static class ModelDataSerializer
+    {
+        internal static readonly DynamicTravellerContext Context = new DynamicTravellerContext(new ModelSerializationReflectionInspector());
+    }
     public class ModelDataSerializer<T> : ITypedSerializer<T>
     {
-
-        private static readonly DynamicTravellerContext Context = new DynamicTravellerContext(new ModelSerializationReflectionInspector());
 
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
@@ -20,7 +22,7 @@ namespace Enigma.Db.Serialization
         public ModelDataSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine(Context);
+            _engine = new SerializationEngine(ModelDataSerializer.Context);
         }
 
         void ITypedSerializer.Serialize(Stream stream, object graph)

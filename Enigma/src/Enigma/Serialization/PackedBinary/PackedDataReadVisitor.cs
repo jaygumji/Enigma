@@ -11,7 +11,7 @@ namespace Enigma.Serialization.PackedBinary
         private readonly BinaryDataReader _reader;
         private UInt32 _nextIndex;
         private bool _endOfLevel;
-
+        
         public PackedDataReadVisitor(Stream stream)
         {
             _stream = stream;
@@ -57,15 +57,17 @@ namespace Enigma.Serialization.PackedBinary
 
         public ValueState TryVisit(VisitArgs args)
         {
-            if (args.Type == LevelType.Root) return ValueState.Found;
-
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index))
+            if (args.Index > 0 && !MoveToIndex(args.Index))
                 return ValueState.NotFound;
 
             var byteLength = _reader.ReadByte();
             if (byteLength == BinaryZPacker.Null) return ValueState.Null;
             if (byteLength != BinaryZPacker.VariabelLength)
                 throw new UnexpectedLengthException(args, byteLength);
+
+            if (args.IsRoot) {
+                return ValueState.Found;
+            }
 
             _reader.Skip(4);
 
@@ -79,7 +81,7 @@ namespace Enigma.Serialization.PackedBinary
                 return;
             }
 
-            if (args.Type == LevelType.Root) return;
+            if (args.IsRoot) return;
             if (args.Type.IsCollection()) return;
             if (args.Type.IsDictionary()) return;
 
@@ -89,7 +91,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out byte? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -107,7 +109,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out short? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -122,7 +124,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out int? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -137,7 +139,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out long? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -152,7 +154,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out ushort? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -167,7 +169,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out uint? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -182,7 +184,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out ulong? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -197,7 +199,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out bool? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -215,7 +217,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out float? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -233,7 +235,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out double? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -251,7 +253,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out decimal? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -269,7 +271,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out TimeSpan? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -284,7 +286,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out DateTime? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -299,7 +301,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out string value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -317,7 +319,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out Guid? value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }
@@ -335,7 +337,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public bool TryVisitValue(VisitArgs args, out byte[] value)
         {
-            if (args.Metadata.Index > 0 && !MoveToIndex(args.Metadata.Index)) {
+            if (args.Index > 0 && !MoveToIndex(args.Index)) {
                 value = null;
                 return false;
             }

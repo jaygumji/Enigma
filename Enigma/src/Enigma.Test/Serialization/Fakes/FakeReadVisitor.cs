@@ -56,10 +56,16 @@ namespace Enigma.Test.Serialization.Fakes
             LevelType.DictionaryInCollection,
             LevelType.DictionaryInDictionaryKey,
             LevelType.DictionaryInDictionaryValue
-        }; 
+        };
+
+        private static string GetName(VisitArgs args)
+        {
+            return args.Name ?? args.Type.ToString();
+        }
+
         private bool ShouldRead(VisitArgs args)
         {
-            var key = _args.Count == 0 ? args.Name : string.Concat(_args.Peek().Name, "---", args.Name);
+            var key = _args.Count == 0 ? GetName(args) : string.Concat(GetName(_args.Peek()), "---", GetName(args));
             var visitCount = 0;
             if (_propertyVisitCounts.ContainsKey(key))
                 visitCount = ++_propertyVisitCounts[key];

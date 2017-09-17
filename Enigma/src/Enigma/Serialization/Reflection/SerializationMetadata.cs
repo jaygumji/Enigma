@@ -2,19 +2,16 @@
 {
     public class SerializationMetadata
     {
-        public static readonly SerializationMetadata Root = new SerializationMetadata(1, new Arguments());
-        public static readonly SerializationMetadata Item = new SerializationMetadata(0, new Arguments());
+        public static readonly SerializationMetadata Root = new SerializationMetadata(1, new StateBag());
+        public static readonly SerializationMetadata Item = new SerializationMetadata(0, new StateBag());
 
-        private readonly uint _index;
-        private readonly Arguments _args;
-
-        public SerializationMetadata(uint index, Arguments args)
+        public SerializationMetadata(uint index, StateBag args)
         {
-            _index = index;
-            _args = args;
+            Index = index;
+            Args = args;
         }
 
-        public uint Index { get { return _index; } }
-        public Arguments Args { get { return _args; } }
+        public uint Index { get; }
+        public StateBag Args { get; }
     }
 }

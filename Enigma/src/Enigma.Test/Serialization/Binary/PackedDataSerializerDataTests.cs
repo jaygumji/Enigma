@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Enigma.Serialization.PackedBinary;
 using Enigma.Test.Serialization.Fakes;
 using Enigma.Testing.Fakes.Entities;
 using Xunit;
@@ -13,6 +11,9 @@ namespace Enigma.Test.Serialization.Binary
     
     public class PackedDataSerializerDataTests
     {
+
+        private readonly BinarySerializationTestContext _context = new BinarySerializationTestContext();
+
         [Fact]
         public void WriteAndReadNullableValuesTest()
         {
@@ -23,8 +24,7 @@ namespace Enigma.Test.Serialization.Binary
                 MayInt = 44,
                 MayTimeSpan = new TimeSpan(22, 30, 10)
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual);
             Assert.Equal(1, actual.Id);
@@ -45,8 +45,7 @@ namespace Enigma.Test.Serialization.Binary
                 }
             };
 
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual);
             Assert.NotNull(actual.Test);
@@ -67,8 +66,7 @@ namespace Enigma.Test.Serialization.Binary
                 }
             };
 
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual);
             Assert.NotNull(actual.Test);
@@ -83,8 +81,7 @@ namespace Enigma.Test.Serialization.Binary
         {
             var graph = new Identifier { Id = 1, Type = ApplicationType.Api };
 
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual);
             Assert.Equal(graph.Id, actual.Id);

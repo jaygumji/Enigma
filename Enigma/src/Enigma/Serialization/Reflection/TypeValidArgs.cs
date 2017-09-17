@@ -4,19 +4,13 @@ namespace Enigma.Serialization.Reflection
 {
     public class TypeValidArgs
     {
-        private readonly Type _type;
-
+        public Type Type { get; }
         public bool IsValid { get; set; }
 
         public TypeValidArgs(Type type)
         {
-            _type = type;
+            Type = type;
             IsValid = true;
-        }
-
-        public Type Type
-        {
-            get { return _type; }
         }
 
     }

@@ -56,7 +56,7 @@ namespace Enigma.Test.Serialization.Binary
         [Fact]
         public void ReadHardCodedTravelTest()
         {
-            var bytes = SerializationTestContext.GetFilledDataBlockBlob();
+            var bytes = BinarySerializationTestContext.GetFilledDataBlockBlob();
             var stream = new MemoryStream(bytes);
             var visitor = new PackedDataReadVisitor(stream);
 
@@ -72,7 +72,7 @@ namespace Enigma.Test.Serialization.Binary
         [Fact]
         public void ReadDynamicTravelTest()
         {
-            var bytes = SerializationTestContext.GetFilledDataBlockBlob();
+            var bytes = BinarySerializationTestContext.GetFilledDataBlockBlob();
             var stream = new MemoryStream(bytes);
             var visitor = new PackedDataReadVisitor(stream);
 

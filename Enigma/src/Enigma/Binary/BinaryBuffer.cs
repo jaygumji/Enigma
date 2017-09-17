@@ -34,6 +34,7 @@ namespace Enigma.Binary
         }
 
         public byte[] Buffer => _buffer;
+        public int Position => _position;
         private bool HasReservations => _firstReservation != null;
 
         public void RequestSpace(int length)

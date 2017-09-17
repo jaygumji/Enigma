@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Enigma.Binary;
 
 namespace Enigma.IO
@@ -8,14 +9,27 @@ namespace Enigma.IO
     public class BinaryDataWriter : IDataWriter
     {
         private readonly BinaryBuffer _buffer;
+        private readonly Encoding _encoding;
 
-        public BinaryDataWriter(Stream stream) : this(new BinaryBuffer(8024, stream))
+        public BinaryDataWriter(Stream stream, Encoding encoding)
+            : this(new BinaryBuffer(8024, stream), encoding)
+        {
+        }
+
+        public BinaryDataWriter(Stream stream)
+            : this(new BinaryBuffer(8024, stream), Encoding.UTF8)
         {
         }
 
         public BinaryDataWriter(BinaryBuffer buffer)
+            : this(buffer, Encoding.UTF8)
+        {
+        }
+
+        public BinaryDataWriter(BinaryBuffer buffer, Encoding encoding)
         {
             _buffer = buffer;
+            _encoding = encoding;
         }
 
         public BinaryBufferReservation Reserve()
@@ -140,7 +154,8 @@ namespace Enigma.IO
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            Write(BinaryInformation.String, value);
+            var bytes = _encoding.GetBytes(value);
+            _buffer.Write(bytes, 0, bytes.Length);
         }
 
         public void Write(Guid value)

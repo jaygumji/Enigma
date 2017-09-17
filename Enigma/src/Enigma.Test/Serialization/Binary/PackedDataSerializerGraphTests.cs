@@ -13,110 +13,97 @@ namespace Enigma.Test.Serialization.Binary
     public class PackedDataSerializerGraphTests
     {
 
+        private readonly BinarySerializationTestContext _context = new BinarySerializationTestContext();
+
         [Fact]
         public void WriteInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new Int16Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new Int16Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new Int32Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new Int32Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new Int64Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new Int64Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt16Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new UInt16Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new UInt16Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt32Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new UInt32Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new UInt32Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteUInt64Test()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new UInt64Graph { Value = 42 });
+            _context.AssertBinarySingleProperty(new UInt64Graph { Value = 42 });
         }
 
         [Fact]
         public void WriteBooleanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new BooleanGraph { Value = true });
+            _context.AssertBinarySingleProperty(new BooleanGraph { Value = true });
         }
 
         [Fact]
         public void WriteSingleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new SingleGraph { Value = 42.3f });
+            _context.AssertBinarySingleProperty(new SingleGraph { Value = 42.3f });
         }
 
         [Fact]
         public void WriteDoubleTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new DoubleGraph { Value = 42.7d });
+            _context.AssertBinarySingleProperty(new DoubleGraph { Value = 42.7d });
         }
 
         [Fact]
         public void WriteDecimalTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new DecimalGraph { Value = 42.74343M });
+            _context.AssertBinarySingleProperty(new DecimalGraph { Value = 42.74343M });
         }
 
         [Fact]
         public void WriteTimeSpanTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new TimeSpanGraph { Value = new TimeSpan(12, 30, 00) });
+            _context.AssertBinarySingleProperty(new TimeSpanGraph { Value = new TimeSpan(12, 30, 00) });
         }
 
         [Fact]
         public void WriteDateTimeTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new DateTimeGraph { Value = new DateTime(2001, 01, 07, 15, 30, 24) });
+            _context.AssertBinarySingleProperty(new DateTimeGraph { Value = new DateTime(2001, 01, 07, 15, 30, 24) });
         }
 
         [Fact]
         public void WriteStringTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new StringGraph { Value = "Hello World" });
+            _context.AssertBinarySingleProperty(new StringGraph { Value = "Hello World" });
         }
 
         [Fact]
         public void WriteGuidTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new GuidGraph { Value = Guid.NewGuid() });
+            _context.AssertBinarySingleProperty(new GuidGraph { Value = Guid.NewGuid() });
         }
 
         [Fact]
         public void WriteBlobTest()
         {
             var graph = new BlobGraph {Value = new byte[] {1, 2, 3}};
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.True(graph.Value.SequenceEqual(actual.Value));
@@ -125,16 +112,14 @@ namespace Enigma.Test.Serialization.Binary
         [Fact]
         public void WriteEnumTest()
         {
-            var context = new SerializationTestContext();
-            context.AssertBinarySingleProperty(new EnumGraph { Value = ApplicationType.Api });
+            _context.AssertBinarySingleProperty(new EnumGraph { Value = ApplicationType.Api });
         }
 
         [Fact]
         public void WriteComplexTest()
         {
             var graph = new ComplexGraph {Value = new Relation {Id = Guid.NewGuid(), Name = "Test", Description = "Binary", Value = 1}};
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(graph.Value.Id, actual.Value.Id);
@@ -147,8 +132,7 @@ namespace Enigma.Test.Serialization.Binary
         public void WriteDictionaryTest()
         {
             var graph = new DictionaryGraph {Value = new Dictionary<int, string> {{2, "Test"}}};
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -174,8 +158,7 @@ namespace Enigma.Test.Serialization.Binary
                     }}, {"C", new Category {Name = "Temporary"}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(3, actual.Value.Count);
@@ -196,8 +179,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new Identifier {Id = 3, Type = ApplicationType.Service}, new Category {Name = "Temporary"}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(3, actual.Value.Count);
@@ -218,8 +200,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new Identifier {Id = 3, Type = ApplicationType.Service}, "C"}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(3, actual.Value.Count);
@@ -238,8 +219,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new Dictionary<int, string> {{42, "No 42"}}, "Hello World"}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -265,8 +245,7 @@ namespace Enigma.Test.Serialization.Binary
                     {"X", new Dictionary<int, string> {{42, "No 42"}}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -292,8 +271,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new Dictionary<string, int> {{"No 42", 42}}, new Dictionary<int, string> {{42, "No 42"}}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -324,8 +302,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new List<int> {42}, "Hello World"}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -350,8 +327,7 @@ namespace Enigma.Test.Serialization.Binary
                     {"X", new List<int> {42}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -376,8 +352,7 @@ namespace Enigma.Test.Serialization.Binary
                     {new List<int> {42}, new List<string> {"No 42"}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -402,8 +377,7 @@ namespace Enigma.Test.Serialization.Binary
         public void WriteCollectionTest()
         {
             var graph = new CollectionGraph { Value = new List<string> { "Test" } };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -416,8 +390,7 @@ namespace Enigma.Test.Serialization.Binary
             var graph = new CollectionOfComplexGraph {
                 Value = new List<Relation> { new Relation { Id = Guid.Empty, Name = "Test", Value = 1 } }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -437,8 +410,7 @@ namespace Enigma.Test.Serialization.Binary
                     new Dictionary<string, int> {{"Test", 42}}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -464,8 +436,7 @@ namespace Enigma.Test.Serialization.Binary
                     new List<string> {"Test"}
                 }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(1, actual.Value.Count);
@@ -488,8 +459,7 @@ namespace Enigma.Test.Serialization.Binary
             var graph = new JaggedArrayGraph {
                 Value = new[] { new[] { 5, 2, 3 }, new[] { 1, 2, 3 } }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(graph.Value.Length, actual.Value.Length);
@@ -513,8 +483,7 @@ namespace Enigma.Test.Serialization.Binary
             var graph = new MultidimensionalArrayGraph {
                 Value = new[,] { { 5, 2, 3 }, { 1, 2, 3 } }
             };
-            var context = new SerializationTestContext();
-            var actual = context.SerializeAndDeserialize(graph);
+            var actual = _context.SerializeAndDeserialize(graph);
 
             Assert.NotNull(actual.Value);
             Assert.Equal(6, actual.Value.Length);

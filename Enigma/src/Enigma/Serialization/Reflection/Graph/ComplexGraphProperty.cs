@@ -8,11 +8,11 @@ namespace Enigma.Serialization.Reflection.Graph
         private readonly IGraphType _propertyType;
         private readonly VisitArgs _args;
 
-        public ComplexGraphProperty(SerializableProperty property, IGraphType propertyType)
+        public ComplexGraphProperty(SerializableProperty property, IGraphType propertyType, VisitArgs args)
         {
             _property = property;
             _propertyType = propertyType;
-            _args = property.CreateVisitArgs();
+            _args = args;
         }
 
         public void Visit(object graph, IReadVisitor visitor)
