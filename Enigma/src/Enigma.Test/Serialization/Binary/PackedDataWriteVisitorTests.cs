@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using Enigma.Test.Fakes.Entities;
 using Enigma.Testing.Fakes.Entities;
 using Xunit;
 

@@ -14,6 +14,15 @@ namespace Enigma.Test.Serialization
 
         protected abstract ITypedSerializer<T> CreateSerializer<T>();
 
+        public byte[] Serialize<T>(T graph)
+        {
+            var serializer = CreateSerializer<T>();
+            using (var stream = new MemoryStream()) {
+                serializer.Serialize(stream, graph);
+                return stream.ToArray();
+            }
+        }
+
         public T SerializeAndDeserialize<T>(T graph)
         {
             var serializer = CreateSerializer<T>();

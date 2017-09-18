@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Enigma.Binary;
-using Enigma.Serialization.PackedBinary;
 
 namespace Enigma.Serialization.Json
 {
@@ -36,7 +35,7 @@ namespace Enigma.Serialization.Json
 
         public object Deserialize(Type type, Stream stream)
         {
-            var visitor = new PackedDataReadVisitor(stream);
+            var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, stream);
             return _engine.Deserialize(visitor, type);
         }
     }
@@ -69,7 +68,7 @@ namespace Enigma.Serialization.Json
 
         public T Deserialize(Stream stream)
         {
-            var visitor = new PackedDataReadVisitor(stream);
+            var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, stream);
             return _engine.Deserialize<T>(visitor);
         }
 

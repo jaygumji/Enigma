@@ -9,24 +9,43 @@ namespace Enigma.Serialization.Json
     {
         private readonly JsonEncoding _encoding;
         private readonly IFieldNameResolver _fieldNameResolver;
-        private readonly BinaryDataWriter _writer;
         private readonly BinaryBuffer _buffer;
         private readonly Stack<bool> _isFirsts;
 
         public JsonWriteVisitor(JsonEncoding encoding,
             IFieldNameResolver fieldNameResolver,
             BinaryBuffer buffer)
+            : this(encoding, fieldNameResolver, buffer, new Stack<bool>())
+        {
+        }
+
+        /// <summary>
+        /// Used by unit tests to simulate the stack already been set.
+        /// </summary>
+        /// <param name="encoding"></param>
+        /// <param name="fieldNameResolver"></param>
+        /// <param name="buffer"></param>
+        /// <param name="stack"></param>
+        public JsonWriteVisitor(JsonEncoding encoding,
+            IFieldNameResolver fieldNameResolver,
+            BinaryBuffer buffer,
+            Stack<bool> stack)
         {
             _encoding = encoding;
             _fieldNameResolver = fieldNameResolver;
             _buffer = buffer;
-            _writer = new BinaryDataWriter(_buffer, _encoding.BaseEncoding);
-            _isFirsts = new Stack<bool>();
+            _isFirsts = stack;
         }
 
         private void WriteFieldName(VisitArgs args)
         {
             WriteEscaped(_fieldNameResolver.Resolve(args));
+        }
+
+        private void Write(string value)
+        {
+            var bytes = _encoding.BaseEncoding.GetBytes(value);
+            _buffer.Write(bytes, 0, bytes.Length);
         }
 
         private void WriteValuePrefix(VisitArgs args)
@@ -40,7 +59,7 @@ namespace Enigma.Serialization.Json
             }
             if (args.Type == LevelType.Value) {
                 WriteFieldName(args);
-                _writer.Write(_encoding.Assignment);
+                _buffer.Write(_encoding.Assignment);
             }
         }
 
@@ -48,7 +67,7 @@ namespace Enigma.Serialization.Json
         {
             switch (args.Type) {
                 case LevelType.DictionaryKey:
-                    _writer.Write(_encoding.Assignment);
+                    _buffer.Write(_encoding.Assignment);
                     return;
             }
         }
@@ -58,10 +77,17 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
             }
             else {
-                _writer.Write(value.Value.ToString(JsonEncoding.NumberFormat));
+                if (args.Type == LevelType.DictionaryKey) {
+                    _buffer.Write(_encoding.Quote);
+                    Write(value.Value.ToString(JsonEncoding.NumberFormat));
+                    _buffer.Write(_encoding.Quote);
+                }
+                else {
+                    Write(value.Value.ToString(JsonEncoding.NumberFormat));
+                }
             }
             WriteValueSuffix(args);
         }
@@ -73,19 +99,19 @@ namespace Enigma.Serialization.Json
                 _isFirsts.Push(false);
             }
             else {
-                _writer.Write(_encoding.Comma);
+                _buffer.Write(_encoding.Comma);
             }
         }
 
         private void WriteEscaped(string value)
         {
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
                 return;
             }
-            _writer.Write(_encoding.Quote);
+            _buffer.Write(_encoding.Quote);
             if (value.Length == 0) {
-                _writer.Write(_encoding.Quote);
+                _buffer.Write(_encoding.Quote);
                 return;
             }
             var index = 0;
@@ -103,14 +129,15 @@ namespace Enigma.Serialization.Json
                     position += _encoding.BaseEncoding.GetBytes(value, index, i - index, _buffer.Buffer, position);
                 }
                 index = i + 1;
-                Buffer.BlockCopy(_encoding.ReverseSolidus, 0, _buffer.Buffer, position, _encoding.ReverseSolidus.Length);
+                Buffer.BlockCopy(_encoding.ReverseSolidus, 0, _buffer.Buffer, position,
+                    _encoding.ReverseSolidus.Length);
                 position += _encoding.ReverseSolidus.Length;
                 Buffer.BlockCopy(charBytes, 0, _buffer.Buffer, position, charBytes.Length);
                 position += charBytes.Length;
             }
             if (index == 0) {
-                _writer.Write(value);
-                _writer.Write(_encoding.Quote);
+                Write(value);
+                _buffer.Write(_encoding.Quote);
                 return;
             }
 
@@ -119,67 +146,70 @@ namespace Enigma.Serialization.Json
             }
 
             _buffer.Advance(position - _buffer.Position);
-            _writer.Write(_encoding.Quote);
+            _buffer.Write(_encoding.Quote);
+        }
+
+        private void Visit(object level, VisitArgs args, byte[] beginToken)
+        {
+            if (!args.IsRoot) {
+                WriteFieldName(args);
+                _buffer.Write(_encoding.Assignment);
+            }
+            _buffer.Write(level == null ? _encoding.Null : beginToken);
         }
 
         public void Visit(object level, VisitArgs args)
         {
-            if (level == null) {
-                _writer.Write(_encoding.Null);
-                return;
+            if (!args.IsRoot && !args.Type.IsDictionaryValue()) {
+                EnsureComma();
             }
-
-            _isFirsts.Push(true);
             switch (args.Type) {
-                case LevelType.Single:
-                    if (!args.IsRoot) {
-                        WriteFieldName(args);
-                        _writer.Write(_encoding.Assignment);
-                    }
-                    _writer.Write(_encoding.ObjectBegin);
-                    return;
-                case LevelType.Collection:
-                    if (!args.IsRoot) {
-                        WriteFieldName(args);
-                        _writer.Write(_encoding.Assignment);
-                    }
-                    _writer.Write(_encoding.ArrayBegin);
-                    return;
-                case LevelType.Dictionary:
-                    if (!args.IsRoot) {
-                        WriteFieldName(args);
-                        _writer.Write(_encoding.Assignment);
-                    }
-                    _writer.Write(_encoding.ObjectBegin);
-                    return;
-                case LevelType.CollectionInCollection:
                 case LevelType.CollectionInDictionaryKey:
-                case LevelType.CollectionInDictionaryValue: {
-                    _writer.Write(_encoding.ArrayBegin);
-                    return;
-                }
+                    throw new NotSupportedException("Collections are not supported in dictionary keys");
+                case LevelType.DictionaryInDictionaryKey:
+                    throw new NotSupportedException("Dictionaries are not supported in dictionary keys");
+                case LevelType.DictionaryKey:
+                    throw new NotSupportedException("Objects are not supported in dictionary keys");
+                case LevelType.Single:
+                case LevelType.Dictionary:
+                    Visit(level, args, _encoding.ObjectBegin);
+                    break;
+                case LevelType.Collection:
+                    Visit(level, args, _encoding.ArrayBegin);
+                    break;
+                case LevelType.CollectionInCollection:
+                case LevelType.CollectionInDictionaryValue:
+                    _buffer.Write(level == null ? _encoding.Null : _encoding.ArrayBegin);
+                    break;
+                default:
+                    _buffer.Write(level == null ? _encoding.Null : _encoding.ObjectBegin);
+                    break;
             }
-            _writer.Write(_encoding.ObjectBegin);
+            _isFirsts.Push(true);
         }
 
         public void Leave(object level, VisitArgs args)
         {
+            _isFirsts.Pop();
+
             if (level == null) {
                 return;
             }
 
-            _isFirsts.Pop();
             switch (args.Type) {
                 case LevelType.Collection:
                 case LevelType.CollectionInCollection:
                 case LevelType.CollectionInDictionaryKey:
                 case LevelType.CollectionInDictionaryValue: {
-                    _writer.Write(_encoding.ArrayBegin);
+                    _buffer.Write(_encoding.ArrayEnd);
 
                     return;
                 }
             }
-            _writer.Write(_encoding.ObjectEnd);
+            _buffer.Write(_encoding.ObjectEnd);
+            if (args.Type.IsDictionaryKey()) {
+                _buffer.Write(_encoding.Assignment);
+            }
         }
 
         public void VisitValue(byte? value, VisitArgs args)
@@ -219,12 +249,16 @@ namespace Enigma.Serialization.Json
 
         public void VisitValue(bool? value, VisitArgs args)
         {
+            if (args.Type == LevelType.DictionaryKey) {
+                throw new NotSupportedException("A boolean is not supported as dictionary key.");
+            }
+
             WriteValuePrefix(args);
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
             }
             else {
-                _writer.Write(value.Value ? _encoding.True : _encoding.False);
+                _buffer.Write(value.Value ? _encoding.True : _encoding.False);
             }
             WriteValueSuffix(args);
         }
@@ -248,12 +282,12 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
             }
             else {
-                _writer.Write(_encoding.Quote);
-                _writer.Write(value.Value.ToString());
-                _writer.Write(_encoding.Quote);
+                _buffer.Write(_encoding.Quote);
+                Write(value.Value.ToString());
+                _buffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
@@ -262,12 +296,12 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
             }
             else {
-                _writer.Write(_encoding.Quote);
-                _writer.Write(value.Value.ToString("O", JsonEncoding.NumberFormat));
-                _writer.Write(_encoding.Quote);
+                _buffer.Write(_encoding.Quote);
+                Write(value.Value.ToString("O", JsonEncoding.NumberFormat));
+                _buffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
@@ -283,35 +317,42 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _writer.Write(_encoding.Null);
+                _buffer.Write(_encoding.Null);
             }
             else {
-                _writer.Write(_encoding.Quote);
-                _writer.Write(value.Value.ToString());
-                _writer.Write(_encoding.Quote);
+                _buffer.Write(_encoding.Quote);
+                Write(value.Value.ToString());
+                _buffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
 
         public void VisitValue(byte[] value, VisitArgs args)
         {
+            if (args.Type == LevelType.DictionaryKey) {
+                throw new NotSupportedException("A blob is not supported as dictionary key.");
+            }
             WriteValuePrefix(args);
 
-            _writer.Write(_encoding.ArrayBegin);
-            var isFirst = true;
-            foreach (var el in value) {
-                if (isFirst) {
-                    isFirst = false;
-                }
-                else {
-                    _writer.Write(_encoding.Comma);
-                }
-                _writer.Write(el.ToString());
+            if (value == null) {
+                _buffer.Write(_encoding.Null);
             }
-            _writer.Write(_encoding.ArrayEnd);
+            else {
+                _buffer.Write(_encoding.ArrayBegin);
+                var isFirst = true;
+                foreach (var el in value) {
+                    if (isFirst) {
+                        isFirst = false;
+                    }
+                    else {
+                        _buffer.Write(_encoding.Comma);
+                    }
+                    Write(el.ToString());
+                }
+                _buffer.Write(_encoding.ArrayEnd);
+            }
 
             WriteValueSuffix(args);
         }
-
     }
 }

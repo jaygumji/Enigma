@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Enigma.Test.Fakes.Entities;
 using Xunit;
 
 namespace Enigma.Test.IoC

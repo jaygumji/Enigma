@@ -15,26 +15,27 @@ namespace Enigma.Serialization
         public static readonly VisitArgs CollectionInDictionaryValue = new VisitArgs(LevelType.CollectionInDictionaryValue);
 
         private VisitArgs(LevelType type)
-            : this(null, type, 0, Enigma.StateBag.Empty, isRoot: false)
+            : this(null, type, 0, EnigmaSerializationAttributes.Empty, null, isRoot: false)
         {
         }
 
         public VisitArgs(string name, LevelType type)
-            : this(name, type, 0, Enigma.StateBag.Empty, isRoot: false)
+            : this(name, type, 0, EnigmaSerializationAttributes.Empty, null, isRoot: false)
         {
         }
 
-        public VisitArgs(string name, LevelType type, uint index, IReadOnlyStateBag stateBag)
-            : this(name, type, index, stateBag, isRoot: false)
+        public VisitArgs(string name, LevelType type, uint index, EnigmaSerializationAttributes attributes, object state)
+            : this(name, type, index, attributes, state, isRoot: false)
         {
         }
 
-        private VisitArgs(string name, LevelType type, uint index, IReadOnlyStateBag stateBag, bool isRoot)
+        private VisitArgs(string name, LevelType type, uint index, EnigmaSerializationAttributes attributes, object state, bool isRoot)
         {
             Name = name;
             Type = type;
             Index = index;
-            StateBag = stateBag;
+            Attributes = attributes;
+            State = state;
             IsRoot = isRoot;
         }
 
@@ -42,16 +43,17 @@ namespace Enigma.Serialization
         public LevelType Type { get; }
         public uint Index { get; }
         public bool IsRoot { get; }
-        public IReadOnlyStateBag StateBag { get; }
+        public EnigmaSerializationAttributes Attributes { get; }
+        public object State { get; }
 
         public override string ToString()
         {
             return string.Concat(Type, " args ", Name, " with index ", Index);
         }
 
-        public static VisitArgs CreateRoot(LevelType type)
+        public static VisitArgs CreateRoot(LevelType type, object state = null)
         {
-            return new VisitArgs(null, type, 1, Enigma.StateBag.Empty, isRoot: true);
+            return new VisitArgs(null, type, 1, EnigmaSerializationAttributes.Empty, state, isRoot: true);
         }
 
     }

@@ -29,10 +29,26 @@ namespace Enigma.Serialization
             return (type & LevelType.Collection) == LevelType.Collection;
         }
 
+        public static bool IsCollectionItem(this LevelType type)
+        {
+            return (type & LevelType.CollectionItem) == LevelType.CollectionItem;
+        }
+
         public static bool IsDictionary(this LevelType type)
         {
             return (type & LevelType.Dictionary) == LevelType.Dictionary;
         }
+
+        public static bool IsDictionaryKey(this LevelType type)
+        {
+            return (type & LevelType.DictionaryKey) == LevelType.DictionaryKey;
+        }
+
+        public static bool IsDictionaryValue(this LevelType type)
+        {
+            return (type & LevelType.DictionaryValue) == LevelType.DictionaryValue;
+        }
+
 
     }
 }

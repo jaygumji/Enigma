@@ -137,6 +137,11 @@ namespace Enigma.Binary
             _buffer[_position++] = value;
         }
 
+        public void Write(byte[] buffer)
+        {
+            Write(buffer, 0, buffer.Length);
+        }
+
         public void Write(byte[] buffer, int offset, int length)
         {
             if (_isDisposed)
@@ -165,12 +170,11 @@ namespace Enigma.Binary
 
             _isDisposed = true;
 
-            if (_pool != null) {
-                _pool.Free(this);
-            }
+            _pool?.Free(this);
 
             _buffer = null;
             _position = -1;
         }
+
     }
 }

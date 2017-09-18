@@ -4,6 +4,7 @@ using Enigma.Serialization;
 using Enigma.Serialization.Reflection;
 using Enigma.Testing.Fakes.Entities;
 using Enigma.Reflection;
+using Enigma.Test.Fakes.Entities;
 
 namespace Enigma.Test.Serialization.HardCoded
 {

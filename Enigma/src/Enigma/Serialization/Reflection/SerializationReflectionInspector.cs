@@ -43,14 +43,23 @@ namespace Enigma.Serialization.Reflection
             var args = new AcquirePropertyMetadataArgs(type, property);
             OnAcquirePropertyMetadata(args);
 
-            var index = args.Index ?? nextIndex++;
-            var metadata = new SerializationMetadata(index, args.Args);
+            var index = args.Index ?? nextIndex;
+            nextIndex = index + 1;
+            var metadata = new SerializationMetadata(index);
             return metadata;
         }
 
-        protected virtual void IsPropertyValid(PropertyValidArgs args) { }
+        protected virtual void IsPropertyValid(PropertyValidArgs args)
+        {
+            args.IsValid = args.Property.GetCustomAttribute<IgnoreAttribute>() == null;
+        }
+
         protected virtual void IsTypeValid(TypeValidArgs args) { }
-        protected virtual void OnAcquirePropertyMetadata(AcquirePropertyMetadataArgs args) { }
+
+        protected virtual void OnAcquirePropertyMetadata(AcquirePropertyMetadataArgs args)
+        {
+            args.Index = args.Property.GetCustomAttribute<IndexAttribute>()?.Index;
+        }
 
     }
 }

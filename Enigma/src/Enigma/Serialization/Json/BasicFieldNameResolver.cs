@@ -8,7 +8,9 @@ namespace Enigma.Serialization.Json
     {
         public string Resolve(VisitArgs args)
         {
-            return args.Name;
+            return !string.IsNullOrEmpty(args.Attributes.Name)
+                ? args.Attributes.Name
+                : args.Name;
         }
     }
 }

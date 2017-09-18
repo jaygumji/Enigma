@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
-using Enigma.IO;
-using Enigma.Serialization.PackedBinary;
+using Enigma.Testing.Fakes.Entities;
 
-namespace Enigma.Testing.Fakes.Entities
+namespace Enigma.Test.Fakes.Entities
 {
     public class DataBlock
     {
@@ -87,4 +85,5 @@ namespace Enigma.Testing.Fakes.Entities
         }
 
     }
+    
 }

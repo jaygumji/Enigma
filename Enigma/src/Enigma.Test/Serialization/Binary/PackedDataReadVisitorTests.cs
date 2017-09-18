@@ -3,6 +3,7 @@ using System.Linq;
 using Enigma.IO;
 using Enigma.Serialization.PackedBinary;
 using Enigma.Serialization.Reflection.Emit;
+using Enigma.Test.Fakes.Entities;
 using Enigma.Test.Serialization.HardCoded;
 using Enigma.Testing.Fakes.Entities;
 using Xunit;

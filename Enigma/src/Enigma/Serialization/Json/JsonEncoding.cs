@@ -70,7 +70,6 @@ namespace Enigma.Serialization.Json
             False = baseEncoding.GetBytes("false");
             Zero = baseEncoding.GetBytes("0");
         }
-
         public bool RequiresEscape(char c, out byte[] charBytes)
         {
             switch (c) {

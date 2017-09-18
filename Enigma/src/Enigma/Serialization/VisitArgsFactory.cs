@@ -15,7 +15,6 @@ namespace Enigma.Serialization
             SerializableType = provider.GetOrCreate(type);
         }
 
-
         public virtual IVisitArgsFactory ConstructWith(Type type)
         {
             return new VisitArgsFactory(Provider, type);
@@ -27,12 +26,12 @@ namespace Enigma.Serialization
             var levelType = GetLevelTypeFromClass(property.Ext.Class);
             var name = property.Ref.Name;
             var idx = property.Metadata.Index;
-            var stateBag = property.Metadata.Args;
+            var attributes = EnigmaSerializationAttributes.FromMember(property.Ref);
 
-            var args = new ConstructStateBagArgs(property, stateBag, levelType);
-            OnConstructStateBag(args);
+            var args = new ConstructStateArgs(property, attributes, levelType);
+            OnConstructState(args);
 
-            return new VisitArgs(name, levelType, idx, stateBag);
+            return new VisitArgs(name, levelType, idx, attributes, args.State);
         }
 
         private static LevelType GetLevelTypeFromClass(TypeClass cls)
@@ -50,10 +49,10 @@ namespace Enigma.Serialization
         }
 
         /// <summary>
-        /// Used to add additional states to the visitargs for use with visitors later
+        /// Used to add additional state to the visitargs passed on to the visitors later
         /// </summary>
-        /// <param name="args">Arguments used to create the state bag</param>
-        protected virtual void OnConstructStateBag(ConstructStateBagArgs args)
+        /// <param name="args">Arguments used to create the state</param>
+        protected virtual void OnConstructState(ConstructStateArgs args)
         {
         }
     }
