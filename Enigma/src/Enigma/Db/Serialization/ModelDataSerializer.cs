@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Enigma.Binary;
+using Enigma.IoC;
 using Enigma.Serialization.Reflection.Emit;
 using Enigma.Serialization;
 
@@ -7,6 +8,7 @@ namespace Enigma.Db.Serialization
 {
     internal static class ModelDataSerializer
     {
+        internal static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection();
         internal static readonly DynamicTravellerContext Context = new DynamicTravellerContext(new ModelSerializationReflectionInspector());
     }
     public class ModelDataSerializer<T> : ITypedSerializer<T>
@@ -15,14 +17,14 @@ namespace Enigma.Db.Serialization
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
-        public ModelDataSerializer() : this(BinaryBufferPool.Instance)
+        public ModelDataSerializer() : this(new BinaryBufferFactory())
         {
         } 
 
         public ModelDataSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine(ModelDataSerializer.Context);
+            _engine = new SerializationEngine(ModelDataSerializer.Context, new IoCContainer(), ModelDataSerializer.Travellers);
         }
 
         void ITypedSerializer.Serialize(Stream stream, object graph)

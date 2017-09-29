@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Enigma.Binary
 {
     public class BufferLevel
     {
-        private readonly LinkedList<Item> _cachedBuffers;
-        private readonly object _lockObj = new object();
+        private readonly List<Item> _cachedBuffers;
+        private readonly SemaphoreSlim _sem = new SemaphoreSlim(1);
+
         public int Size { get; }
 
         private class Item
@@ -18,64 +20,79 @@ namespace Enigma.Binary
         public BufferLevel(int size)
         {
             Size = size;
-            _cachedBuffers = new LinkedList<Item>();
+            _cachedBuffers = new List<Item>();
         }
 
         public byte[] PopOrCreate()
         {
-            lock (_lockObj) {
+            _sem.Wait();
+            try {
                 if (_cachedBuffers.Count == 0) {
                     return new byte[Size];
                 }
-                var item = _cachedBuffers.Last.Value;
-                _cachedBuffers.RemoveLast();
+                var index = _cachedBuffers.Count - 1;
+                var item = _cachedBuffers[index];
+                _cachedBuffers.RemoveAt(index);
                 return item.Buffer;
+            }
+            finally {
+                _sem.Release();
             }
         }
 
         public bool TryPop(out byte[] buffer)
         {
-            lock (_lockObj) {
+            _sem.Wait();
+            try {
                 if (_cachedBuffers.Count == 0) {
                     buffer = null;
                     return false;
                 }
-                var item = _cachedBuffers.Last.Value;
-                _cachedBuffers.RemoveLast();
+                var index = _cachedBuffers.Count - 1;
+                var item = _cachedBuffers[index];
+                _cachedBuffers.RemoveAt(index);
                 buffer = item.Buffer;
                 return true;
+            }
+            finally {
+                _sem.Release();
             }
         }
 
         public void Release(byte[] buffer)
         {
-            lock (_lockObj) {
-                _cachedBuffers.AddLast(new Item {
-                    Buffer = buffer,
-                    TimeStamp = DateTime.Now
-                });
+            var item = new Item {
+                Buffer = buffer,
+                TimeStamp = DateTime.Now
+            };
+
+            _sem.Wait();
+            try {
+                _cachedBuffers.Add(item);
+            }
+            finally {
+                _sem.Release();
             }
         }
 
         public void RemoveUnused(DateTime minTimeStamp)
         {
-            lock (_lockObj) {
+            _sem.Wait();
+            try {
                 if (_cachedBuffers.Count == 0) {
                     return;
                 }
-                var node = _cachedBuffers.First;
-                while (node != null) {
-                    if (node.Value.TimeStamp < minTimeStamp) {
-                        var nodeToRemove = node;
-                        node = node.Next;
-                        _cachedBuffers.Remove(nodeToRemove);
-                    }
-                    else {
-                        node = node.Next;
+                for (var i = _cachedBuffers.Count - 1; i >= 0; i--) {
+                    var item = _cachedBuffers[i];
+                    if (item.TimeStamp < minTimeStamp) {
+                        _cachedBuffers.RemoveAt(i);
                     }
                 }
             }
+            finally {
+                _sem.Release();
+            }
         }
-
     }
+
 }

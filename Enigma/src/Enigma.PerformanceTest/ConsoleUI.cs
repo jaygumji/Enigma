@@ -35,7 +35,7 @@ namespace Enigma.ProofOfConcept
         {
             WriteHelp();
             var key = ReadKey();
-            while (!(key.Modifiers.HasFlag(ConsoleModifiers.Control) && key.KeyChar == 'c')) {
+            while (!(key.Modifiers.HasFlag(ConsoleModifiers.Control) && key.Key == ConsoleKey.Q)) {
                 IConsoleCommand command;
                 if (_commands.TryGetValue(key.KeyChar, out command))
                     command.Invoke();
@@ -71,7 +71,7 @@ namespace Enigma.ProofOfConcept
         {
             foreach (var keyValue in _commands)
                 Console.WriteLine("{0} - {1}", keyValue.Key, keyValue.Value.GetType().Name);
-            Console.WriteLine("Ctrl+c - Exit application");
+            Console.WriteLine("Ctrl+q - Exit application");
         }
     }
 }

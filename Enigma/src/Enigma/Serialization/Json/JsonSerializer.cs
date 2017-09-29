@@ -7,6 +7,9 @@ namespace Enigma.Serialization.Json
 
     public class JsonSerializer : ISerializer
     {
+
+        internal static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection();
+
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
@@ -22,7 +25,7 @@ namespace Enigma.Serialization.Json
         public JsonSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine();
+            _engine = new SerializationEngine(Travellers);
         }
 
         public void Serialize(Stream stream, object graph)
@@ -50,14 +53,14 @@ namespace Enigma.Serialization.Json
         public IFieldNameResolver FieldNameResolver { get; set; }
         public JsonEncoding Encoding { get; set; }
 
-        public JsonSerializer() : this(new BinaryBufferPool())
+        public JsonSerializer() : this(new BinaryBufferFactory())
         {
         }
 
         public JsonSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine();
+            _engine = new SerializationEngine(JsonSerializer.Travellers);
             FieldNameResolver = new CamelCaseFieldNameResolver();
             Encoding = JsonEncoding.UTF16LE;
         }

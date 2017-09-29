@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using Enigma.Serialization.PackedBinary;
 using Enigma.Testing.Fakes.Entities;
 
@@ -23,18 +24,24 @@ namespace Enigma.ProofOfConcept
                 length = stream.Length;
             }
 
-            var initializationTime = watch.Elapsed;
+            Console.WriteLine("Initialization time: " + watch.Elapsed);
+            Console.WriteLine("MinSize of data: " + length);
+            watch.Restart();
 
             for (var i = 0; i < 10000; i++) {
                 serializer.Serialize(new MemoryStream(), graph);
             }
 
-            var serializationTime = watch.Elapsed.Subtract(initializationTime);
+            Console.WriteLine("Serialization time: " + watch.Elapsed);
+            watch.Restart();
+
+            Parallel.For(0, 10000, new ParallelOptions {MaxDegreeOfParallelism = 4}, (idx) => {
+                serializer.Serialize(new MemoryStream(), graph);
+            });
+
+            Console.WriteLine("Parallel serialization time: " + watch.Elapsed);
 
             Console.WriteLine("Enigma serialization test completed");
-            Console.WriteLine("MinSize of data: " + length);
-            Console.WriteLine("Initialization time: " + initializationTime);
-            Console.WriteLine("Serialization time: " + serializationTime);
         }
     }
 }

@@ -3,19 +3,25 @@ using Enigma.Binary;
 
 namespace Enigma.Serialization.PackedBinary
 {
+
+    internal static class PackedDataSerializer
+    {
+        public static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection();
+    }
+
     public class PackedDataSerializer<T> : ITypedSerializer<T>
     {
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
-        public PackedDataSerializer() : this(BinaryBufferPool.Instance)
+        public PackedDataSerializer() : this(new BinaryBufferFactory())
         {
         } 
 
         public PackedDataSerializer(IBinaryBufferPool bufferPool)
         {
             _bufferPool = bufferPool;
-            _engine = new SerializationEngine();
+            _engine = new SerializationEngine(PackedDataSerializer.Travellers);
         }
 
         void ITypedSerializer.Serialize(Stream stream, object graph)
