@@ -15,7 +15,7 @@ namespace Enigma.Db.Serialization
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
-        public ModelDataSerializer() : this(new BinaryBufferPoolFactory())
+        public ModelDataSerializer() : this(BinaryBufferPool.Instance)
         {
         } 
 
@@ -38,7 +38,7 @@ namespace Enigma.Db.Serialization
 
         public void Serialize(Stream stream, T graph)
         {
-            using (var buffer = _bufferPool.AcquireBuffer(stream)) {
+            using (var buffer = _bufferPool.AcquireWriteBuffer(stream)) {
                 var visitor = new ModelDataWriteVisitor(buffer);
                 _engine.Serialize(visitor, graph);
             }

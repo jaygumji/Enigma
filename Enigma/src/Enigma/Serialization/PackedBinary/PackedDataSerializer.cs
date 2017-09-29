@@ -8,7 +8,7 @@ namespace Enigma.Serialization.PackedBinary
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;
 
-        public PackedDataSerializer() : this(new BinaryBufferPoolFactory())
+        public PackedDataSerializer() : this(BinaryBufferPool.Instance)
         {
         } 
 
@@ -31,7 +31,7 @@ namespace Enigma.Serialization.PackedBinary
 
         public void Serialize(Stream stream, T graph)
         {
-            using (var buffer = _bufferPool.AcquireBuffer(stream)) {
+            using (var buffer = _bufferPool.AcquireWriteBuffer(stream)) {
                 var visitor = new PackedDataWriteVisitor(buffer);
                 _engine.Serialize(visitor, graph);
             }

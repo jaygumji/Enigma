@@ -102,7 +102,7 @@ namespace Enigma.ProtocolBuffer
             Convert((T)value, buffer, offset);
         }
 
-        public void Convert(T value, BinaryBuffer buffer)
+        public void Convert(T value, BinaryWriteBuffer writeBuffer)
         {
             byte[] data;
             using (var stream = new MemoryStream())
@@ -110,12 +110,12 @@ namespace Enigma.ProtocolBuffer
                 _typeModel.Serialize(stream, value);
                 data = stream.ToArray();
             }
-            buffer.Write(data, 0, data.Length);
+            writeBuffer.Write(data, 0, data.Length);
         }
 
-        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        void IBinaryConverter.Convert(object value, BinaryWriteBuffer writeBuffer)
         {
-            Convert((T)value, buffer);
+            Convert((T)value, writeBuffer);
         }
 
     }

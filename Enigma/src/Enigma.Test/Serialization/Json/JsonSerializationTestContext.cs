@@ -16,14 +16,14 @@ namespace Enigma.Test.Serialization.Json
 
         public JsonSerializationTestContext()
         {
-            _encoding = JsonEncoding.Unicode;
+            _encoding = JsonEncoding.UTF16LE;
             _fieldNameResolver = new CamelCaseFieldNameResolver();
         }
 
         public void AssertWriteVisitorCall(string expected, Action<JsonWriteVisitor> action)
         {
             using (var memStream = new MemoryStream()) {
-                var buffer = new BinaryBuffer(1024, memStream);
+                var buffer = new BinaryWriteBuffer(1024, memStream);
                 var writeVisitor = new JsonWriteVisitor(_encoding, _fieldNameResolver, buffer, new Stack<bool>(new [] {true}));
                 action(writeVisitor);
                 buffer.Flush();

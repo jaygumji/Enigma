@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Text;
 using Enigma.Binary;
 
 namespace Enigma.Serialization.Json
@@ -8,18 +9,46 @@ namespace Enigma.Serialization.Json
     {
         private readonly JsonEncoding _encoding;
         private readonly IFieldNameResolver _fieldNameResolver;
-        private readonly Stream _stream;
+        private readonly BinaryReadBuffer _buffer;
+        private readonly JsonReader _reader;
 
-        public JsonReadVisitor(JsonEncoding encoding, IFieldNameResolver fieldNameResolver, Stream stream)
+        public JsonReadVisitor(JsonEncoding encoding, IFieldNameResolver fieldNameResolver, BinaryReadBuffer buffer)
         {
             _encoding = encoding;
             _fieldNameResolver = fieldNameResolver;
-            _stream = stream;
+            _buffer = buffer;
+            _reader = new JsonReader(buffer, _encoding);
         }
+
+        //private string FindField(VisitArgs args)
+        //{
+        //    var fieldName = _reader.ReadString();
+        //    _fieldNameResolver.Unresolve();
+        //}
 
         public ValueState TryVisit(VisitArgs args)
         {
-            throw new NotImplementedException();
+            var literal = _reader.ReadLiteral();
+
+            if (args.IsRoot) {
+                if (literal == JsonLiteral.Null) {
+                    return ValueState.Null;
+                }
+                switch (args.Type) {
+                    case LevelType.Dictionary:
+                    case LevelType.Single:
+                        if (literal == JsonLiteral.ObjectBegin) {
+                            return ValueState.Found;
+                        }
+                        throw UnexpectedJsonException.From("object begin token", _buffer, _encoding);
+                    case LevelType.Collection:
+                        if (literal == JsonLiteral.ArrayBegin) {
+                            return ValueState.Found;
+                        }
+                        throw UnexpectedJsonException.From("array begin token", _buffer, _encoding);
+                }
+            }
+            throw new InvalidOperationException("Invalid root");
         }
 
         public void Leave(VisitArgs args)

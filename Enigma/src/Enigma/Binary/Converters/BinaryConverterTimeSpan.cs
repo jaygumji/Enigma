@@ -71,15 +71,15 @@ namespace Enigma.Binary.Converters
             Convert((TimeSpan)value, buffer, offset);
         }
 
-        public void Convert(TimeSpan value, BinaryBuffer buffer)
+        public void Convert(TimeSpan value, BinaryWriteBuffer writeBuffer)
         {
-            var offset = buffer.Advance(8);
-            Convert(value, buffer.Buffer, offset);
+            var offset = writeBuffer.Advance(8);
+            Convert(value, writeBuffer.Buffer, offset);
         }
 
-        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        void IBinaryConverter.Convert(object value, BinaryWriteBuffer writeBuffer)
         {
-            Convert((TimeSpan)value, buffer);
+            Convert((TimeSpan)value, writeBuffer);
         }
 
     }

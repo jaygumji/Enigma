@@ -2,33 +2,42 @@
 
 namespace Enigma.Caching
 {
-    internal class CacheContent<T>
+    internal class CacheContent<TKey, TContent> : ICacheContent<TKey, TContent>
     {
-        private readonly DateTime _createdAt;
-        private readonly DateTime _lastAccessedAt;
-        private readonly T _content;
         private readonly ICachePolicy _policy;
 
-        public CacheContent(T content, ICachePolicy policy)
+        public CacheContent(TKey key, TContent value, ICachePolicy policy)
         {
-            _content = content;
+            Key = key;
+            Value = value;
             _policy = policy;
-            _createdAt = DateTime.Now;
-            _lastAccessedAt = DateTime.Now;
+            CreatedAt = DateTime.Now;
+            LastAccessedAt = DateTime.Now;
         }
 
-        public DateTime CreatedAt { get { return _createdAt; } }
+        public DateTime CreatedAt { get; private set; }
 
-        public DateTime LastAccessedAt { get { return _lastAccessedAt; } }
+        public DateTime LastAccessedAt { get; private set; }
 
-        public T Content { get { return _content; } }
-        public DateTime ExpiresAt { get { return _policy.CalculateExpiration(_createdAt, _lastAccessedAt); } }
+        public TKey Key { get; }
+        public TContent Value { get; }
+        public DateTime ExpiresAt => _policy.CalculateExpiration(CreatedAt, LastAccessedAt);
 
         public bool Validate()
         {
-            var expiresAt = _policy.CalculateExpiration(_createdAt, _lastAccessedAt);
+            var expiresAt = _policy.CalculateExpiration(CreatedAt, LastAccessedAt);
             return expiresAt >= DateTime.Now;
         }
 
+        public void Touch()
+        {
+            LastAccessedAt = DateTime.Now;
+        }
+
+        public void Refresh()
+        {
+            CreatedAt = DateTime.Now;
+            LastAccessedAt = DateTime.Now;
+        }
     }
 }

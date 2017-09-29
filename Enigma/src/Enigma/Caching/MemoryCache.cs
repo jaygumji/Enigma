@@ -1,20 +1,22 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Enigma.Scheduling;
 
 namespace Enigma.Caching
 {
-    public class MemoryCache<TKey, TContent> : ICache<TKey, TContent>, IDisposable
+    public class MemoryCache<TKey, TValue> : ICache<TKey, TValue>, IDisposable
     {
         private static readonly TimeSpan Disabled = new TimeSpan(0, 0, 0, 0, -1);
 
         private readonly ICachePolicy _policy;
         private readonly Timer _timer;
         private readonly DateTimeQueue<TKey> _queue;
-        private readonly ConcurrentDictionary<TKey, CacheContent<TContent>> _contents;
+        private readonly Dictionary<TKey, CacheContent<TKey, TValue>> _contents;
         private DateTime _nextTimerExecution;
+        private readonly ReaderWriterLockSlim _rwLock;
+
+        public event EventHandler<ExpiredEventArgs<TKey, TValue>> Expired;
 
         public MemoryCache(ICachePolicy policy) : this(policy, EqualityComparer<TKey>.Default)
         {
@@ -25,31 +27,46 @@ namespace Enigma.Caching
             _policy = policy;
             _timer = new Timer(CacheValidationCallback, null, Disabled, Disabled);
             _queue = new DateTimeQueue<TKey>();
-            _contents = new ConcurrentDictionary<TKey, CacheContent<TContent>>(keyComparer);
+            _contents = new Dictionary<TKey, CacheContent<TKey, TValue>>(keyComparer);
             _nextTimerExecution = DateTime.MaxValue;
+            _rwLock = new ReaderWriterLockSlim();
         }
 
         private void CacheValidationCallback(object state)
         {
-            IEnumerable<TKey> keys;
-            while (_queue.TryDequeue(out keys)) {
-                foreach (var key in keys) {
-                    CacheContent<TContent> content;
-                    if (!_contents.TryGetValue(key, out content)) continue;
+            _rwLock.EnterWriteLock();
+            try {
+                while (_queue.TryDequeue(out var keys)) {
+                    foreach (var key in keys) {
+                        if (!_contents.TryGetValue(key, out var content)) continue;
 
-                    if (content.Validate()) {
-                        var expiresAt = content.ExpiresAt;
-                        if (expiresAt != DateTime.MaxValue)
-                            _queue.Enqueue(content.ExpiresAt, key);
+                        if (content.Validate()) {
+                            var expiresAt = content.ExpiresAt;
+                            if (expiresAt != DateTime.MaxValue)
+                                _queue.Enqueue(content.ExpiresAt, key);
+
+                            continue;
+                        }
+
+                        if (Expired != null) {
+                            var args = new ExpiredEventArgs<TKey, TValue>(content);
+                            Expired.Invoke(this, args);
+                            if (args.CancelEviction) {
+                                content.Refresh();
+                                continue;
+                            }
+                        }
+                        _contents.Remove(key);
                     }
-                    else
-                        _contents.TryRemove(key, out content);
                 }
             }
+            finally {
+                _rwLock.ExitWriteLock();
+            }
 
-            DateTime nextAt;
-            if (_queue.TryPeekNextEntryAt(out nextAt))
+            if (_queue.TryPeekNextEntryAt(out var nextAt)) {
                 SetTimer(DateTime.MaxValue, nextAt);
+            }
         }
 
         private void SetTimer(DateTime currentAt, DateTime expiresAt)
@@ -73,6 +90,8 @@ namespace Enigma.Caching
         public void Dispose()
         {
             _timer.Dispose();
+            _rwLock.Dispose();
+            Expired = null;
         }
 
         void ICache.Set(object key, object content)
@@ -88,10 +107,10 @@ namespace Enigma.Caching
             if (!(key is TKey))
                 throw new ArgumentException("The parameter key must be of type " + typeof(TKey).FullName);
 
-            if (!(content is TContent))
-                throw new ArgumentException("The parameter content must be of type " + typeof(TContent).FullName);
+            if (!(content is TValue))
+                throw new ArgumentException("The parameter value must be of type " + typeof(TValue).FullName);
 
-            Set((TKey)key, (TContent)content, policy);
+            Set((TKey)key, (TValue)content, policy);
         }
 
         object ICache.TrySet(object key, Func<object, object> contentGetter)
@@ -109,12 +128,12 @@ namespace Enigma.Caching
 
             return TrySet((TKey) key, k => {
                 var content = contentGetter(key);
-                if (content == null) throw new ArgumentException("The content getter delegate may not return null");
+                if (content == null) throw new ArgumentException("The value getter delegate may not return null");
 
-                if (!(content is TContent))
-                    throw new ArgumentException("The content must be of type " + typeof (TContent).FullName);
+                if (!(content is TValue))
+                    throw new ArgumentException("The value must be of type " + typeof (TValue).FullName);
 
-                return (TContent) content;
+                return (TValue) content;
             });
         }
 
@@ -135,67 +154,98 @@ namespace Enigma.Caching
             if (!(key is TKey))
                 throw new ArgumentException("The parameter key must be of type " + typeof(TKey).FullName);
 
-            TContent typedContent;
-            var res = TryGet((TKey) key, out typedContent);
+            var res = TryGet((TKey) key, out var typedContent);
 
             content = typedContent;
             return res;
         }
 
-        public void Set(TKey key, TContent content)
+        public void Set(TKey key, TValue value)
         {
-            Set(key, content, _policy);
+            Set(key, value, _policy);
         }
 
-        public void Set(TKey key, TContent content, ICachePolicy policy)
+        public void Set(TKey key, TValue value, ICachePolicy policy)
         {
-            _contents.AddOrUpdate(key,
-                k => {
-                    var cached = new CacheContent<TContent>(content, policy);
-                    UpdateExpiryControl(cached.ExpiresAt, k);
-                    return cached;
-                },
-                (k, c) => {
-                    var cached = new CacheContent<TContent>(content, policy);
-                    UpdateExpiryControl(cached.ExpiresAt, k);
-                    return cached;
-                });
+            _rwLock.EnterWriteLock();
+            try {
+                var cached = new CacheContent<TKey, TValue>(key, value, policy);
+                if (_contents.ContainsKey(key)) {
+                    _contents[key] = cached;
+                }
+                else {
+                    _contents.Add(key, cached);
+                }
+                UpdateExpiryControl(cached.ExpiresAt, key);
+            }
+            finally {
+                _rwLock.ExitWriteLock();
+            }
         }
 
-        public TContent TrySet(TKey key, Func<TKey, TContent> contentGetter)
+        public TValue TrySet(TKey key, Func<TKey, TValue> valueGetter)
         {
-            return TrySet(key, contentGetter, _policy);
+            return TrySet(key, valueGetter, _policy);
         }
 
-        public TContent TrySet(TKey key, Func<TKey, TContent> contentGetter, ICachePolicy policy)
+        public TValue TrySet(TKey key, Func<TKey, TValue> valueGetter, ICachePolicy policy)
         {
-            var cached = _contents.GetOrAdd(key, k => {
-                var c = new CacheContent<TContent>(contentGetter(k), policy);
-                UpdateExpiryControl(c.ExpiresAt, k);
-                return c;
-            });
-            return cached.Content;
-        }
-
-        public TContent Get(TKey key)
-        {
-            CacheContent<TContent> cached;
-            if (!_contents.TryGetValue(key, out cached))
-                throw new KeyNotFoundException("The given key was not found in the cache");
-
-            return cached.Content;
-        }
-
-        public bool TryGet(TKey key, out TContent content)
-        {
-            CacheContent<TContent> cached;
-            if (!_contents.TryGetValue(key, out cached)) {
-                content = default(TContent);
-                return false;
+            _rwLock.EnterReadLock();
+            try {
+                if (_contents.TryGetValue(key, out var cached)) {
+                    return cached.Value;
+                }
+            }
+            finally {
+                _rwLock.ExitReadLock();
             }
 
-            content = cached.Content;
-            return true;
+            _rwLock.EnterWriteLock();
+            try {
+                if (_contents.TryGetValue(key, out var cached)) {
+                    return cached.Value;
+                }
+
+                cached = new CacheContent<TKey, TValue>(key, valueGetter(key), policy);
+                UpdateExpiryControl(cached.ExpiresAt, key);
+                return cached.Value;
+            }
+            finally {
+                _rwLock.ExitWriteLock();
+            }
         }
+
+        public TValue Get(TKey key)
+        {
+            _rwLock.EnterReadLock();
+            try {
+                if (!_contents.TryGetValue(key, out var cached))
+                    throw new KeyNotFoundException("The given key was not found in the cache");
+
+                cached.Touch();
+                return cached.Value;
+            }
+            finally {
+                _rwLock.ExitReadLock();
+            }
+        }
+
+        public bool TryGet(TKey key, out TValue content)
+        {
+            _rwLock.EnterReadLock();
+            try {
+                if (!_contents.TryGetValue(key, out var cached)) {
+                    content = default(TValue);
+                    return false;
+                }
+                cached.Touch();
+                content = cached.Value;
+                return true;
+            }
+            finally {
+                _rwLock.ExitReadLock();
+            }
+        }
+
     }
 }

@@ -76,15 +76,15 @@ namespace Enigma.Binary.Converters
             Convert((Guid)value, buffer, offset);
         }
 
-        public void Convert(Guid value, BinaryBuffer buffer)
+        public void Convert(Guid value, BinaryWriteBuffer writeBuffer)
         {
-            var offset = buffer.Advance(16);
-            Convert(value, buffer.Buffer, offset);
+            var offset = writeBuffer.Advance(16);
+            Convert(value, writeBuffer.Buffer, offset);
         }
 
-        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        void IBinaryConverter.Convert(object value, BinaryWriteBuffer writeBuffer)
         {
-            Convert((Guid)value, buffer);
+            Convert((Guid)value, writeBuffer);
         }
 
     }

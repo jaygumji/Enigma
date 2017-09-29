@@ -4,6 +4,7 @@ using Enigma.Serialization.Reflection.Emit;
 using Enigma.IoC;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Enigma.Binary;
 using Enigma.Serialization.Reflection;
 
 namespace Enigma.Serialization

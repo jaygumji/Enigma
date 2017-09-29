@@ -8,38 +8,38 @@ namespace Enigma.IO
 {
     public class BinaryDataWriter : IDataWriter
     {
-        private readonly BinaryBuffer _buffer;
+        private readonly BinaryWriteBuffer _writeBuffer;
         private readonly Encoding _encoding;
 
         public BinaryDataWriter(Stream stream, Encoding encoding)
-            : this(new BinaryBuffer(8024, stream), encoding)
+            : this(new BinaryWriteBuffer(8024, stream), encoding)
         {
         }
 
         public BinaryDataWriter(Stream stream)
-            : this(new BinaryBuffer(8024, stream), Encoding.UTF8)
+            : this(new BinaryWriteBuffer(8024, stream), Encoding.UTF8)
         {
         }
 
-        public BinaryDataWriter(BinaryBuffer buffer)
-            : this(buffer, Encoding.UTF8)
+        public BinaryDataWriter(BinaryWriteBuffer writeBuffer)
+            : this(writeBuffer, Encoding.UTF8)
         {
         }
 
-        public BinaryDataWriter(BinaryBuffer buffer, Encoding encoding)
+        public BinaryDataWriter(BinaryWriteBuffer writeBuffer, Encoding encoding)
         {
-            _buffer = buffer;
+            _writeBuffer = writeBuffer;
             _encoding = encoding;
         }
 
         public BinaryBufferReservation Reserve()
         {
-            return _buffer.Reserve(4);
+            return _writeBuffer.Reserve(4);
         }
 
         public void Write(BinaryBufferReservation reservation)
         {
-            _buffer.Use(reservation);
+            _writeBuffer.Use(reservation);
         }
 
         //public void Write(WriteReservation reservation, UInt32 value)
@@ -56,7 +56,7 @@ namespace Enigma.IO
         /// <param name="value">The value to pack</param>
         public void WriteZ(UInt32 value)
         {
-            BinaryZPacker.Pack(_buffer, value);
+            BinaryZPacker.Pack(_writeBuffer, value);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Enigma.IO
         /// <param name="value">The value to pack</param>
         public void WriteV(UInt32 value)
         {
-            BinaryV32Packer.PackU(_buffer, value);
+            BinaryV32Packer.PackU(_writeBuffer, value);
         }
 
         /// <summary>
@@ -74,19 +74,19 @@ namespace Enigma.IO
         /// <param name="nullableValue">The value to pack</param>
         public void WriteNV(UInt32? nullableValue)
         {
-            BinaryV32Packer.PackU(_buffer, nullableValue);
+            BinaryV32Packer.PackU(_writeBuffer, nullableValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void Write<T>(IBinaryInformation<T> info, T value)
         {
             var bytes = info.Converter.Convert(value);
-            _buffer.Write(bytes, 0, bytes.Length);
+            _writeBuffer.Write(bytes, 0, bytes.Length);
         }
 
         public void Write(byte value)
         {
-            _buffer.WriteByte(value);
+            _writeBuffer.WriteByte(value);
         }
 
         public void Write(short value)
@@ -155,7 +155,7 @@ namespace Enigma.IO
                 throw new ArgumentNullException("value");
 
             var bytes = _encoding.GetBytes(value);
-            _buffer.Write(bytes, 0, bytes.Length);
+            _writeBuffer.Write(bytes, 0, bytes.Length);
         }
 
         public void Write(Guid value)
@@ -168,7 +168,7 @@ namespace Enigma.IO
             if (value == null)
                 throw new ArgumentNullException("value");
 
-            _buffer.Write(value, 0, value.Length);
+            _writeBuffer.Write(value, 0, value.Length);
         }
 
     }

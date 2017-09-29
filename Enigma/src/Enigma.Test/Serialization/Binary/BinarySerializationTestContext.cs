@@ -37,7 +37,7 @@ namespace Enigma.Test.Serialization.Binary
         public byte[] Pack<T>(T graph)
         {
             var stream = new MemoryStream();
-            using (var buffer = new BinaryBuffer(1024, stream)) {
+            using (var buffer = new BinaryWriteBuffer(1024, stream)) {
                 var visitor = new PackedDataWriteVisitor(buffer);
 
                 var traveller = CreateTraveller<T>();
@@ -59,7 +59,7 @@ namespace Enigma.Test.Serialization.Binary
         public static byte[] GetFilledDataBlockBlob()
         {
             var stream = new MemoryStream();
-            using (var buffer = new BinaryBuffer(1024, stream)) {
+            using (var buffer = new BinaryWriteBuffer(1024, stream)) {
                 var visitor = new PackedDataWriteVisitor(buffer);
                 var traveller = DataBlockHardCodedTraveller.Create();
                 traveller.Travel(visitor, DataBlock.Filled());

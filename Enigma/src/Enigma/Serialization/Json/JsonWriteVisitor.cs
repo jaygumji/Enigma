@@ -9,13 +9,13 @@ namespace Enigma.Serialization.Json
     {
         private readonly JsonEncoding _encoding;
         private readonly IFieldNameResolver _fieldNameResolver;
-        private readonly BinaryBuffer _buffer;
+        private readonly BinaryWriteBuffer _writeBuffer;
         private readonly Stack<bool> _isFirsts;
 
         public JsonWriteVisitor(JsonEncoding encoding,
             IFieldNameResolver fieldNameResolver,
-            BinaryBuffer buffer)
-            : this(encoding, fieldNameResolver, buffer, new Stack<bool>())
+            BinaryWriteBuffer writeBuffer)
+            : this(encoding, fieldNameResolver, writeBuffer, new Stack<bool>())
         {
         }
 
@@ -24,16 +24,16 @@ namespace Enigma.Serialization.Json
         /// </summary>
         /// <param name="encoding"></param>
         /// <param name="fieldNameResolver"></param>
-        /// <param name="buffer"></param>
+        /// <param name="writeBuffer"></param>
         /// <param name="stack"></param>
         public JsonWriteVisitor(JsonEncoding encoding,
             IFieldNameResolver fieldNameResolver,
-            BinaryBuffer buffer,
+            BinaryWriteBuffer writeBuffer,
             Stack<bool> stack)
         {
             _encoding = encoding;
             _fieldNameResolver = fieldNameResolver;
-            _buffer = buffer;
+            _writeBuffer = writeBuffer;
             _isFirsts = stack;
         }
 
@@ -45,7 +45,7 @@ namespace Enigma.Serialization.Json
         private void Write(string value)
         {
             var bytes = _encoding.BaseEncoding.GetBytes(value);
-            _buffer.Write(bytes, 0, bytes.Length);
+            _writeBuffer.Write(bytes, 0, bytes.Length);
         }
 
         private void WriteValuePrefix(VisitArgs args)
@@ -59,7 +59,7 @@ namespace Enigma.Serialization.Json
             }
             if (args.Type == LevelType.Value) {
                 WriteFieldName(args);
-                _buffer.Write(_encoding.Assignment);
+                _writeBuffer.Write(_encoding.Assignment);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Enigma.Serialization.Json
         {
             switch (args.Type) {
                 case LevelType.DictionaryKey:
-                    _buffer.Write(_encoding.Assignment);
+                    _writeBuffer.Write(_encoding.Assignment);
                     return;
             }
         }
@@ -77,13 +77,13 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
                 if (args.Type == LevelType.DictionaryKey) {
-                    _buffer.Write(_encoding.Quote);
+                    _writeBuffer.Write(_encoding.Quote);
                     Write(value.Value.ToString(JsonEncoding.NumberFormat));
-                    _buffer.Write(_encoding.Quote);
+                    _writeBuffer.Write(_encoding.Quote);
                 }
                 else {
                     Write(value.Value.ToString(JsonEncoding.NumberFormat));
@@ -99,19 +99,19 @@ namespace Enigma.Serialization.Json
                 _isFirsts.Push(false);
             }
             else {
-                _buffer.Write(_encoding.Comma);
+                _writeBuffer.Write(_encoding.Comma);
             }
         }
 
         private void WriteEscaped(string value)
         {
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
                 return;
             }
-            _buffer.Write(_encoding.Quote);
+            _writeBuffer.Write(_encoding.Quote);
             if (value.Length == 0) {
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
                 return;
             }
             var index = 0;
@@ -122,40 +122,40 @@ namespace Enigma.Serialization.Json
                 }
                 if (position == 0) {
                     var maxSize = _encoding.BaseEncoding.GetMaxByteCount(value.Length) + value.Length;
-                    _buffer.RequestSpace(maxSize);
-                    position = _buffer.Position;
+                    _writeBuffer.RequestSpace(maxSize);
+                    position = _writeBuffer.Position;
                 }
                 if (index < i - 1) {
-                    position += _encoding.BaseEncoding.GetBytes(value, index, i - index, _buffer.Buffer, position);
+                    position += _encoding.BaseEncoding.GetBytes(value, index, i - index, _writeBuffer.Buffer, position);
                 }
                 index = i + 1;
-                Buffer.BlockCopy(_encoding.ReverseSolidus, 0, _buffer.Buffer, position,
+                Buffer.BlockCopy(_encoding.ReverseSolidus, 0, _writeBuffer.Buffer, position,
                     _encoding.ReverseSolidus.Length);
                 position += _encoding.ReverseSolidus.Length;
-                Buffer.BlockCopy(charBytes, 0, _buffer.Buffer, position, charBytes.Length);
+                Buffer.BlockCopy(charBytes, 0, _writeBuffer.Buffer, position, charBytes.Length);
                 position += charBytes.Length;
             }
             if (index == 0) {
                 Write(value);
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
                 return;
             }
 
             if (index < value.Length) {
-                position += _encoding.BaseEncoding.GetBytes(value, index, value.Length, _buffer.Buffer, position);
+                position += _encoding.BaseEncoding.GetBytes(value, index, value.Length, _writeBuffer.Buffer, position);
             }
 
-            _buffer.Advance(position - _buffer.Position);
-            _buffer.Write(_encoding.Quote);
+            _writeBuffer.Advance(position - _writeBuffer.Position);
+            _writeBuffer.Write(_encoding.Quote);
         }
 
         private void Visit(object level, VisitArgs args, byte[] beginToken)
         {
             if (!args.IsRoot) {
                 WriteFieldName(args);
-                _buffer.Write(_encoding.Assignment);
+                _writeBuffer.Write(_encoding.Assignment);
             }
-            _buffer.Write(level == null ? _encoding.Null : beginToken);
+            _writeBuffer.Write(level == null ? _encoding.Null : beginToken);
         }
 
         public void Visit(object level, VisitArgs args)
@@ -179,10 +179,10 @@ namespace Enigma.Serialization.Json
                     break;
                 case LevelType.CollectionInCollection:
                 case LevelType.CollectionInDictionaryValue:
-                    _buffer.Write(level == null ? _encoding.Null : _encoding.ArrayBegin);
+                    _writeBuffer.Write(level == null ? _encoding.Null : _encoding.ArrayBegin);
                     break;
                 default:
-                    _buffer.Write(level == null ? _encoding.Null : _encoding.ObjectBegin);
+                    _writeBuffer.Write(level == null ? _encoding.Null : _encoding.ObjectBegin);
                     break;
             }
             _isFirsts.Push(true);
@@ -201,14 +201,14 @@ namespace Enigma.Serialization.Json
                 case LevelType.CollectionInCollection:
                 case LevelType.CollectionInDictionaryKey:
                 case LevelType.CollectionInDictionaryValue: {
-                    _buffer.Write(_encoding.ArrayEnd);
+                    _writeBuffer.Write(_encoding.ArrayEnd);
 
                     return;
                 }
             }
-            _buffer.Write(_encoding.ObjectEnd);
+            _writeBuffer.Write(_encoding.ObjectEnd);
             if (args.Type.IsDictionaryKey()) {
-                _buffer.Write(_encoding.Assignment);
+                _writeBuffer.Write(_encoding.Assignment);
             }
         }
 
@@ -255,10 +255,10 @@ namespace Enigma.Serialization.Json
 
             WriteValuePrefix(args);
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _buffer.Write(value.Value ? _encoding.True : _encoding.False);
+                _writeBuffer.Write(value.Value ? _encoding.True : _encoding.False);
             }
             WriteValueSuffix(args);
         }
@@ -282,12 +282,12 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
                 Write(value.Value.ToString());
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
@@ -296,12 +296,12 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
                 Write(value.Value.ToString("O", JsonEncoding.NumberFormat));
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
@@ -317,12 +317,12 @@ namespace Enigma.Serialization.Json
         {
             WriteValuePrefix(args);
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
                 Write(value.Value.ToString());
-                _buffer.Write(_encoding.Quote);
+                _writeBuffer.Write(_encoding.Quote);
             }
             WriteValueSuffix(args);
         }
@@ -335,21 +335,21 @@ namespace Enigma.Serialization.Json
             WriteValuePrefix(args);
 
             if (value == null) {
-                _buffer.Write(_encoding.Null);
+                _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _buffer.Write(_encoding.ArrayBegin);
+                _writeBuffer.Write(_encoding.ArrayBegin);
                 var isFirst = true;
                 foreach (var el in value) {
                     if (isFirst) {
                         isFirst = false;
                     }
                     else {
-                        _buffer.Write(_encoding.Comma);
+                        _writeBuffer.Write(_encoding.Comma);
                     }
                     Write(el.ToString());
                 }
-                _buffer.Write(_encoding.ArrayEnd);
+                _writeBuffer.Write(_encoding.ArrayEnd);
             }
 
             WriteValueSuffix(args);

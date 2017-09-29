@@ -13,10 +13,10 @@ namespace Enigma.Serialization.Json
         public IFieldNameResolver FieldNameResolver { get; set; }
         public JsonEncoding Encoding { get; set; }
 
-        public JsonSerializer() : this(new BinaryBufferPoolFactory())
+        public JsonSerializer() : this(BinaryBufferPool.Instance)
         {
             FieldNameResolver = new CamelCaseFieldNameResolver();
-            Encoding = JsonEncoding.Unicode;
+            Encoding = JsonEncoding.UTF16LE;
         }
 
         public JsonSerializer(IBinaryBufferPool bufferPool)
@@ -27,7 +27,7 @@ namespace Enigma.Serialization.Json
 
         public void Serialize(Stream stream, object graph)
         {
-            using (var buffer = _bufferPool.AcquireBuffer(stream)) {
+            using (var buffer = _bufferPool.AcquireWriteBuffer(stream)) {
                 var visitor = new JsonWriteVisitor(Encoding, FieldNameResolver, buffer);
                 _engine.Serialize(visitor, graph);
             }
@@ -35,8 +35,10 @@ namespace Enigma.Serialization.Json
 
         public object Deserialize(Type type, Stream stream)
         {
-            var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, stream);
-            return _engine.Deserialize(visitor, type);
+            using (var buffer = _bufferPool.AcquireReadBuffer(stream)) {
+                var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, buffer);
+                return _engine.Deserialize(visitor, type);
+            }
         }
     }
 
@@ -48,8 +50,7 @@ namespace Enigma.Serialization.Json
         public IFieldNameResolver FieldNameResolver { get; set; }
         public JsonEncoding Encoding { get; set; }
 
-
-        public JsonSerializer() : this(new BinaryBufferPoolFactory())
+        public JsonSerializer() : this(new BinaryBufferPool())
         {
         }
 
@@ -58,7 +59,7 @@ namespace Enigma.Serialization.Json
             _bufferPool = bufferPool;
             _engine = new SerializationEngine();
             FieldNameResolver = new CamelCaseFieldNameResolver();
-            Encoding = JsonEncoding.Unicode;
+            Encoding = JsonEncoding.UTF16LE;
         }
 
         void ITypedSerializer.Serialize(Stream stream, object graph)
@@ -68,13 +69,15 @@ namespace Enigma.Serialization.Json
 
         public T Deserialize(Stream stream)
         {
-            var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, stream);
-            return _engine.Deserialize<T>(visitor);
+            using (var buffer = _bufferPool.AcquireReadBuffer(stream)) {
+                var visitor = new JsonReadVisitor(Encoding, FieldNameResolver, buffer);
+                return _engine.Deserialize<T>(visitor);
+            }
         }
 
         public void Serialize(Stream stream, T graph)
         {
-            using (var buffer = _bufferPool.AcquireBuffer(stream)) {
+            using (var buffer = _bufferPool.AcquireWriteBuffer(stream)) {
                 var visitor = new JsonWriteVisitor(Encoding, FieldNameResolver, buffer);
                 _engine.Serialize(visitor, graph);
             }

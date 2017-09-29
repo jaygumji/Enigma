@@ -119,15 +119,15 @@ namespace Enigma.Binary.Converters
             Convert((Decimal)value, buffer, offset);
         }
 
-        public void Convert(Decimal value, BinaryBuffer buffer)
+        public void Convert(Decimal value, BinaryWriteBuffer writeBuffer)
         {
-            var offset = buffer.Advance(16);
-            Convert(value, buffer.Buffer, offset);
+            var offset = writeBuffer.Advance(16);
+            Convert(value, writeBuffer.Buffer, offset);
         }
 
-        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        void IBinaryConverter.Convert(object value, BinaryWriteBuffer writeBuffer)
         {
-            Convert((Decimal)value, buffer);
+            Convert((Decimal)value, writeBuffer);
         }
 
     }

@@ -32,7 +32,7 @@ namespace Enigma.ProofOfConcept
             var serializationTime = watch.Elapsed.Subtract(initializationTime);
 
             Console.WriteLine("Enigma serialization test completed");
-            Console.WriteLine("Size of data: " + length);
+            Console.WriteLine("MinSize of data: " + length);
             Console.WriteLine("Initialization time: " + initializationTime);
             Console.WriteLine("Serialization time: " + serializationTime);
         }

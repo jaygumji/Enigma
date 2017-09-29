@@ -11,6 +11,6 @@ namespace Enigma.Caching
         /// Creates a new instance of <see cref="CachedContentNotFoundException"/>
         /// </summary>
         /// <param name="key">The requested cache key</param>
-        public CachedContentNotFoundException(object key) : base(string.Format("Content was not found, supplied key was {0}", key)) { }
+        public CachedContentNotFoundException(object key) : base(string.Format("Value was not found, supplied key was {0}", key)) { }
     }
 }

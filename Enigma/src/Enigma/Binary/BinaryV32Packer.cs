@@ -26,14 +26,14 @@ namespace Enigma.Binary
         /// <summary>
         /// The value is packed with a loss of 2 bits
         /// </summary>
-        /// <param name="buffer">The buffer where we write the value to.</param>
+        /// <param name="writeBuffer">The buffer where we write the value to.</param>
         /// <param name="nullableValue">Value</param>
         /// <exception cref="System.ArgumentOutOfRangeException">value;Must be between 0 and  + ZMaxValue</exception>
-        public static void PackU(BinaryBuffer buffer, UInt32? nullableValue)
+        public static void PackU(BinaryWriteBuffer writeBuffer, UInt32? nullableValue)
         {
             var length = nullableValue.HasValue ? GetULength(nullableValue.Value) : 1;
-            var position = buffer.Advance(length);
-            PackU(buffer.Buffer, position, length, nullableValue);
+            var position = writeBuffer.Advance(length);
+            PackU(writeBuffer.Buffer, position, length, nullableValue);
         }
 
         /// <summary>

@@ -71,15 +71,15 @@ namespace Enigma.Binary.Converters
             Convert((Int64)value, buffer, offset);
         }
 
-        public void Convert(Int64 value, BinaryBuffer buffer)
+        public void Convert(Int64 value, BinaryWriteBuffer writeBuffer)
         {
-            var offset = buffer.Advance(8);
-            Convert(value, buffer.Buffer, offset);
+            var offset = writeBuffer.Advance(8);
+            Convert(value, writeBuffer.Buffer, offset);
         }
 
-        void IBinaryConverter.Convert(object value, BinaryBuffer buffer)
+        void IBinaryConverter.Convert(object value, BinaryWriteBuffer writeBuffer)
         {
-            Convert((Int64)value, buffer);
+            Convert((Int64)value, writeBuffer);
         }
 
     }

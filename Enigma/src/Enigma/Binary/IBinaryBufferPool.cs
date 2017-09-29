@@ -12,12 +12,26 @@ namespace Enigma.Binary
         /// </summary>
         /// <param name="stream">The stream.</param>
         /// <returns>BinaryBuffer.</returns>
-        BinaryBuffer AcquireBuffer(Stream stream);
+        BinaryWriteBuffer AcquireWriteBuffer(Stream stream);
 
         /// <summary>
-        /// Frees the specified binary buffer.
+        /// Acquires the buffer for the requested stream.
         /// </summary>
-        /// <param name="binaryBuffer">The binary buffer.</param>
-        void Free(BinaryBuffer binaryBuffer);
+        /// <param name="stream">The stream.</param>
+        /// <returns>BinaryBuffer.</returns>
+        BinaryReadBuffer AcquireReadBuffer(Stream stream);
+
+        /// <summary>
+        /// Get a binary buffer to use.
+        /// </summary>
+        /// <param name="minSize">The minimum size of the new buffer</param>
+        /// <returns>Binary buffer.</returns>
+        byte[] AcquireBuffer(int minSize);
+
+        /// <summary>
+        /// Releases the specified binary buffer.
+        /// </summary>
+        /// <param name="buffer">The binary buffer.</param>
+        void Release(byte[] buffer);
     }
 }

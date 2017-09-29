@@ -8,7 +8,7 @@
         byte[] Convert(object value);
         void Convert(object value, byte[] buffer);
         void Convert(object value, byte[] buffer, int offset);
-        void Convert(object value, BinaryBuffer buffer);
+        void Convert(object value, BinaryWriteBuffer writeBuffer);
     }
 
     public interface IBinaryConverter<T> : IBinaryConverter
@@ -19,6 +19,6 @@
         byte[] Convert(T value);
         void Convert(T value, byte[] buffer);
         void Convert(T value, byte[] buffer, int offset);
-        void Convert(T value, BinaryBuffer buffer);
+        void Convert(T value, BinaryWriteBuffer writeBuffer);
     }
 }

@@ -66,17 +66,17 @@ namespace Enigma.Binary
         /// <summary>
         /// The value is packed with a loss of 2 bits
         /// </summary>
-        /// <param name="buffer">The buffer where we write the value to.</param>
+        /// <param name="writeBuffer">The buffer where we write the value to.</param>
         /// <param name="value">Value</param>
         /// <exception cref="System.ArgumentOutOfRangeException">value;Must be between 0 and  + ZMaxValue</exception>
-        public static void Pack(BinaryBuffer buffer, UInt32 value)
+        public static void Pack(BinaryWriteBuffer writeBuffer, UInt32 value)
         {
             if (value > ZMaxValue)
                 throw new ArgumentOutOfRangeException("value", value, "Must be between 0 and " + ZMaxValue);
 
             var length = GetLength(value);
-            var position = buffer.Advance(length);
-            Pack(buffer.Buffer, position, length, value);
+            var position = writeBuffer.Advance(length);
+            Pack(writeBuffer.Buffer, position, length, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

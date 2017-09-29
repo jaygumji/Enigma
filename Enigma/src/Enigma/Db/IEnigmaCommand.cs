@@ -11,5 +11,5 @@ namespace Enigma.Db
 
     }
 
-    public delegate void BufferedCommandHandler(BinaryBuffer buffer);
+    public delegate void BufferedCommandHandler(BinaryWriteBuffer writeBuffer);
 }
