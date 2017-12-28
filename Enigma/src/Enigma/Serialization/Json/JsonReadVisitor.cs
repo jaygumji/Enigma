@@ -28,7 +28,7 @@ namespace Enigma.Serialization.Json
 
         public ValueState TryVisit(VisitArgs args)
         {
-            var literal = _reader.ReadLiteral();
+            var literal = _reader.PeekLiteral();
 
             if (args.IsRoot) {
                 if (literal == JsonLiteral.Null) {
@@ -47,7 +47,12 @@ namespace Enigma.Serialization.Json
                         }
                         throw UnexpectedJsonException.From("array begin token", _buffer, _encoding);
                 }
+
             }
+
+            switch (args.Type) {
+            }
+
             throw new InvalidOperationException("Invalid root");
         }
 

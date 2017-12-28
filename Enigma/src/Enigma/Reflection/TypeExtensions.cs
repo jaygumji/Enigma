@@ -54,5 +54,29 @@ namespace Enigma.Reflection
             return NullableType.MakeGenericType(type);
         }
 
+        public static bool TryGetInterface(this Type type, Type interfaceType, out Type matchedInterfaceType)
+        {
+            var interfaces = type.GetTypeInfo().GetInterfaces();
+            var interfaceTypeInfo = interfaceType.GetTypeInfo();
+            var isGenericTypeDef = interfaceTypeInfo.IsGenericTypeDefinition;
+            foreach (var itInterface in interfaces) {
+                if (isGenericTypeDef) {
+                    if (itInterface.GetGenericTypeDefinition() == interfaceType) {
+                        matchedInterfaceType = itInterface;
+                        return true;
+                    }
+                }
+                else {
+                    if (itInterface == interfaceType) {
+                        matchedInterfaceType = itInterface;
+                        return true;
+                    }
+                }
+            }
+
+            matchedInterfaceType = null;
+            return false;
+        }
+
     }
 }

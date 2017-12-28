@@ -5,9 +5,9 @@ namespace Enigma.Reflection.Emit
 {
     public class ILChainIf
     {
-        private readonly ILExpressed _il;
+        private readonly ILGenerator _il;
 
-        public ILChainIf(ILExpressed il)
+        public ILChainIf(ILGenerator il)
         {
             _il = il;
         }
@@ -23,27 +23,27 @@ namespace Enigma.Reflection.Emit
 
             Condition.Invoke();
 
-            var endLabel = _il.DefineLabel();
+            var endLabel = _il.NewLabel();
 
-            var elseLabel = default(Label);
+            var elseLabel = default(ILLabel);
             if (ElseBody != null) {
-                elseLabel = _il.DefineLabel();
-                _il.TransferLongIfFalse(elseLabel);
+                elseLabel = _il.NewLabel();
+                elseLabel.TransferLongIfFalse();
             }
             else {
-                _il.TransferLongIfFalse(endLabel);
+                endLabel.TransferLongIfFalse();
             }
 
             Body.Invoke();
 
             if (ElseBody != null) {
-                _il.TransferLong(endLabel);
+                endLabel.TransferLong();
 
-                _il.MarkLabel(elseLabel);
+                elseLabel.Mark();
                 ElseBody.Invoke();
             }
             
-            _il.MarkLabel(endLabel);
+            endLabel.Mark();
         }
     }
 }

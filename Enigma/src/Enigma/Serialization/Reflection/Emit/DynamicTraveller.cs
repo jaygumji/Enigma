@@ -6,38 +6,37 @@ namespace Enigma.Serialization.Reflection.Emit
 {
     public class DynamicTraveller
     {
-        private Type _travellerType;
-        private ConstructorInfo _constructor;
-        private MethodInfo _travelWriteMethod;
-        private MethodInfo _travelReadMethod;
         private readonly DynamicTravellerMembers _members;
         private bool _isConstructing;
         private DynamicActivator _activator;
 
         public DynamicTraveller(Type travellerType, ConstructorInfo constructor, MethodInfo travelWriteMethod, MethodInfo travelReadMethod, DynamicTravellerMembers members)
         {
-            _travellerType = travellerType;
-            _constructor = constructor;
-            _travelWriteMethod = travelWriteMethod;
-            _travelReadMethod = travelReadMethod;
+            TravellerType = travellerType;
+            Constructor = constructor;
+            TravelWriteMethod = travelWriteMethod;
+            TravelReadMethod = travelReadMethod;
             _members = members;
             _isConstructing = true;
         }
 
-        public Type TravellerType => _travellerType;
-        public ConstructorInfo Constructor => _constructor;
-        public MethodInfo TravelWriteMethod => _travelWriteMethod;
-        public MethodInfo TravelReadMethod => _travelReadMethod;
+        public Type TravellerType { get; private set; }
+
+        public ConstructorInfo Constructor { get; private set; }
+
+        public MethodInfo TravelWriteMethod { get; private set; }
+
+        public MethodInfo TravelReadMethod { get; private set; }
 
         public void Complete(Type actualTravellerType)
         {
             var actualTravellerTypeInfo = actualTravellerType.GetTypeInfo();
 
-            _travellerType = actualTravellerType;
-            _constructor = actualTravellerTypeInfo.GetConstructor(_members.TravellerConstructorTypes);
-            _travelWriteMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelWriteMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-            _travelReadMethod = actualTravellerTypeInfo.GetMethod("Travel", _travelReadMethod.GetParameters().Select(p => p.ParameterType).ToArray());
-            _activator = new DynamicActivator(_constructor);
+            TravellerType = actualTravellerType;
+            Constructor = actualTravellerTypeInfo.GetConstructor(_members.TravellerConstructorTypes);
+            TravelWriteMethod = actualTravellerTypeInfo.GetMethod("Travel", TravelWriteMethod.GetParameters().Select(p => p.ParameterType).ToArray());
+            TravelReadMethod = actualTravellerTypeInfo.GetMethod("Travel", TravelReadMethod.GetParameters().Select(p => p.ParameterType).ToArray());
+            _activator = new DynamicActivator(Constructor);
             _isConstructing = false;
         }
 

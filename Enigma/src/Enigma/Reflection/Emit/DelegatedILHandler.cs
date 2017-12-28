@@ -1,7 +1,9 @@
+using System.Reflection.Emit;
+
 namespace Enigma.Reflection.Emit
 {
 
-    public class DelegatedILHandler<T> where T : ILCodeParameter
+    public class DelegatedILHandler<T> where T : ILPointer
     {
         private readonly ILGenerationMethodHandler<T> _handler;
         private readonly ILGenerationHandler<T> _parameterlessHandler;
@@ -22,10 +24,12 @@ namespace Enigma.Reflection.Emit
             _parameterlessHandler = parameterlessHandler;
         }
 
-        public void Invoke(ILExpressed il, T parameter)
+        public void Invoke(ILGenerator il, T parameter)
         {
             if (_handler != null) _handler.Invoke(il, parameter);
-            else if (_parameterlessHandler != null) _parameterlessHandler.Invoke(parameter);
+            else {
+                _parameterlessHandler?.Invoke(parameter);
+            }
         }
     }
 
@@ -48,10 +52,12 @@ namespace Enigma.Reflection.Emit
             _parameterlessHandler = parameterlessHandler;
         }
 
-        public void Invoke(ILExpressed il)
+        public void Invoke(ILGenerator il)
         {
             if (_handler != null) _handler.Invoke(il);
-            else if (_parameterlessHandler != null) _parameterlessHandler.Invoke();
+            else {
+                _parameterlessHandler?.Invoke();
+            }
         }
 
     }

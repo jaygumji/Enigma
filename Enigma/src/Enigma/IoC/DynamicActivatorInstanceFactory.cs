@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using Enigma.Reflection.Emit.Pointers;
 
 namespace Enigma.IoC
 {
@@ -55,21 +56,22 @@ namespace Enigma.IoC
                 type.FullName.Replace(".", "_"),
                 "$",
                 Guid.NewGuid());
+
             var method = new DynamicMethod(methodName, typeof(void), new[] { type, typeof(object[])});
 
             var il = method.GetILGenerator();
-            var gen = new ILExpressed(il, provider);
-            var instance = gen.Var.Arg(0, type);
-            var props = gen.Var.Arg(1, typeof(object[]));
+            var instance = ILPointer.Arg(0, type);
+            var props = ILPointer.Arg(1, typeof(object[]));
 
             for (var i = 0; i < properties.Length; i++) {
                 var property = properties[i];
-                var value = gen.Var.ArrayElement(props, i)
+                var value = props
+                    .ElementAt(i)
                     .Cast(property.PropertyType);
 
-                gen.Snippets.SetPropertyValue(instance, property, value);
+                il.Set(instance, property, value);
             }
-            gen.Return();
+            il.Emit(OpCodes.Ret);
 
             return (Action<TInstance, object[]>)
                 method.CreateDelegate(typeof(Action<TInstance, object[]>));

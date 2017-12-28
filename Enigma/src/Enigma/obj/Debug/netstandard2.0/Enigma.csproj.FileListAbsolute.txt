@@ -6,3 +6,4 @@ C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard2.0\Enigma.As
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard2.0\Enigma.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard2.0\Enigma.pdb
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard2.0\Enigma.csprojResolveAssemblyReference.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Debug\netstandard2.0\Enigma.AssemblyInfoInputs.cache

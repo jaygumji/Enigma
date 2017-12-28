@@ -11,15 +11,15 @@ namespace Enigma.Serialization.Reflection.Emit
     public sealed class DynamicReadTravellerMembers
     {
 
-        public readonly ILCodeParameter VisitArgsCollectionItem;
-        public readonly ILCodeParameter VisitArgsDictionaryKey;
-        public readonly ILCodeParameter VisitArgsDictionaryValue;
-        public readonly ILCodeParameter VisitArgsCollectionInCollection;
-        public readonly ILCodeParameter VisitArgsDictionaryInCollection;
-        public readonly ILCodeParameter VisitArgsDictionaryInDictionaryKey;
-        public readonly ILCodeParameter VisitArgsDictionaryInDictionaryValue;
-        public readonly ILCodeParameter VisitArgsCollectionInDictionaryKey;
-        public readonly ILCodeParameter VisitArgsCollectionInDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionItem;
+        public readonly ILPointer VisitArgsDictionaryKey;
+        public readonly ILPointer VisitArgsDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionInCollection;
+        public readonly ILPointer VisitArgsDictionaryInCollection;
+        public readonly ILPointer VisitArgsDictionaryInDictionaryKey;
+        public readonly ILPointer VisitArgsDictionaryInDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionInDictionaryKey;
+        public readonly ILPointer VisitArgsCollectionInDictionaryValue;
 
         public readonly MethodInfo VisitorTryVisit;
         public readonly MethodInfo VisitorLeave;
@@ -36,15 +36,15 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             var visitArgsType = typeof(VisitArgs).GetTypeInfo();
 
-            VisitArgsCollectionItem = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionItem"));
-            VisitArgsDictionaryKey = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryKey"));
-            VisitArgsDictionaryValue = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryValue"));
-            VisitArgsCollectionInCollection = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionInCollection"));
-            VisitArgsDictionaryInCollection = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryInCollection"));
-            VisitArgsDictionaryInDictionaryKey = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryInDictionaryKey"));
-            VisitArgsDictionaryInDictionaryValue = new StaticFieldILCodeVariable(visitArgsType.GetField("DictionaryInDictionaryValue"));
-            VisitArgsCollectionInDictionaryKey = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionInDictionaryKey"));
-            VisitArgsCollectionInDictionaryValue = new StaticFieldILCodeVariable(visitArgsType.GetField("CollectionInDictionaryValue"));
+            VisitArgsCollectionItem = new ILStaticFieldVariable(visitArgsType.GetField("CollectionItem"));
+            VisitArgsDictionaryKey = new ILStaticFieldVariable(visitArgsType.GetField("DictionaryKey"));
+            VisitArgsDictionaryValue = new ILStaticFieldVariable(visitArgsType.GetField("DictionaryValue"));
+            VisitArgsCollectionInCollection = new ILStaticFieldVariable(visitArgsType.GetField("CollectionInCollection"));
+            VisitArgsDictionaryInCollection = new ILStaticFieldVariable(visitArgsType.GetField("DictionaryInCollection"));
+            VisitArgsDictionaryInDictionaryKey = new ILStaticFieldVariable(visitArgsType.GetField("DictionaryInDictionaryKey"));
+            VisitArgsDictionaryInDictionaryValue = new ILStaticFieldVariable(visitArgsType.GetField("DictionaryInDictionaryValue"));
+            VisitArgsCollectionInDictionaryKey = new ILStaticFieldVariable(visitArgsType.GetField("CollectionInDictionaryKey"));
+            VisitArgsCollectionInDictionaryValue = new ILStaticFieldVariable(visitArgsType.GetField("CollectionInDictionaryValue"));
 
             var readVisitorType = typeof(IReadVisitor).GetTypeInfo();
             VisitorTryVisit = readVisitorType.GetMethod("TryVisit");

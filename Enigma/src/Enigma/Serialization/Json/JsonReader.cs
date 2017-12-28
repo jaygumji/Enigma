@@ -54,7 +54,7 @@ namespace Enigma.Serialization.Json
             return true;
         }
 
-        public JsonLiteral ReadLiteral()
+        public JsonLiteral PeekLiteral()
         {
             var first = _buffer.PeekByte();
 
@@ -161,6 +161,11 @@ namespace Enigma.Serialization.Json
 
         public string ReadString()
         {
+            if (!IsNextCharacter(_encoding.Quote, _buffer.Position)) {
+                throw UnexpectedJsonException.From("\"", _buffer, _encoding);
+            }
+            _buffer.Advance(_encoding.Quote.Length);
+
             var b = new StringBuilder();
             var offset = _buffer.Position;
 

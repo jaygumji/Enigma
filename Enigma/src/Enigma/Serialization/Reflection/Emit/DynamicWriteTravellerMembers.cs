@@ -11,15 +11,15 @@ namespace Enigma.Serialization.Reflection.Emit
     public sealed class DynamicWriteTravellerMembers
     {
 
-        public readonly ILCodeParameter VisitArgsCollectionItem;
-        public readonly ILCodeParameter VisitArgsDictionaryKey;
-        public readonly ILCodeParameter VisitArgsDictionaryValue;
-        public readonly ILCodeParameter VisitArgsCollectionInCollection;
-        public readonly ILCodeParameter VisitArgsDictionaryInCollection;
-        public readonly ILCodeParameter VisitArgsDictionaryInDictionaryKey;
-        public readonly ILCodeParameter VisitArgsDictionaryInDictionaryValue;
-        public readonly ILCodeParameter VisitArgsCollectionInDictionaryKey;
-        public readonly ILCodeParameter VisitArgsCollectionInDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionItem;
+        public readonly ILPointer VisitArgsDictionaryKey;
+        public readonly ILPointer VisitArgsDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionInCollection;
+        public readonly ILPointer VisitArgsDictionaryInCollection;
+        public readonly ILPointer VisitArgsDictionaryInDictionaryKey;
+        public readonly ILPointer VisitArgsDictionaryInDictionaryValue;
+        public readonly ILPointer VisitArgsCollectionInDictionaryKey;
+        public readonly ILPointer VisitArgsCollectionInDictionaryValue;
 
         public readonly MethodInfo VisitorVisit;
         public readonly MethodInfo VisitorLeave;
@@ -36,15 +36,15 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             var visitArgsType = typeof (VisitArgs);
             var visitArgsTypeInfo = visitArgsType.GetTypeInfo();
-            VisitArgsCollectionItem = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("CollectionItem"));
-            VisitArgsDictionaryKey = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("DictionaryKey"));
-            VisitArgsDictionaryValue = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("DictionaryValue"));
-            VisitArgsCollectionInCollection = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("CollectionInCollection"));
-            VisitArgsDictionaryInCollection = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("DictionaryInCollection"));
-            VisitArgsDictionaryInDictionaryKey = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("DictionaryInDictionaryKey"));
-            VisitArgsDictionaryInDictionaryValue = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("DictionaryInDictionaryValue"));
-            VisitArgsCollectionInDictionaryKey = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("CollectionInDictionaryKey"));
-            VisitArgsCollectionInDictionaryValue = new StaticFieldILCodeVariable(visitArgsTypeInfo.GetField("CollectionInDictionaryValue"));
+            VisitArgsCollectionItem = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("CollectionItem"));
+            VisitArgsDictionaryKey = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("DictionaryKey"));
+            VisitArgsDictionaryValue = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("DictionaryValue"));
+            VisitArgsCollectionInCollection = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("CollectionInCollection"));
+            VisitArgsDictionaryInCollection = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("DictionaryInCollection"));
+            VisitArgsDictionaryInDictionaryKey = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("DictionaryInDictionaryKey"));
+            VisitArgsDictionaryInDictionaryValue = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("DictionaryInDictionaryValue"));
+            VisitArgsCollectionInDictionaryKey = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("CollectionInDictionaryKey"));
+            VisitArgsCollectionInDictionaryValue = new ILStaticFieldVariable(visitArgsTypeInfo.GetField("CollectionInDictionaryValue"));
 
             var writeVisitorType = typeof (IWriteVisitor);
             var writeVisitorTypeInfo = writeVisitorType.GetTypeInfo();

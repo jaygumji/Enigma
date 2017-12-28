@@ -3,6 +3,7 @@ using Enigma.Reflection.Emit;
 using System;
 using System.Reflection;
 using System.Reflection.Emit;
+using Enigma.Reflection.Emit.Pointers;
 
 namespace Enigma
 {
@@ -45,22 +46,22 @@ namespace Enigma
             var method = new DynamicMethod(methodName, typeof(object), DynConstructorTypes);
 
             var il = method.GetILGenerator();
-            var gen = new ILExpressed(il, provider);
-            var methodParams = gen.Var.Arg(0, typeof(object[]));
+            var methodParams = ILPointer.Arg(0, typeof(object[]));
 
             var parameters = constructor.GetParameters();
 
-            var constructParameters = new ILCodeParameter[parameters.Length];
+            var constructParameters = new ILPointer[parameters.Length];
             for (var i = 0; i < parameters.Length; i++) {
                 var parameter = parameters[i];
-                var constructParam = gen.Var.ArrayElement(methodParams, i)
+                var constructParam = methodParams
+                    .ElementAt(i)
                     .Cast(parameter.ParameterType);
 
                 constructParameters[i] = constructParam;
             }
 
-            gen.Snippets.ConstructInstance(constructor, constructParameters);
-            gen.Return();
+            il.Construct(constructor, constructParameters);
+            il.Emit(OpCodes.Ret);
 
             _activate = (Func<object[], object>)
                 method.CreateDelegate(typeof(Func<object[], object>));

@@ -11,11 +11,9 @@ namespace Enigma.Reflection.Emit
         private readonly string _name;
         private readonly System.Reflection.Emit.AssemblyBuilder _assemblyBuilder;
         private readonly ModuleBuilder _module;
-        private readonly ITypeProvider _provider;
 
-        public AssemblyBuilder(ITypeProvider provider)
+        public AssemblyBuilder()
         {
-            _provider = provider;
             _name = "EnigmaDynamicEmit." + Guid.NewGuid().ToString("N");
 
             _assemblyBuilder = System.Reflection.Emit.AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(_name), AssemblyBuilderAccess.Run);
@@ -25,7 +23,7 @@ namespace Enigma.Reflection.Emit
         public ClassBuilder DefineClass(string name, Type inherits, Type[] implements)
         {
             const TypeAttributes attributes = TypeAttributes.Class | TypeAttributes.AnsiClass | TypeAttributes.AutoClass | TypeAttributes.BeforeFieldInit;
-            return new ClassBuilder(_module.DefineType(_name + name, attributes, inherits, implements), _provider);
+            return new ClassBuilder(_module.DefineType(_name + name, attributes, inherits, implements));
         }
 
     }

@@ -1,20 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Enigma.Scheduling
 {
     public class DateTimeQueue<T>
     {
 
+        private volatile int _count;
         private readonly SortedDictionary<DateTime, List<T>> _entries; 
 
         public DateTimeQueue()
         {
             _entries = new SortedDictionary<DateTime, List<T>>();
+            _count = 0;
         }
 
-        public bool IsEmpty { get { return _entries.Count == 0; } }
+        public bool IsEmpty => _count == 0;
 
         public void Enqueue(DateTime when, T value)
         {
@@ -25,13 +28,15 @@ namespace Enigma.Scheduling
                     _entries.Add(when, list);
                 }
             }
-            lock (list)
+            lock (list) {
                 list.Add(value);
+            }
+            _count++;
         }
 
         public bool TryDequeue(out IEnumerable<T> values)
         {
-            if (_entries.Count == 0) {
+            if (_count == 0) {
                 values = null;
                 return false;
             }
@@ -53,12 +58,13 @@ namespace Enigma.Scheduling
             }
 
             values = kv.Value;
+            _count -= kv.Value.Count;
             return true;
         }
 
         public bool TryPeekNextEntryAt(out DateTime nextAt)
         {
-            if (_entries.Count == 0) {
+            if (_count == 0) {
                 nextAt = default(DateTime);
                 return false;
             }

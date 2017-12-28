@@ -25,7 +25,7 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             _typeProvider = typeProvider;
             _travellers = new Dictionary<Type, DynamicTraveller>();
-            _assemblyBuilder = new AssemblyBuilder(typeProvider.Provider);
+            _assemblyBuilder = new AssemblyBuilder();
             Members = new DynamicTravellerMembers();
         }
 

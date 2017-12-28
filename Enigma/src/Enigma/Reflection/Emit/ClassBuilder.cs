@@ -9,13 +9,11 @@ namespace Enigma.Reflection.Emit
         private readonly TypeBuilder _typeBuilder;
         private Type _type;
         private bool _isSealed;
-        private readonly ITypeProvider _provider;
 
-        public ClassBuilder(TypeBuilder typeBuilder, ITypeProvider provider)
+        public ClassBuilder(TypeBuilder typeBuilder)
         {
             _typeBuilder = typeBuilder;
             _isSealed = false;
-            _provider = provider;
         }
 
         // TODO: Check _typeBuilder.AsType call
@@ -30,27 +28,27 @@ namespace Enigma.Reflection.Emit
         public ConstructorBuilder DefineDefaultConstructor()
         {
             var constructorBuilder = _typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, Type.EmptyTypes);
-            return new ConstructorBuilder(constructorBuilder, _provider);
+            return new ConstructorBuilder(constructorBuilder);
         }
 
         public ConstructorBuilder DefineConstructor(params Type[] parameterTypes)
         {
             var constructorBuilder = _typeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, parameterTypes);
-            return new ConstructorBuilder(constructorBuilder, _provider);
+            return new ConstructorBuilder(constructorBuilder);
         }
 
         public MethodBuilder DefineMethod(string name, Type returnType, Type[] parameterTypes)
         {
             const MethodAttributes attributes = MethodAttributes.Public | MethodAttributes.HideBySig;
             var methodBuilder = _typeBuilder.DefineMethod(name, attributes, returnType, parameterTypes);
-            return new MethodBuilder(methodBuilder, _provider);
+            return new MethodBuilder(methodBuilder);
         }
 
         public MethodBuilder DefineOverloadMethod(string name, Type returnType, Type[] parameterTypes)
         {
             const MethodAttributes attributes = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Final | MethodAttributes.NewSlot | MethodAttributes.Virtual;
             var methodBuilder = _typeBuilder.DefineMethod(name, attributes, returnType, parameterTypes);
-            return new MethodBuilder(methodBuilder, _provider);
+            return new MethodBuilder(methodBuilder);
         }
 
         public void Seal()

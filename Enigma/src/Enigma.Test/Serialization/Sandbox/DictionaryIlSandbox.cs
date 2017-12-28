@@ -13,7 +13,7 @@ namespace Enigma.Test.Serialization.Sandbox
 
         public DictionaryIlSandbox()
         {
-            _assemblyBuilder = new AssemblyBuilder(new CachedTypeProvider());
+            _assemblyBuilder = new AssemblyBuilder();
             _classBuilder = _assemblyBuilder.DefineClass("SandboxClass", typeof(object), Type.EmptyTypes);
             _methodBuilder = _classBuilder.DefineMethod("Execute", typeof(void), new [] {typeof(IReadVisitor), typeof(Fakes.ValueDictionary)});
 
