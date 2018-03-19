@@ -70,6 +70,14 @@ namespace Enigma.Serialization.Json
             Serialize(stream, (T)graph);
         }
 
+        public T Deserialize(string json)
+        {
+            var bytes = Encoding.BaseEncoding.GetBytes(json);
+            using (var stream = new MemoryStream(bytes)) {
+                return Deserialize(stream);
+            }
+        }
+
         public T Deserialize(Stream stream)
         {
             using (var buffer = _bufferPool.AcquireReadBuffer(stream)) {

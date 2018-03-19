@@ -29,7 +29,7 @@
           "lib/netstandard1.3/Microsoft.CSharp.dll": {}
         }
       },
-      "Microsoft.DotNet.PlatformAbstractions/1.1.0": {
+      "Microsoft.DotNet.PlatformAbstractions/1.0.3": {
         "type": "package",
         "dependencies": {
           "System.AppContext": "4.1.0",
@@ -48,10 +48,10 @@
           "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll": {}
         }
       },
-      "Microsoft.Extensions.DependencyModel/1.1.0": {
+      "Microsoft.Extensions.DependencyModel/1.0.3": {
         "type": "package",
         "dependencies": {
-          "Microsoft.DotNet.PlatformAbstractions": "1.1.0",
+          "Microsoft.DotNet.PlatformAbstractions": "1.0.3",
           "Newtonsoft.Json": "9.0.1",
           "System.Diagnostics.Debug": "4.0.11",
           "System.Dynamic.Runtime": "4.0.11",
@@ -1580,12 +1580,12 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
-      "xunit/2.3.0-beta5-build3769": {
+      "xunit/2.3.1": {
         "type": "package",
         "dependencies": {
           "xunit.analyzers": "0.7.0",
-          "xunit.assert": "[2.3.0-beta5-build3769]",
-          "xunit.core": "[2.3.0-beta5-build3769]"
+          "xunit.assert": "[2.3.1]",
+          "xunit.core": "[2.3.1]"
         }
       },
       "xunit.abstractions/2.0.1": {
@@ -1603,7 +1603,7 @@
       "xunit.analyzers/0.7.0": {
         "type": "package"
       },
-      "xunit.assert/2.3.0-beta5-build3769": {
+      "xunit.assert/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1"
@@ -1615,11 +1615,11 @@
           "lib/netstandard1.1/xunit.assert.dll": {}
         }
       },
-      "xunit.core/2.3.0-beta5-build3769": {
+      "xunit.core/2.3.1": {
         "type": "package",
         "dependencies": {
-          "xunit.extensibility.core": "[2.3.0-beta5-build3769]",
-          "xunit.extensibility.execution": "[2.3.0-beta5-build3769]"
+          "xunit.extensibility.core": "[2.3.1]",
+          "xunit.extensibility.execution": "[2.3.1]"
         },
         "build": {
           "build/xunit.core.props": {},
@@ -1630,7 +1630,7 @@
           "buildMultiTargeting/xunit.core.targets": {}
         }
       },
-      "xunit.extensibility.core/2.3.0-beta5-build3769": {
+      "xunit.extensibility.core/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
@@ -1643,11 +1643,11 @@
           "lib/netstandard1.1/xunit.core.dll": {}
         }
       },
-      "xunit.extensibility.execution/2.3.0-beta5-build3769": {
+      "xunit.extensibility.execution/2.3.1": {
         "type": "package",
         "dependencies": {
           "NETStandard.Library": "1.6.1",
-          "xunit.extensibility.core": "[2.3.0-beta5-build3769]"
+          "xunit.extensibility.core": "[2.3.1]"
         },
         "compile": {
           "lib/netstandard1.1/xunit.execution.dotnet.dll": {}
@@ -1656,12 +1656,10 @@
           "lib/netstandard1.1/xunit.execution.dotnet.dll": {}
         }
       },
-      "xunit.runner.visualstudio/2.3.0-beta5-build3769": {
+      "xunit.runner.visualstudio/2.3.1": {
         "type": "package",
         "dependencies": {
-          "Microsoft.DotNet.PlatformAbstractions": "1.1.0",
-          "Microsoft.Extensions.DependencyModel": "1.1.0",
-          "Microsoft.TestPlatform.ObjectModel": "15.0.0"
+          "Microsoft.NET.Test.Sdk": "15.0.0"
         },
         "build": {
           "build/netcoreapp1.0/xunit.runner.visualstudio.props": {}
@@ -1741,26 +1739,28 @@
         "ref/xamarinwatchos10/_._"
       ]
     },
-    "Microsoft.DotNet.PlatformAbstractions/1.1.0": {
-      "sha512": "Bl6KYfbFSIW3QIRHAp931iR5h01qHjKghdpAtncwbzNUs0+IUZ+XfwkIU0sQsR33ufGvi3u4dZMIYYFysjpHAA==",
+    "Microsoft.DotNet.PlatformAbstractions/1.0.3": {
+      "sha512": "rF92Gp5L2asYrFNf0cKNBxzzGLh1krHuj6TRDk9wdjN2qdvJLaNYOn1s9oYkMlptYX436KiEFqxhLB+I5veXvQ==",
       "type": "package",
-      "path": "microsoft.dotnet.platformabstractions/1.1.0",
+      "path": "microsoft.dotnet.platformabstractions/1.0.3",
       "files": [
+        "lib/.DS_Store",
         "lib/net451/Microsoft.DotNet.PlatformAbstractions.dll",
         "lib/netstandard1.3/Microsoft.DotNet.PlatformAbstractions.dll",
-        "microsoft.dotnet.platformabstractions.1.1.0.nupkg.sha512",
+        "microsoft.dotnet.platformabstractions.1.0.3.nupkg.sha512",
         "microsoft.dotnet.platformabstractions.nuspec"
       ]
     },
-    "Microsoft.Extensions.DependencyModel/1.1.0": {
-      "sha512": "TG7dJ8GY1Myz9lZ8DJL4i6D05ncJQBi5CjBMXMdJ4edKxaW+vP2DndDd1jJabdMdmVRdGrvybzqkB+A6Df7eDw==",
+    "Microsoft.Extensions.DependencyModel/1.0.3": {
+      "sha512": "Z3o19EnheuegmvgpCzwoSlnCWxYA6qIUhvKJ7ifKHHvU7U+oYR/gliLiL3LVYOOeGMEEzkpJ5W67sOcXizGtlw==",
       "type": "package",
-      "path": "microsoft.extensions.dependencymodel/1.1.0",
+      "path": "microsoft.extensions.dependencymodel/1.0.3",
       "files": [
+        "lib/.DS_Store",
         "lib/net451/Microsoft.Extensions.DependencyModel.dll",
         "lib/netstandard1.3/Microsoft.Extensions.DependencyModel.dll",
         "lib/netstandard1.6/Microsoft.Extensions.DependencyModel.dll",
-        "microsoft.extensions.dependencymodel.1.1.0.nupkg.sha512",
+        "microsoft.extensions.dependencymodel.1.0.3.nupkg.sha512",
         "microsoft.extensions.dependencymodel.nuspec"
       ]
     },
@@ -5531,12 +5531,12 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
-    "xunit/2.3.0-beta5-build3769": {
-      "sha512": "/sE1xWNPBv49psqHVaRmvk+Gxck++KPhEkzx4KIjD6R6XAdxcq5HKH2RuEmcbEHrw6spid9iTvSM3gkIMl4ohw==",
+    "xunit/2.3.1": {
+      "sha512": "IWux0xXfZ/bC7SgooK5rmW5KwCwFg9GFslmPxA7+pJsT+2SRyhOfOgNUXDd7B09UN4f6kogRT2TqNi6gbWEspA==",
       "type": "package",
-      "path": "xunit/2.3.0-beta5-build3769",
+      "path": "xunit/2.3.1",
       "files": [
-        "xunit.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.2.3.1.nupkg.sha512",
         "xunit.nuspec"
       ]
     },
@@ -5565,70 +5565,73 @@
         "xunit.analyzers.nuspec"
       ]
     },
-    "xunit.assert/2.3.0-beta5-build3769": {
-      "sha512": "24uDH5YPFRzeHrzJWsLHUlJkCQMXkAU3vE3K8woVNLG/QBmBKK+dhXpioZ7sgjcved/ntsa/jNUVtg4jGGXPNQ==",
+    "xunit.assert/2.3.1": {
+      "sha512": "+mUMp3aJOS0ag3qJ2tUhVa930KhwjyypxXT4Ab8lQozEQN8/xgkblQnYs0woIWpr2NbzEOxsZojytl9NBVRKxg==",
       "type": "package",
-      "path": "xunit.assert/2.3.0-beta5-build3769",
+      "path": "xunit.assert/2.3.1",
       "files": [
         "lib/netstandard1.1/xunit.assert.dll",
         "lib/netstandard1.1/xunit.assert.xml",
-        "xunit.assert.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.assert.2.3.1.nupkg.sha512",
         "xunit.assert.nuspec"
       ]
     },
-    "xunit.core/2.3.0-beta5-build3769": {
-      "sha512": "CQOgkpxDPor2XuAdlCNLboMyc4zG1PXBrsgFrTpDiS/2MctHC3LO2jqsNVyLDV+n9mNivYcSmDQPBvWShmnk7A==",
+    "xunit.core/2.3.1": {
+      "sha512": "LOG4qOFuVQcjYcIuZbKeo03Uvng3lSb2gZJU9ANljwCf+PTd//iAMZS5qcJQZrjhndc4aOUlJGQy5wa0+/iZ6w==",
       "type": "package",
-      "path": "xunit.core/2.3.0-beta5-build3769",
+      "path": "xunit.core/2.3.1",
       "files": [
         "build/xunit.core.props",
         "build/xunit.core.targets",
         "build/xunit.execution.desktop.dll",
         "buildMultiTargeting/xunit.core.props",
         "buildMultiTargeting/xunit.core.targets",
-        "xunit.core.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.core.2.3.1.nupkg.sha512",
         "xunit.core.nuspec"
       ]
     },
-    "xunit.extensibility.core/2.3.0-beta5-build3769": {
-      "sha512": "9o6oZ53sC731TtOAw1J0qIpk0wPkzcjeItXvBrICwh8k8bB+pZVABYuFc9esoUrFZIiOxGkr8gzO+lGcTUvpPw==",
+    "xunit.extensibility.core/2.3.1": {
+      "sha512": "1mgYqXeQfU+7zcSRW8/5Uf1jVZ5+5WELmi+BuRTh0xu/x0Q0gK0SuR3FLUF4BSd8sfZzvrRUrhWj3ltpyFxhrg==",
       "type": "package",
-      "path": "xunit.extensibility.core/2.3.0-beta5-build3769",
+      "path": "xunit.extensibility.core/2.3.1",
       "files": [
         "lib/netstandard1.1/xunit.core.dll",
         "lib/netstandard1.1/xunit.core.dll.tdnet",
         "lib/netstandard1.1/xunit.core.xml",
         "lib/netstandard1.1/xunit.runner.tdnet.dll",
         "lib/netstandard1.1/xunit.runner.utility.net452.dll",
-        "xunit.extensibility.core.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.extensibility.core.2.3.1.nupkg.sha512",
         "xunit.extensibility.core.nuspec"
       ]
     },
-    "xunit.extensibility.execution/2.3.0-beta5-build3769": {
-      "sha512": "/ROo0XF+s3f6cOj1ldkBV0ShcYi1GMUGQRZdchFSlX5FgEIQ6x/ButSIfxYr8Jj7FRLeJFgF7g1NQ8LV/l5bjQ==",
+    "xunit.extensibility.execution/2.3.1": {
+      "sha512": "i8xrHfKC5dyBWQ7I15FePzm0m8KNToBsTleCCQbOQuXRPZIvupd4nnfaCPeJuKHHe7yJ8JGtWxjIgw0ow/cMhg==",
       "type": "package",
-      "path": "xunit.extensibility.execution/2.3.0-beta5-build3769",
+      "path": "xunit.extensibility.execution/2.3.1",
       "files": [
         "lib/net452/xunit.execution.desktop.dll",
         "lib/net452/xunit.execution.desktop.xml",
         "lib/netstandard1.1/xunit.execution.dotnet.dll",
         "lib/netstandard1.1/xunit.execution.dotnet.xml",
-        "xunit.extensibility.execution.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.extensibility.execution.2.3.1.nupkg.sha512",
         "xunit.extensibility.execution.nuspec"
       ]
     },
-    "xunit.runner.visualstudio/2.3.0-beta5-build3769": {
-      "sha512": "R9Unk4J59PFSnYHqTuKP2IgpHdAcXk/Nw0sQZ/eM+M2fv5EAAEfwLWSjvLL8ngQctWyh9J38i13iT+4tdOhOTA==",
+    "xunit.runner.visualstudio/2.3.1": {
+      "sha512": "B+RtW4dyBquEyjSAFyV5RMifaOZOirDwlzcIq2DNVGo1gzJS8PAPu5S+2y1n6ZgEMWbpqJf9TkZ55+X6FLdy3A==",
       "type": "package",
-      "path": "xunit.runner.visualstudio/2.3.0-beta5-build3769",
+      "path": "xunit.runner.visualstudio/2.3.1",
       "files": [
         "build/_common/xunit.abstractions.dll",
         "build/_common/xunit.runner.reporters.net452.dll",
         "build/_common/xunit.runner.utility.net452.dll",
         "build/_common/xunit.runner.visualstudio.testadapter.dll",
         "build/net20/xunit.runner.visualstudio.props",
+        "build/netcoreapp1.0/xunit.abstractions.dll",
         "build/netcoreapp1.0/xunit.runner.reporters.netcoreapp10.dll",
         "build/netcoreapp1.0/xunit.runner.utility.netcoreapp10.dll",
+        "build/netcoreapp1.0/xunit.runner.utility.netcoreapp10.xml",
+        "build/netcoreapp1.0/xunit.runner.visualstudio.dotnetcore.testadapter.deps.json",
         "build/netcoreapp1.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll",
         "build/netcoreapp1.0/xunit.runner.visualstudio.props",
         "build/uap10.0/xunit.runner.reporters.netstandard11.dll",
@@ -5637,7 +5640,7 @@
         "build/uap10.0/xunit.runner.visualstudio.targets",
         "build/uap10.0/xunit.runner.visualstudio.uwp.dll",
         "build/uap10.0/xunit.runner.visualstudio.uwp.pri",
-        "xunit.runner.visualstudio.2.3.0-beta5-build3769.nupkg.sha512",
+        "xunit.runner.visualstudio.2.3.1.nupkg.sha512",
         "xunit.runner.visualstudio.nuspec"
       ]
     },
@@ -5652,8 +5655,8 @@
       "Enigma >= 0.1.0",
       "Microsoft.NET.Test.Sdk >= 15.3.0",
       "Microsoft.NETCore.App >= 2.0.0",
-      "xunit >= 2.3.0-beta5-build3769",
-      "xunit.runner.visualstudio >= 2.3.0-beta5-build3769"
+      "xunit >= 2.3.1",
+      "xunit.runner.visualstudio >= 2.3.1"
     ]
   },
   "packageFolders": {
@@ -5663,9 +5666,6 @@
   },
   "project": {
     "version": "1.0.0",
-    "restoreSettings": {
-      "hideWarningsAndErrors": true
-    },
     "restore": {
       "projectUniqueName": "C:\\Dev\\Current\\Repos\\Enigma\\Enigma\\src\\Enigma.Test\\Enigma.Test.csproj",
       "projectName": "Enigma.Test",
@@ -5719,11 +5719,11 @@
           },
           "xunit": {
             "target": "Package",
-            "version": "[2.3.0-beta5-build3769, )"
+            "version": "[2.3.1, )"
           },
           "xunit.runner.visualstudio": {
             "target": "Package",
-            "version": "[2.3.0-beta5-build3769, )"
+            "version": "[2.3.1, )"
           }
         },
         "imports": [

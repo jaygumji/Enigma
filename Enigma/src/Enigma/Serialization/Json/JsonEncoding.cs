@@ -38,10 +38,7 @@ namespace Enigma.Serialization.Json
                 NumberDecimalSeparator = "."
             };
 
-        public static readonly IFormatProvider DateTimeFormat =
-            new DateTimeFormatInfo {
-                
-            };
+        public static readonly IFormatProvider DateTimeFormat = CultureInfo.InvariantCulture;
 
         public readonly Encoding BaseEncoding;
         public readonly IEncodingBinaryFormat BinaryFormat;
@@ -79,6 +76,8 @@ namespace Enigma.Serialization.Json
         public readonly byte[] Seven;
         public readonly byte[] Eight;
         public readonly byte[] Nine;
+        public readonly byte[] Point;
+        public readonly byte[] Space;
 
         public JsonEncoding(Encoding baseEncoding, IEncodingBinaryFormat binaryFormat)
         {
@@ -113,7 +112,10 @@ namespace Enigma.Serialization.Json
             Seven = baseEncoding.GetBytes("7");
             Eight = baseEncoding.GetBytes("8");
             Nine = baseEncoding.GetBytes("9");
+            Point = baseEncoding.GetBytes(".");
+            Space = baseEncoding.GetBytes(" ");
         }
+
         public bool RequiresEscape(char c, out byte[] charBytes)
         {
             switch (c) {

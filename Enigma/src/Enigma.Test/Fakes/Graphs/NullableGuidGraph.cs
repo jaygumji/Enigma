@@ -2,7 +2,7 @@
 
 namespace Enigma.Testing.Fakes.Graphs
 {
-    public class NullableGuidGraph
+    public class NullableGuidGraph : ISingleNullableValueGraph<Guid>
     {
         public Guid? Value { get; set; }
     }

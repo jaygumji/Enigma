@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using Enigma.Binary;
 using Enigma.IO;
 
@@ -338,18 +339,19 @@ namespace Enigma.Serialization.Json
                 _writeBuffer.Write(_encoding.Null);
             }
             else {
-                _writeBuffer.Write(_encoding.ArrayBegin);
-                var isFirst = true;
-                foreach (var el in value) {
-                    if (isFirst) {
-                        isFirst = false;
-                    }
-                    else {
-                        _writeBuffer.Write(_encoding.Comma);
-                    }
-                    Write(el.ToString());
-                }
-                _writeBuffer.Write(_encoding.ArrayEnd);
+
+                //_writeBuffer.Write(_encoding.ArrayBegin);
+                //var isFirst = true;
+                //foreach (var el in value) {
+                //    if (isFirst) {
+                //        isFirst = false;
+                //    }
+                //    else {
+                //        _writeBuffer.Write(_encoding.Comma);
+                //    }
+                //    Write(el.ToString());
+                //}
+                //_writeBuffer.Write(_encoding.ArrayEnd);
             }
 
             WriteValueSuffix(args);

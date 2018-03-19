@@ -98,7 +98,7 @@ namespace Enigma.Binary
                     throw new EndOfStreamException();
                 }
             }
-            Position++;
+            Position += length;
         }
 
     }

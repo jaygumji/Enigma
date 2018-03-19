@@ -35,7 +35,7 @@ namespace Enigma.Test.Serialization.Binary
         //public void ProtoBufTest()
         //{
         //    var converter = new ProtocolBuffer.ProtocolBufferBinaryConverter<DataBlock>();
-        //    var bytes = converter.Convert(DataBlock.Filled());
+        //    var bytes = converter.ConvertTo(DataBlock.Filled());
         //    Assert.NotNull(bytes);
         //    Assert.True(bytes.Length > 0);
         //    var hex = "0x" + string.Join("", bytes.Select(b => b.ToString("X")));

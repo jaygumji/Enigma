@@ -4,17 +4,19 @@ using System.Collections.Generic;
 
 namespace Enigma.Serialization.Json
 {
-    public class JsonObject : JsonPrototype, IEnumerable<KeyValuePair<string, JsonPrototype>>
+    public class JsonObject : IJsonNode, IEnumerable<KeyValuePair<string, IJsonNode>>
     {
 
-        private readonly Dictionary<string, JsonPrototype> _fields;
+        private readonly Dictionary<string, IJsonNode> _fields;
 
         public JsonObject()
         {
-            _fields = new Dictionary<string, JsonPrototype>(StringComparer.Ordinal);
+            _fields = new Dictionary<string, IJsonNode>(StringComparer.Ordinal);
         }
 
-        public void Add(string fieldName, JsonPrototype field)
+        bool IJsonNode.IsNull => false;
+
+        public void Add(string fieldName, IJsonNode field)
         {
             _fields.Add(fieldName, field);
         }
@@ -24,7 +26,14 @@ namespace Enigma.Serialization.Json
             return _fields.Remove(fieldName);
         }
 
-        public IEnumerator<KeyValuePair<string, JsonPrototype>> GetEnumerator()
+        public bool TryGet(string fieldName, out IJsonNode field)
+        {
+            return _fields.TryGetValue(fieldName, out field);
+        }
+
+        public IJsonNode this[string fieldName] => _fields[fieldName];
+
+        public IEnumerator<KeyValuePair<string, IJsonNode>> GetEnumerator()
         {
             return _fields.GetEnumerator();
         }

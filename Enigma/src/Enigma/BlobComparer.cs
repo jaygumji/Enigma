@@ -1,13 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Enigma
 {
-    public class BlobComparer : IComparer<byte[]>
+    public class BlobComparer : IComparer<byte[]>, IEqualityComparer<byte[]>
     {
+        public static readonly BlobComparer Instance = new BlobComparer();
+
+        private BlobComparer()
+        {
+        }
+
         public int Compare(byte[] left, byte[] right)
         {
             return CompareBlobs(left, right);
+        }
+
+        public bool Equals(byte[] x, byte[] y)
+        {
+            return AreEqual(x, y);
+        }
+
+        public int GetHashCode(byte[] blob)
+        {
+            return GetBlobHashCode(blob);
         }
 
         public static int CompareBlobs(byte[] left, byte[] right)
@@ -21,11 +38,13 @@ namespace Enigma
             if (left.Length != right.Length)
                 return left.Length - right.Length;
 
-            for (var index = 0; index < left.Length; index++) {
-                var leftByte = left[index];
-                var rightByte = right[index];
-                if (leftByte != rightByte)
-                    return leftByte - rightByte < 0 ? -1 : 1;
+            unchecked {
+                for (var index = 0; index < left.Length; index++) {
+                    var leftByte = left[index];
+                    var rightByte = right[index];
+                    if (leftByte != rightByte)
+                        return leftByte - rightByte < 0 ? -1 : 1;
+                }
             }
             return 0;
         }
@@ -57,5 +76,6 @@ namespace Enigma
 
             return hash ^ lastPart;
         }
+
     }
 }

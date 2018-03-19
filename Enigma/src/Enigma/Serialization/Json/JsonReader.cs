@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 using Enigma.Binary;
 
@@ -8,6 +9,7 @@ namespace Enigma.Serialization.Json
     {
         private readonly BinaryReadBuffer _buffer;
         private readonly JsonEncoding _encoding;
+        private readonly JsonNumberReader _numberReader;
 
         public JsonReader(Stream stream)
             : this(stream, JsonEncoding.UTF16LE)
@@ -23,14 +25,17 @@ namespace Enigma.Serialization.Json
         {
             _buffer = buffer;
             _encoding = encoding;
+            _numberReader = JsonNumberReader.Create(buffer, encoding);
         }
 
         private bool IsLiteral(byte first, byte[] literalBytes, bool advance = true)
         {
+            _buffer.RequestSpace(_encoding.BinaryFormat.MaxSize);
             if (first != literalBytes[0]) {
                 return false;
             }
             if (literalBytes.Length == 1) {
+                _buffer.Advance(1);
                 return true;
             }
             if (literalBytes.Length == 2) {
@@ -39,7 +44,7 @@ namespace Enigma.Serialization.Json
                     return false;
                 }
                 if (advance) {
-                    _buffer.Advance(1);
+                    _buffer.Advance(2);
                 }
                 return true;
             }
@@ -54,32 +59,40 @@ namespace Enigma.Serialization.Json
             return true;
         }
 
-        public JsonLiteral PeekLiteral()
+        private JsonLiteral ReadLiteral(bool advance)
         {
             var first = _buffer.PeekByte();
 
-            if (IsLiteral(first, _encoding.ObjectBegin)) {
+            while (IsLiteral(first, _encoding.Space, advance: true)
+                   || IsLiteral(first, _encoding.CarriageReturn, advance: true)
+                   || IsLiteral(first, _encoding.Newline, advance: true)
+                   || IsLiteral(first, _encoding.HorizontalTab, advance: true)) {
+
+                first = _buffer.PeekByte();
+            }
+            
+            if (IsLiteral(first, _encoding.ObjectBegin, advance)) {
                 return JsonLiteral.ObjectBegin;
             }
-            if (IsLiteral(first, _encoding.ObjectEnd)) {
+            if (IsLiteral(first, _encoding.ObjectEnd, advance)) {
                 return JsonLiteral.ObjectEnd;
             }
-            if (IsLiteral(first, _encoding.ArrayBegin)) {
+            if (IsLiteral(first, _encoding.ArrayBegin, advance)) {
                 return JsonLiteral.ArrayBegin;
             }
-            if (IsLiteral(first, _encoding.ArrayEnd)) {
+            if (IsLiteral(first, _encoding.ArrayEnd, advance)) {
                 return JsonLiteral.ArrayEnd;
             }
-            if (IsLiteral(first, _encoding.Assignment)) {
+            if (IsLiteral(first, _encoding.Assignment, advance)) {
                 return JsonLiteral.Assignment;
             }
-            if (IsLiteral(first, _encoding.Quote)) {
+            if (IsLiteral(first, _encoding.Quote, advance)) {
                 return JsonLiteral.Quote;
             }
-            if (IsLiteral(first, _encoding.Comma)) {
+            if (IsLiteral(first, _encoding.Comma, advance)) {
                 return JsonLiteral.Comma;
             }
-            if (IsLiteral(first, _encoding.Minus, advance:false)) {
+            if (IsLiteral(first, _encoding.Minus, advance: false)) {
                 return JsonLiteral.Number;
             }
             if (IsLiteral(first, _encoding.Zero, advance: false)) {
@@ -112,19 +125,29 @@ namespace Enigma.Serialization.Json
             if (IsLiteral(first, _encoding.Nine, advance: false)) {
                 return JsonLiteral.Number;
             }
-            if (IsLiteral(first, _encoding.Null)) {
+            if (IsLiteral(first, _encoding.Null, advance)) {
                 return JsonLiteral.Null;
             }
-            if (IsLiteral(first, _encoding.True)) {
+            if (IsLiteral(first, _encoding.True, advance)) {
                 return JsonLiteral.True;
             }
-            if (IsLiteral(first, _encoding.False)) {
+            if (IsLiteral(first, _encoding.False, advance)) {
                 return JsonLiteral.False;
             }
-            if (IsLiteral(first, _encoding.Undefined)) {
+            if (IsLiteral(first, _encoding.Undefined, advance)) {
                 return JsonLiteral.Undefined;
             }
             throw UnexpectedJsonException.From("literal or value", _buffer, _encoding);
+        }
+
+        public JsonLiteral ReadLiteral()
+        {
+            return ReadLiteral(advance: true);
+        }
+
+        public JsonLiteral PeekLiteral()
+        {
+            return ReadLiteral(advance: false);
         }
 
         private bool IsNextCharacter(byte[] charCode, int offset)
@@ -161,10 +184,19 @@ namespace Enigma.Serialization.Json
 
         public string ReadString()
         {
-            if (!IsNextCharacter(_encoding.Quote, _buffer.Position)) {
-                throw UnexpectedJsonException.From("\"", _buffer, _encoding);
+            return ReadString(expectStartToken: true);
+        }
+
+        private string ReadString(bool expectStartToken)
+        {
+            if (expectStartToken) {
+                if (IsNextCharacter(_encoding.Quote, _buffer.Position)) {
+                    _buffer.Advance(_encoding.Quote.Length);
+                }
+                else {
+                    throw UnexpectedJsonException.From("\"", _buffer, _encoding);
+                }
             }
-            _buffer.Advance(_encoding.Quote.Length);
 
             var b = new StringBuilder();
             var offset = _buffer.Position;
@@ -215,6 +247,186 @@ namespace Enigma.Serialization.Json
                 offset += _encoding.GetCharacterSize(_buffer.Buffer, offset);
             } while (true);
 
+        }
+
+        private JsonObject ReadObject(bool expectStartToken)
+        {
+            var obj = new JsonObject();
+
+            while (ReadField(out var fieldName, out var node)) {
+                obj.Add(fieldName, node);
+            }
+
+            return obj;
+        }
+
+        private JsonNumber ReadNumber()
+        {
+            var numberSize = _encoding.Zero.Length;
+            _buffer.RequestSpace(16 * numberSize);
+            double n = 0, decMultiplier = 1;
+            byte next = 0;
+            var isDecimal = false;
+            var isNegative = false;
+            while (_numberReader.ReadNext(ref next)) {
+                if (next == JsonNumberReader.Negative) {
+                    isNegative = true;
+                    continue;
+                }
+                if (next == JsonNumberReader.Decimal) {
+                    isDecimal = true;
+                    continue;
+                }
+
+                if (isDecimal) {
+                    decMultiplier *= 10;
+                    n += next / decMultiplier;
+                }
+                else {
+                    n = n * 10 + next;
+                }
+            }
+            if (isNegative) {
+                n *= -1;
+            }
+            return new JsonNumber(n);
+        }
+
+        private JsonArray ReadArray(bool expectStartToken)
+        {
+            var arr = new JsonArray();
+
+            var literal = ReadLiteral();
+            if (expectStartToken && literal != JsonLiteral.ArrayBegin) {
+                throw UnexpectedJsonException.InArray(literal);
+            }
+
+            while (literal != JsonLiteral.ArrayEnd) {
+                switch (literal) {
+                    case JsonLiteral.ObjectBegin:
+                        var obj = ReadObject(expectStartToken: false);
+                        arr.Add(obj);
+                        continue;
+                    case JsonLiteral.ArrayBegin:
+                        var arrInArr = ReadArray(expectStartToken: false);
+                        arr.Add(arrInArr);
+                        continue;
+                    case JsonLiteral.Quote:
+                        var value = ReadString(expectStartToken: false);
+                        arr.Add(new JsonString(value));
+                        continue;
+                    case JsonLiteral.Number:
+                        break;
+                    case JsonLiteral.Null:
+                        break;
+                    case JsonLiteral.True:
+                        break;
+                    case JsonLiteral.False:
+                        break;
+                    case JsonLiteral.Undefined:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                literal = ReadLiteral();
+                if (literal == JsonLiteral.Comma) {
+                    literal = ReadLiteral();
+                    if (literal == JsonLiteral.ArrayEnd) {
+                        throw UnexpectedJsonException.InArray(JsonLiteral.Comma);
+                    }
+                }
+                else if (literal != JsonLiteral.ArrayEnd) {
+                    throw UnexpectedJsonException.InArray(literal);
+                }
+            }
+
+            return arr;
+        }
+
+        public bool ReadFieldName(out string name)
+        {
+            var literal = ReadLiteral();
+            if (literal == JsonLiteral.Comma) {
+                literal = ReadLiteral();
+            }
+            if (literal == JsonLiteral.ObjectEnd) {
+                name = null;
+                return false;
+            }
+            if (literal != JsonLiteral.Quote) {
+                throw UnexpectedJsonException.InObject(literal);
+            }
+            name = ReadString(expectStartToken: false);
+            return true;
+        }
+
+        public bool ReadFieldValue(out IJsonNode node)
+        {
+            var literal = ReadLiteral();
+            if (literal != JsonLiteral.Assignment) {
+                throw UnexpectedJsonException.InObject(literal);
+            }
+
+            literal = ReadLiteral();
+            switch (literal) {
+                case JsonLiteral.ObjectBegin:
+                    node = ReadObject(expectStartToken: false);
+                    break;
+                case JsonLiteral.ArrayBegin:
+                    node = ReadArray(expectStartToken: false);
+                    break;
+                case JsonLiteral.Quote:
+                    var value = ReadString(expectStartToken: false);
+                    node = new JsonString(value);
+                    break;
+                case JsonLiteral.Number:
+                    node = ReadNumber();
+                    break;
+                case JsonLiteral.Null:
+                    node = JsonNull.Instance;
+                    break;
+                case JsonLiteral.True:
+                    node = JsonBool.True;
+                    break;
+                case JsonLiteral.False:
+                    node = JsonBool.False;
+                    break;
+                case JsonLiteral.Undefined:
+                    node = JsonUndefined.Instance;
+                    break;
+                default:
+                    throw UnexpectedJsonException.InObject(literal);
+            }
+            return true;
+        }
+
+        public bool ReadField(out string name, out IJsonNode node)
+        {
+            if (!ReadFieldName(out name)) {
+                node = null;
+                return false;
+            }
+            return ReadFieldValue(out node);
+        }
+
+        public IJsonNode ReadValue(JsonLiteral literal)
+        {
+            switch (literal) {
+                case JsonLiteral.Quote:
+                    return new JsonString(ReadString(expectStartToken: false));
+                case JsonLiteral.Number:
+                    return ReadNumber();
+                case JsonLiteral.Null:
+                    return JsonNull.Instance;
+                case JsonLiteral.True:
+                    return JsonBool.True;
+                case JsonLiteral.False:
+                    return JsonBool.False;
+                case JsonLiteral.Undefined:
+                    return JsonUndefined.Instance;
+                default:
+                    throw UnexpectedJsonException.From("value token", _buffer, _encoding);
+            }
         }
     }
 }

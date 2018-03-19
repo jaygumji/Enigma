@@ -5,13 +5,22 @@ namespace Enigma
 {
     public delegate int CompareHandler<in T>(T x, T y);
 
-    public class DelegatedComparer<T> : IComparer<T>, IComparer
+    public delegate int HashCodeHandler<in T>(T x);
+
+    public class DelegatedComparer<T> : IComparer<T>, IComparer, IEqualityComparer<T>, IEqualityComparer
     {
         private readonly CompareHandler<T> _compareCallback;
+        private readonly HashCodeHandler<T> _hashCodeHandler;
 
         public DelegatedComparer(CompareHandler<T> compareCallback)
         {
             _compareCallback = compareCallback;
+        }
+
+        public DelegatedComparer(CompareHandler<T> compareCallback, HashCodeHandler<T> hashCodeHandler)
+        {
+            _compareCallback = compareCallback;
+            _hashCodeHandler = hashCodeHandler;
         }
 
         public int Compare(T x, T y)
@@ -28,6 +37,35 @@ namespace Enigma
                 return 1;
             }
             return Compare((T) x, (T) y);
+        }
+
+        public bool Equals(T x, T y)
+        {
+            return _compareCallback.Invoke(x, y) == 0;
+        }
+
+        public int GetHashCode(T obj)
+        {
+            return _hashCodeHandler?.Invoke(obj) ?? obj.GetHashCode();
+        }
+
+        bool IEqualityComparer.Equals(object x, object y)
+        {
+            if (!(x is T)) {
+                return false;
+            }
+            if (!(y is T)) {
+                return false;
+            }
+            return Equals((T)x, (T)y);
+        }
+
+        int IEqualityComparer.GetHashCode(object obj)
+        {
+            if (!(obj is T)) {
+                return obj.GetHashCode();
+            }
+            return GetHashCode((T) obj);
         }
     }
 }
