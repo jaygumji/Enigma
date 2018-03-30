@@ -61,7 +61,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 var valueTypeExt = provider.Extend(valueType);
 
                 VisitorTryVisitValue.Add(valueType, method);
-                if (valueTypeExt.Class == TypeClass.Nullable) {
+                if (valueTypeExt.Classification == TypeClassification.Nullable) {
                     var innerType = valueTypeExt.Container.AsNullable().ElementType;
                     VisitorTryVisitValue.Add(innerType, method);
 

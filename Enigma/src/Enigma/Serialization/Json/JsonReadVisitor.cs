@@ -36,20 +36,43 @@ namespace Enigma.Serialization.Json
 
         private IJsonNode ParseUntilFound(VisitArgs args)
         {
-            if (args.Type.IsDictionaryKey()) {
-                if (!_reader.ReadFieldName(out var key)) {
-                    throw UnexpectedJsonException.From("field name", _buffer, _encoding);
-                }
-                return new JsonString(key);
-            }
-
             var name = string.IsNullOrEmpty(args.Name)
                 ? null
                 : _fieldNameResolver.Resolve(args);
 
-            var parent = _parents.Peek();
-
             JsonLiteral literal;
+            if (args.IsRoot) {
+                // When the value being deserialized is a simple value only
+                literal = _reader.ReadLiteral();
+                return _reader.ReadValue(literal);
+            }
+
+            var parent = _parents.Peek();
+            if (args.Type.IsDictionaryKey()) {
+                if (!_reader.ReadFieldName(out var key)) {
+                    parent.IsFullyParsed = true;
+                    return JsonUndefined.Instance;
+                }
+                return new JsonString(key);
+            }
+            if (args.Type.IsDictionaryValue()) {
+                literal = _reader.ReadLiteral();
+                if (literal != JsonLiteral.Assignment) {
+                    throw UnexpectedJsonException.From("dictionary assignment token", _buffer, _encoding);
+                }
+                literal = _reader.ReadLiteral();
+                if (literal == JsonLiteral.ObjectBegin) {
+                    var child = new JsonObject();
+                    _parents.Push(new JsonReadLevel(child));
+                    return child;
+                }
+                if (literal == JsonLiteral.ArrayBegin) {
+                    _parents.Push(ArrayLevel);
+                    return ArrayLevel.Node;
+                }
+                return _reader.ReadValue(literal);
+            }
+
             if (parent.Node is JsonObject obj) {
                 if (obj.TryGet(name, out var field)) {
                     if (field is JsonObject || field is JsonArray) {
@@ -190,6 +213,12 @@ namespace Enigma.Serialization.Json
             }
             if (node.IsNull) {
                 value = default(T);
+                return true;
+            }
+
+            if (node is JsonString str) {
+                var parsedNumber = double.Parse(str.Value);
+                value = converter.Invoke(parsedNumber);
                 return true;
             }
             if (!(node is JsonNumber number)) {

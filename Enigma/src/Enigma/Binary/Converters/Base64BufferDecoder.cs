@@ -16,12 +16,47 @@ namespace Enigma.Binary.Converters
             _map = Base64CharacterMap.Create(charSet);
         }
 
-        public int GetSizeOf(int count)
+        public int GetSizeOf(byte[] value)
         {
-            var blockCount = (count - 1) / 3 + 1;
-            var numberOfChars = blockCount * 4;
+            return GetSizeOf(value, 0, value.Length);
+        }
 
-            return numberOfChars * _charSize;
+        public int GetSizeOf(byte[] value, int offset, int count)
+        {
+            unsafe {
+                fixed (byte* vp = value) {
+                    var v = vp + offset;
+                    SizeOf(v, count, out var targetSize, out var padding);
+                    return targetSize;
+                }
+            }
+        }
+
+        private unsafe void SizeOf(byte* v, int count, out int targetSize, out int padding)
+        {
+            var charCount = count / _charSize;
+            var blockCount = (charCount - 1) / 4 + 1;
+            targetSize = blockCount * 3;
+            padding = blockCount * 4 - charCount;
+
+            if (_charSize == 1) {
+                if (count > 2 && v[count - 2] == _paddingChar[0]) {
+                    padding = 2;
+                }
+                else if (count > 1 && v[count - 1] == _paddingChar[0]) {
+                    padding = 1;
+                }
+            }
+            else {
+                if (count > 2 && IsEqual(v + count - (2 * _charSize), _paddingChar)) {
+                    padding = 2;
+                }
+                else if (count > 1 && IsEqual(v + count - _charSize, _paddingChar)) {
+                    padding = 1;
+                }
+            }
+
+            targetSize -= padding;
         }
 
         private unsafe bool IsEqual(byte* left, byte[] right)
@@ -49,18 +84,17 @@ namespace Enigma.Binary.Converters
 
             var charCount = sourceCount / _charSize;
             var blockCount = (charCount - 1) / 4 + 1;
-            var numberOfBytes = blockCount * 3;
-            var padding = blockCount * 4 - charCount;
 
             var targetLength = target.Length;
 
-            if (numberOfBytes > targetLength - targetOffset) {
-                throw new ArgumentException("The base64 encoding does not fit into the target array.");
-            }
-
             unsafe {
                 fixed (byte* startOfSource = source) {
-                    var s = startOfSource;
+                    var s = startOfSource + sourceOffset;
+
+                    SizeOf(s, sourceCount, out var numberOfBytes, out var padding);
+                    if (numberOfBytes > targetLength - targetOffset) {
+                        throw new ArgumentException("The base64 encoding does not fit into the target array.");
+                    }
 
                     if (_charSize == 1) {
                         if (sourceCount > 2 && s[sourceCount - 2] == _paddingChar[0]) {
@@ -80,7 +114,7 @@ namespace Enigma.Binary.Converters
                     }
 
                     fixed (byte* startOfTarget = target) {
-                        var t = startOfTarget;
+                        var t = startOfTarget + targetOffset;
 
                         for (var i = 1; i < blockCount; i++) {
                             _map.MapTo(ref s, ref t);

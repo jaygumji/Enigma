@@ -51,6 +51,7 @@ namespace Enigma.Serialization.Json
 
         private void WriteValuePrefix(VisitArgs args)
         {
+            if (args.IsRoot) return;
             switch (args.Type) {
                 case LevelType.CollectionItem:
                 case LevelType.DictionaryKey:
@@ -339,19 +340,11 @@ namespace Enigma.Serialization.Json
                 _writeBuffer.Write(_encoding.Null);
             }
             else {
-
-                //_writeBuffer.Write(_encoding.ArrayBegin);
-                //var isFirst = true;
-                //foreach (var el in value) {
-                //    if (isFirst) {
-                //        isFirst = false;
-                //    }
-                //    else {
-                //        _writeBuffer.Write(_encoding.Comma);
-                //    }
-                //    Write(el.ToString());
-                //}
-                //_writeBuffer.Write(_encoding.ArrayEnd);
+                _writeBuffer.Write(_encoding.Quote);
+                var size = _encoding.Base64.GetEncodedSizeOf(value);
+                var offset = _writeBuffer.Advance(size);
+                _encoding.Base64.Encode(value, 0, value.Length, _writeBuffer.Buffer, offset);
+                _writeBuffer.Write(_encoding.Quote);
             }
 
             WriteValueSuffix(args);

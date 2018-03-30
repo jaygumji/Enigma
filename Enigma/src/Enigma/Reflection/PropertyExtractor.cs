@@ -23,7 +23,7 @@ namespace Enigma.Reflection
                 var property = containerType.GetTypeInfo().GetProperty(propertyName);
                 var extendedPropertyType = new ExtendedType(property.PropertyType);
 
-                containerType = extendedPropertyType.Class == TypeClass.Collection
+                containerType = extendedPropertyType.Classification == TypeClassification.Collection
                     ? extendedPropertyType.Container.AsCollection().ElementType
                     : property.PropertyType;
 
@@ -46,7 +46,7 @@ namespace Enigma.Reflection
         {
             var result = new List<IPropertyAccessor>();
             PropertyExtractor.Resolve(type, path, (property, extendedPropertyType) => {
-                if (extendedPropertyType.Class == TypeClass.Collection)
+                if (extendedPropertyType.Classification == TypeClassification.Collection)
                     result.Add(new ListPropertyAccessor(property));
                 else
                     result.Add(new PropertyAccessor(property));

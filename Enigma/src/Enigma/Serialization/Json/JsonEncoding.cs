@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.Text;
 using Enigma.Binary;
+using Enigma.Binary.Converters;
 
 namespace Enigma.Serialization.Json
 {
@@ -40,6 +41,7 @@ namespace Enigma.Serialization.Json
 
         public static readonly IFormatProvider DateTimeFormat = CultureInfo.InvariantCulture;
 
+        public readonly Base64Converter Base64;
         public readonly Encoding BaseEncoding;
         public readonly IEncodingBinaryFormat BinaryFormat;
 
@@ -114,6 +116,8 @@ namespace Enigma.Serialization.Json
             Nine = baseEncoding.GetBytes("9");
             Point = baseEncoding.GetBytes(".");
             Space = baseEncoding.GetBytes(" ");
+
+            Base64 = new Base64Converter(baseEncoding);
         }
 
         public bool RequiresEscape(char c, out byte[] charBytes)

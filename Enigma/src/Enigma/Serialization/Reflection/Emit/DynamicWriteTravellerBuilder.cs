@@ -50,7 +50,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorVisitValue[valueType], propertyParameter, argsFieldVariable);
             }
-            else if (extPropertyType.Class == TypeClass.Dictionary) {
+            else if (extPropertyType.Classification == TypeClassification.Dictionary) {
                 var container = extPropertyType.Container.AsDictionary();
 
                 var dictionaryType = container.DictionaryInterfaceType;
@@ -65,7 +65,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorLeave, cLocal, argsFieldVariable);
             }
-            else if (extPropertyType.Class == TypeClass.Collection) {
+            else if (extPropertyType.Classification == TypeClassification.Collection) {
                 var container = extPropertyType.Container.AsCollection();
 
                 var collectionType = extPropertyType.Ref.IsArray && extPropertyType.Container.AsArray().Ranks > 1
@@ -120,7 +120,7 @@ namespace Enigma.Serialization.Reflection.Emit
             if (extType.IsValueOrNullableOfValue()) {
                 _il.InvokeMethod(_visitorVariable, Members.VisitorVisitValue[type], valueParam.AsNullable(), visitArgs);
             }
-            else if (extType.Class == TypeClass.Dictionary) {
+            else if (extType.Classification == TypeClassification.Dictionary) {
                 var container = extType.Container.AsDictionary();
                 var elementType = container.ElementType;
 
@@ -139,7 +139,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorLeave, dictionaryLocal, visitArgs);
             }
-            else if (extType.Class == TypeClass.Collection) {
+            else if (extType.Classification == TypeClassification.Collection) {
                 var container = extType.Container.AsCollection();
                 var collectionType = type.IsArray && extType.Container.AsArray().Ranks > 1
                     ? type
@@ -201,7 +201,7 @@ namespace Enigma.Serialization.Reflection.Emit
         private static ILPointer GetContentVisitArgs(ExtendedType type, LevelType level)
         {
             if (!type.IsValueOrNullableOfValue()) {
-                if (type.Class == TypeClass.Dictionary) {
+                if (type.Classification == TypeClassification.Dictionary) {
                     if (level == LevelType.DictionaryKey)
                         return Members.VisitArgsDictionaryInDictionaryKey;
                     if (level == LevelType.DictionaryValue)
@@ -209,7 +209,7 @@ namespace Enigma.Serialization.Reflection.Emit
                     return Members.VisitArgsDictionaryInCollection;
                 }
 
-                if (type.Class == TypeClass.Collection) {
+                if (type.Classification == TypeClassification.Collection) {
                     if (level == LevelType.DictionaryKey)
                         return Members.VisitArgsCollectionInDictionaryKey;
                     

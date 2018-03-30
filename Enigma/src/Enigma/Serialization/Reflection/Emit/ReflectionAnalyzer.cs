@@ -9,21 +9,21 @@ namespace Enigma.Serialization.Reflection.Emit
 
         public static bool TryGetComplexTypes(ExtendedType type, out Type[] types)
         {
-            if (type.Class == TypeClass.Complex) {
+            if (type.Classification == TypeClassification.Complex) {
                 types = new[] { type.Ref };
                 return true;
             }
-            if (type.Class == TypeClass.Nullable) {
-                var elementType = type.Container.AsNullable().ElementTypeExt;
+            if (type.Classification == TypeClassification.Nullable) {
+                var elementType = type.Provider.Extend(type.Container.AsNullable().ElementType);
                 return TryGetComplexTypes(elementType, out types);
             }
-            if (type.Class == TypeClass.Dictionary) {
+            if (type.Classification == TypeClassification.Dictionary) {
                 var container = type.Container.AsDictionary();
-                Type[] keyTypes;
-                var hasKeyTypes = TryGetComplexTypes(container.KeyTypeExt, out keyTypes);
+                var keyTypeExt = type.Provider.Extend(container.KeyType);
+                var hasKeyTypes = TryGetComplexTypes(keyTypeExt, out var keyTypes);
 
-                Type[] valueTypes;
-                var hasValueTypes = TryGetComplexTypes(container.ValueTypeExt, out valueTypes);
+                var valueTypeExt = type.Provider.Extend(container.ValueType);
+                var hasValueTypes = TryGetComplexTypes(valueTypeExt, out var valueTypes);
 
                 if (!hasKeyTypes && !hasValueTypes) {
                     types = null;
@@ -36,9 +36,9 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 return true;
             }
-            if (type.Class == TypeClass.Collection) {
-                var elementType = type.Container.AsCollection().ElementTypeExt;
-                return TryGetComplexTypes(elementType, out types);
+            if (type.Classification == TypeClassification.Collection) {
+                var elementTypeExt = type.Provider.Extend(type.Container.AsCollection().ElementType);
+                return TryGetComplexTypes(elementTypeExt, out types);
             }
 
             types = null;

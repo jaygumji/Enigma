@@ -22,15 +22,15 @@ namespace Enigma.Modelling
             _uniqueName = uniqueName;
 
             var extendedValueType = new ExtendedType(valueType);
-            switch (extendedValueType.Class) {
-                case TypeClass.Complex:
+            switch (extendedValueType.Classification) {
+                case TypeClassification.Complex:
                     throw new ArgumentException("Only values is accepted as an index");
-                case TypeClass.Dictionary:
+                case TypeClassification.Dictionary:
                     throw new NotSupportedException("Indexed dictionaries are currently not supported");
-                case TypeClass.Nullable:
+                case TypeClassification.Nullable:
                     valueType = extendedValueType.Container.AsNullable().ElementType;
                     break;
-                case TypeClass.Collection:
+                case TypeClassification.Collection:
                     valueType = extendedValueType.Container.AsCollection().ElementType;
                     break;
             }

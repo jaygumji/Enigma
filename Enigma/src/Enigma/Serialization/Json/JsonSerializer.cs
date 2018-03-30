@@ -8,7 +8,7 @@ namespace Enigma.Serialization.Json
     public class JsonSerializer : ISerializer
     {
 
-        internal static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection();
+        internal static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection(SerializationEngine.Context);
 
         private readonly IBinaryBufferPool _bufferPool;
         private readonly SerializationEngine _engine;

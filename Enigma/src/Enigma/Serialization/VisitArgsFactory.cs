@@ -23,7 +23,7 @@ namespace Enigma.Serialization
         public virtual VisitArgs Construct(string propertyName)
         {
             var property = SerializableType.FindProperty(propertyName);
-            var levelType = GetLevelTypeFromClass(property.Ext.Class);
+            var levelType = GetLevelTypeFromClass(property.Ext.Classification);
             var name = property.Ref.Name;
             var idx = property.Metadata.Index;
             var attributes = EnigmaSerializationAttributes.FromMember(property.Ref);
@@ -34,14 +34,14 @@ namespace Enigma.Serialization
             return new VisitArgs(name, levelType, idx, attributes, args.State);
         }
 
-        private static LevelType GetLevelTypeFromClass(TypeClass cls)
+        private static LevelType GetLevelTypeFromClass(TypeClassification cls)
         {
             switch (cls) {
-                case TypeClass.Dictionary:
+                case TypeClassification.Dictionary:
                     return LevelType.Dictionary;
-                case TypeClass.Collection:
+                case TypeClassification.Collection:
                     return LevelType.Collection;
-                case TypeClass.Complex:
+                case TypeClassification.Complex:
                     return LevelType.Single;
                 default:
                     return LevelType.Value;

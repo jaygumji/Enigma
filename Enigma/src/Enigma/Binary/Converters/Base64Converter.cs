@@ -29,12 +29,22 @@ namespace Enigma.Binary.Converters
             return _encoder.GetSizeOf(count);
         }
 
-        public void ConvertTo(byte[] source, int sourceOffset, int sourceCount, byte[] target, int targetOffset)
+        public int GetDecodedSizeOf(byte[] source)
+        {
+            return _decoder.GetSizeOf(source, 0, source.Length);
+        }
+
+        public int GetDecodedSizeOf(byte[] source, int offset, int count)
+        {
+            return _decoder.GetSizeOf(source, offset, count);
+        }
+
+        public void Encode(byte[] source, int sourceOffset, int sourceCount, byte[] target, int targetOffset)
         {
             _encoder.Encode(source, sourceOffset, sourceCount, target, targetOffset);
         }
 
-        public void ConvertFrom(byte[] source, int sourceOffset, int sourceCount, byte[] target, int targetOffset)
+        public void Decode(byte[] source, int sourceOffset, int sourceCount, byte[] target, int targetOffset)
         {
             _decoder.Decode(source, sourceOffset, sourceCount, target, targetOffset);
         }

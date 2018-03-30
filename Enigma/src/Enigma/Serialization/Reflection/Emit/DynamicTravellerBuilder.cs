@@ -43,7 +43,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
         public void BuildTraveller()
         {
-            if (_classBuilder.IsSealed) throw new InvalidOperationException("Class builder is sealed");
+            if (_classBuilder.IsSealed) throw new InvalidOperationException("Classification builder is sealed");
             var target = _typeProvider.GetOrCreate(_type);
             var members = _dtContext.Members;
             var factoryArgument = new ILArgPointer(members.VisitArgsFactoryType, 1);

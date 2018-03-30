@@ -4,16 +4,11 @@ namespace Enigma.Reflection
 {
     public class ArrayContainerTypeInfo : CollectionContainerTypeInfo
     {
-        private readonly int _ranks;
+        public int Ranks { get; }
 
-        public ArrayContainerTypeInfo(Type elementType, int ranks, ITypeProvider provider) : base(elementType, provider)
+        public ArrayContainerTypeInfo(Type elementType, int ranks) : base(elementType)
         {
-            _ranks = ranks;
-        }
-
-        public int Ranks
-        {
-            get { return _ranks; }
+            Ranks = ranks;
         }
     }
 }

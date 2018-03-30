@@ -6,31 +6,33 @@
 
         public Base64FourCharacterMap(Base64EncodedCharacterSet charSet)
         {
-            _map = new byte[byte.MaxValue][][][];
+            const byte maxSize = 123;
+            _map = new byte[maxSize][][][];
             var chars = charSet.Chars;
-            for (byte i = 0; i < chars.Length; i += 4) {
+            byte v = 0;
+            for (var i = 0; i < chars.Length; i += 4) {
                 var midx = chars[i];
                 var m1 = _map[midx];
                 if (m1 == null) {
-                    m1 = new byte[byte.MaxValue][][];
+                    m1 = new byte[maxSize][][];
                     _map[midx] = m1;
                 }
 
                 midx = chars[i + 1];
                 var m2 = m1[midx];
                 if (m2 == null) {
-                    m2 = new byte[byte.MaxValue][];
+                    m2 = new byte[maxSize][];
                     m1[midx] = m2;
                 }
 
                 midx = chars[i + 2];
                 var m3 = m2[midx];
                 if (m3 == null) {
-                    m3 = new byte[byte.MaxValue];
+                    m3 = new byte[maxSize];
                     m2[midx] = m3;
                 }
 
-                m3[chars[i + 3]] = i;
+                m3[chars[i + 3]] = v++;
             }
         }
 

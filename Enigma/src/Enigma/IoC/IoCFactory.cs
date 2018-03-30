@@ -163,7 +163,13 @@ namespace Enigma.IoC
 
         public object GetInstance(Type type, bool throwError)
         {
-            return GetFactory(type, throwError).GetInstance();
+            var factory = GetFactory(type, throwError);
+            if (factory != null) return factory.GetInstance();
+
+            if (throwError) {
+                throw new ArgumentException("Error when attempting to retrieve factory.");
+            }
+            return null;
         }
 
     }

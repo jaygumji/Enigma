@@ -6,16 +6,18 @@
 
         public Base64TwoCharacterMap(Base64EncodedCharacterSet charSet)
         {
-            _map = new byte[byte.MaxValue][];
+            const byte maxSize = 123;
+            _map = new byte[maxSize][];
             var chars = charSet.Chars;
-            for (byte i = 0; i < chars.Length; i+=2) {
+            byte v = 0;
+            for (var i = 0; i < chars.Length; i+=2) {
                 var xi = chars[i];
                 var x = _map[xi];
                 if (x == null) {
-                    x = new byte[byte.MaxValue];
+                    x = new byte[maxSize];
                     _map[xi] = x;
                 }
-                x[chars[i+1]] = i;
+                x[chars[i+1]] = v++;
             }
         }
 

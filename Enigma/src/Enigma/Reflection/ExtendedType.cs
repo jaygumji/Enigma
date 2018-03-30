@@ -6,12 +6,8 @@ namespace Enigma.Reflection
 {
     public class ExtendedType
     {
-        private static readonly IList<Type> SystemValueClasses = new[] {
-            typeof (DateTime), typeof (String), typeof (TimeSpan), typeof(Guid), typeof(Decimal), typeof(byte[])
-        };
-
         private readonly Lazy<IContainerTypeInfo> _containerTypeInfo;
-        private readonly Lazy<TypeClass> _class;
+        private readonly Lazy<TypeClassification> _class;
 
         public ExtendedType(Type type) : this(type, FactoryTypeProvider.Instance)
         {
@@ -22,37 +18,37 @@ namespace Enigma.Reflection
         {
             Ref = type;
             Info = type.GetTypeInfo();
-            _containerTypeInfo = new Lazy<IContainerTypeInfo>(() => type.GetContainerTypeInfo(provider));
-            _class = new Lazy<TypeClass>(() => GetTypeClass(type, _containerTypeInfo.Value));
+            _containerTypeInfo = new Lazy<IContainerTypeInfo>(type.GetContainerTypeInfo);
+            _class = new Lazy<TypeClassification>(() => type.GetClassification(_containerTypeInfo.Value));
             Provider = provider;
         }
 
         public Type Ref { get; }
         public TypeInfo Info { get; }
-        public TypeClass Class => _class.Value;
+        public TypeClassification Classification => _class.Value;
         public IContainerTypeInfo Container => _containerTypeInfo.Value;
-        public bool ImplementsCollection => Class == TypeClass.Collection || Class == TypeClass.Dictionary;
+        public bool ImplementsCollection => Classification == TypeClassification.Collection || Classification == TypeClassification.Dictionary;
 
         public ITypeProvider Provider { get; }
 
         public bool IsValueOrNullableOfValue()
         {
-            if (Class == TypeClass.Value) return true;
-            if (Class != TypeClass.Nullable) return false;
+            if (Classification == TypeClassification.Value) return true;
+            if (Classification != TypeClassification.Nullable) return false;
             var elementExt = Provider.Extend(Container.AsNullable().ElementType);
-            return elementExt.Class == TypeClass.Value;
+            return elementExt.Classification == TypeClassification.Value;
         }
 
         public bool IsEnum()
         {
-            return Info.IsEnum || (Class == TypeClass.Nullable && Container.AsNullable().ElementType.GetTypeInfo().IsEnum);
+            return Info.IsEnum || (Classification == TypeClassification.Nullable && Container.AsNullable().ElementType.GetTypeInfo().IsEnum);
         }
 
         public Type GetUnderlyingEnumType()
         {
             if (Info.IsEnum) return Enum.GetUnderlyingType(Ref);
 
-            if (Class == TypeClass.Nullable) {
+            if (Classification == TypeClassification.Nullable) {
                 var elementType = Container.AsNullable().ElementType;
                 if (elementType.GetTypeInfo().IsEnum) {
                     var underlyingType = Enum.GetUnderlyingType(elementType);
@@ -80,29 +76,6 @@ namespace Enigma.Reflection
             dictionaryTypeInfo = _containerTypeInfo.Value as DictionaryContainerTypeInfo;
             return dictionaryTypeInfo != null;
         }
-
-        #region Type Class
-
-        private static TypeClass GetTypeClass(Type type, IContainerTypeInfo containerInfo)
-        {
-            var ti = type.GetTypeInfo();
-            if (ti.IsPrimitive) return TypeClass.Value;
-            if (ti.IsEnum) return TypeClass.Value;
-            if (SystemValueClasses.Contains(type)) return TypeClass.Value;
-
-            var dictionary = containerInfo as DictionaryContainerTypeInfo;
-            if (dictionary != null) return TypeClass.Dictionary;
-
-            var collection = containerInfo as CollectionContainerTypeInfo;
-            if (collection != null) return TypeClass.Collection;
-
-            var nullable = containerInfo as NullableContainerTypeInfo;
-            if (nullable != null) return TypeClass.Nullable;
-
-            return TypeClass.Complex;
-        }
-
-        #endregion
 
     }
 

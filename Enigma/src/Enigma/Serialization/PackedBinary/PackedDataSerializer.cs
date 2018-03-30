@@ -6,7 +6,7 @@ namespace Enigma.Serialization.PackedBinary
 
     internal static class PackedDataSerializer
     {
-        public static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection();
+        public static readonly GraphTravellerCollection Travellers = new GraphTravellerCollection(SerializationEngine.Context);
     }
 
     public class PackedDataSerializer<T> : ITypedSerializer<T>

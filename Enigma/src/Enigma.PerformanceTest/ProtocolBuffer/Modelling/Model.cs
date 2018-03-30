@@ -63,23 +63,23 @@ namespace Enigma.Modelling
                     propertyMappings.Add(property.Name, propertyMap);
 
                     var extended = new ExtendedType(property.PropertyType);
-                    if (extended.Class == TypeClass.Collection) {
+                    if (extended.Classification == TypeClassification.Collection) {
                         var collectionInfo = extended.Container.AsCollection();
                         var extendedElementType = new ExtendedType(collectionInfo.ElementType);
-                        if (extendedElementType.Class == TypeClass.Complex)
+                        if (extendedElementType.Classification == TypeClassification.Complex)
                             relationTypes.Add(collectionInfo.ElementType);
                     }
-                    else if (extended.Class == TypeClass.Dictionary) {
+                    else if (extended.Classification == TypeClassification.Dictionary) {
                         var dictionaryInfo = extended.Container.AsDictionary();
                         var extendedKeyType = new ExtendedType(dictionaryInfo.KeyType);
-                        if (extendedKeyType.Class == TypeClass.Complex)
+                        if (extendedKeyType.Classification == TypeClassification.Complex)
                             relationTypes.Add(dictionaryInfo.KeyType);
 
                         var extendedValueType = new ExtendedType(dictionaryInfo.ValueType);
-                        if (extendedValueType.Class == TypeClass.Complex)
+                        if (extendedValueType.Classification == TypeClassification.Complex)
                             relationTypes.Add(dictionaryInfo.ValueType);
                     }
-                    else if (extended.Class == TypeClass.Complex)
+                    else if (extended.Classification == TypeClassification.Complex)
                         relationTypes.Add(property.PropertyType);
                 }
             }

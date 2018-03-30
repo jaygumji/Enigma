@@ -54,12 +54,13 @@ namespace Enigma.Binary.Converters
             unsafe {
                 fixed (byte* startOfSource = source) {
                     fixed (byte* startOfChars = _chars) {
-                        var s = startOfSource;
+                        var s = startOfSource + sourceOffset;
 
                         fixed (byte* startOfTarget = target) {
-                            var t = startOfTarget;
+                            var t = startOfTarget + targetOffset;
+
                             byte b1, b2, b3;
-                            for (var i = 0; i < blockCount; i++) {
+                            for (var i = 1; i < blockCount; i++) {
                                 b1 = *s++;
                                 b2 = *s++;
                                 b3 = *s++;
@@ -114,18 +115,18 @@ namespace Enigma.Binary.Converters
                                 }
                                 if (usePadding2) {
                                     for (var ci = 0; ci < _charSize; ci++) {
-                                        *t++ = _paddingChar[c + ci];
+                                        *t++ = _paddingChar[ci];
                                     }
                                 }
                                 else {
-                                    c = ((b3 & 0xC0) << 6 | (b2 & 0x0F) << 2) * _charSize;
+                                    c = ((b3 & 0xC0) >> 6 | (b2 & 0x0F) << 2) * _charSize;
                                     for (var ci = 0; ci < _charSize; ci++) {
                                         *t++ = startOfChars[c + ci];
                                     }
                                 }
                                 if (usePadding1) {
                                     for (var ci = 0; ci < _charSize; ci++) {
-                                        *t++ = _paddingChar[c + ci];
+                                        *t++ = _paddingChar[ci];
                                     }
                                 }
                                 else {

@@ -11,4 +11,5 @@
         void Travel(IWriteVisitor visitor, T graph);
         void Travel(IReadVisitor visitor, T graph);
     }
+
 }

@@ -5,13 +5,11 @@ namespace Enigma.Reflection
 {
     public class DictionaryContainerTypeInfo : CollectionContainerTypeInfo
     {
-
         private static readonly Type KeyValuePairType = typeof(KeyValuePair<,>);
-
         private readonly Lazy<Type> _dictionaryInterfaceType;
 
-        public DictionaryContainerTypeInfo(Type keyType, Type valueType, ITypeProvider provider)
-            : base(KeyValuePairType.MakeGenericType(keyType, valueType), provider)
+        public DictionaryContainerTypeInfo(Type keyType, Type valueType)
+            : base(KeyValuePairType.MakeGenericType(keyType, valueType))
         {
             KeyType = keyType;
             ValueType = valueType;
@@ -21,10 +19,6 @@ namespace Enigma.Reflection
 
         public Type KeyType { get; }
         public Type ValueType { get; }
-
-        public ExtendedType KeyTypeExt => Provider.Extend(KeyType);
-        public ExtendedType ValueTypeExt => Provider.Extend(ValueType);
-
-        public Type DictionaryInterfaceType { get { return _dictionaryInterfaceType.Value; } }
+        public Type DictionaryInterfaceType => _dictionaryInterfaceType.Value;
     }
 }

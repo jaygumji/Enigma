@@ -22,7 +22,7 @@ namespace Enigma.Binary
     }
 
     /// <summary>
-    /// Class BinaryZPacker.
+    /// Classification BinaryZPacker.
     /// </summary>
     public static class BinaryZPacker
     {

@@ -43,7 +43,7 @@ namespace Enigma.Serialization.Reflection.Emit
             var argsField = _context.GetArgsField(target);
             var argsFieldVariable = ILPointer.Field(ILPointer.This(), argsField);
             if (extPropertyType.IsValueOrNullableOfValue()) {
-                var isNullable = extPropertyType.Class == TypeClass.Nullable;
+                var isNullable = extPropertyType.Classification == TypeClassification.Nullable;
                 var isEnum = extPropertyType.IsEnum();
                 var isValueType = extPropertyType.Info.IsValueType;
 
@@ -84,7 +84,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 skipSetValueLabel.Mark();
             }
-            else if (extPropertyType.Class == TypeClass.Dictionary) {
+            else if (extPropertyType.Classification == TypeClassification.Dictionary) {
                 var stateLocal = _il.NewLocal(typeof(ValueState));
                 _il.Set(stateLocal, _visitorVariable.Call(Members.VisitorTryVisit, argsFieldVariable));
 
@@ -109,7 +109,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 endLabel.Mark();
             }
-            else if (extPropertyType.Class == TypeClass.Collection) {
+            else if (extPropertyType.Classification == TypeClassification.Collection) {
                 _il.InvokeMethod(_visitorVariable, Members.VisitorTryVisit, argsFieldVariable);
                 var stateLocal = _il.NewLocal(typeof(ValueState));
                 _il.Set(stateLocal);
@@ -197,7 +197,7 @@ namespace Enigma.Serialization.Reflection.Emit
                     _il.EmitCall(OpCodes.Callvirt, collectionMembers.Add, null);
                 });
             }
-            else if (collectionMembers.ElementTypeExt.Class == TypeClass.Dictionary) {
+            else if (collectionMembers.ElementTypeExt.Classification == TypeClassification.Dictionary) {
                 _il.WhileLoop(il => { // Condition
                     var callTryVisit = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsDictionaryInCollection);
                     _il.AreEqual(callTryVisit, (int)ValueState.Found);
@@ -207,7 +207,7 @@ namespace Enigma.Serialization.Reflection.Emit
                     _il.InvokeMethod(collectionLocal, collectionMembers.Add, contentParam);
                 });
             }
-            else if (collectionMembers.ElementTypeExt.Class == TypeClass.Collection) {
+            else if (collectionMembers.ElementTypeExt.Classification == TypeClassification.Collection) {
                 _il.WhileLoop(il => { // Condition
                     var callTryVisit = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsCollectionInCollection);
                     _il.AreEqual(callTryVisit, (int)ValueState.Found);
@@ -260,12 +260,12 @@ namespace Enigma.Serialization.Reflection.Emit
             if (keyTypeExt.IsValueOrNullableOfValue()) {
                 keyParam = _il.NewLocal(keyType);
             }
-            else if (keyTypeExt.Class == TypeClass.Dictionary) {
+            else if (keyTypeExt.Classification == TypeClassification.Dictionary) {
                 keyParam = GenerateDictionaryEnumerateCode(keyType, refName);
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorLeave, Members.VisitArgsDictionaryInDictionaryKey);
             }
-            else if (keyTypeExt.Class == TypeClass.Collection) {
+            else if (keyTypeExt.Classification == TypeClassification.Collection) {
                 keyParam = GenerateCollectionContent(keyTypeExt, refName);
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorLeave, Members.VisitArgsCollectionInDictionaryKey);
@@ -306,7 +306,7 @@ namespace Enigma.Serialization.Reflection.Emit
                 checkIfErrorLabel.Mark();
                 throwExceptionLabel.TransferLongIfTrue();
             }
-            else if (extValueType.Class == TypeClass.Dictionary) {
+            else if (extValueType.Classification == TypeClassification.Dictionary) {
                 var callTryVisitValue = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsDictionaryInDictionaryValue);
                 _il.AreEqual(callTryVisitValue, (int)ValueState.Found);
                 throwExceptionLabel.TransferLongIfFalse();
@@ -315,7 +315,7 @@ namespace Enigma.Serialization.Reflection.Emit
 
                 _il.InvokeMethod(_visitorVariable, Members.VisitorLeave, Members.VisitArgsDictionaryInDictionaryValue);
             }
-            else if (extValueType.Class == TypeClass.Collection) {
+            else if (extValueType.Classification == TypeClassification.Collection) {
                 var callTryVisit = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsCollectionInDictionaryValue);
                 _il.AreEqual(callTryVisit, (int)ValueState.Found);
                 throwExceptionLabel.TransferLongIfFalse();
@@ -370,12 +370,12 @@ namespace Enigma.Serialization.Reflection.Emit
                 checkConditionLabel.Mark();
                 bodyLabel.TransferLongIfTrue();
             }
-            else if (keyTypeExt.Class == TypeClass.Dictionary) {
+            else if (keyTypeExt.Classification == TypeClassification.Dictionary) {
                 var callTryVisitKey = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsDictionaryInDictionaryKey);
                 _il.AreEqual(callTryVisitKey, (int)ValueState.Found);
                 bodyLabel.TransferLongIfTrue();
             }
-            else if (keyTypeExt.Class == TypeClass.Collection) {
+            else if (keyTypeExt.Classification == TypeClassification.Collection) {
                 var callTryVisitKey = new ILCallMethodSnippet(_visitorVariable, Members.VisitorTryVisit, Members.VisitArgsCollectionInDictionaryKey);
                 _il.AreEqual(callTryVisitKey, (int)ValueState.Found);
                 bodyLabel.TransferLongIfTrue();
@@ -400,7 +400,7 @@ namespace Enigma.Serialization.Reflection.Emit
         {
             var type = param.Type;
             var extType = _typeProvider.Extend(type);
-            if (extType.Class == TypeClass.Nullable)
+            if (extType.Classification == TypeClassification.Nullable)
                 type = extType.Container.AsNullable().ElementType;
 
             if (extType.Info.IsValueType)
