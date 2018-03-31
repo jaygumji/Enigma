@@ -1,14 +1,14 @@
 # Enigma
-Enigma libary which adds core functionality used primarily for the Enigma Document DB. There is however a focus on making all library functionality completely generic, which can be used in many other scenarios.
+Enigma libary is used primarily for the Enigma Document DB to add core functionality. There is however a focus on making all library functionality completely generic, which can be used in many other scenarios.
 
-Most of the functionality of this library already exists in other projects. The reason for me building this is primarily because I wanted to limit the amount of dependencies Engima has, and also cause I wanted to experiment with making these kind of libraries myself as a learning experience.
+Most of the functionality of this library already exist in other projects. The reason for me building this is primarily because I wanted to limit the number of dependencies Engima has and experiment with making these kind of libraries myself as a learning experience.
 
 Please note that it's early alpha and no performance tuning has been done as of yet.
 
 ## Serialization
-Enigma contains a serialization engine, although there are plenty of those around, this one has a nice feature. The core part of the Enigma serialization is completely generic and can therefor rather easily be extended with addictional output and input formats.
+Enigma contains a serialization engine, and although there are plenty of those around, this one has a nice feature. The core part of the Enigma serialization is completely generic and can therefor rather easily be extended with addictional output and input formats.
 
-The current version have support for the following formats:
+The current version has support for the following formats:
 - JSON
 - Enigma Binary
 
