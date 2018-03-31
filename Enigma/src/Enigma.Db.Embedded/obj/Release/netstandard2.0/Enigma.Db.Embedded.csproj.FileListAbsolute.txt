@@ -9,3 +9,4 @@ C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Release\netstandar
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Release\netstandard2.0\Enigma.Db.Embedded.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Release\netstandard2.0\Enigma.Db.Embedded.pdb
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Release\netstandard2.0\Enigma.Db.Embedded.AssemblyInfoInputs.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.Db.Embedded\obj\Release\netstandard2.0\Enigma.Db.Embedded.csproj.CopyComplete

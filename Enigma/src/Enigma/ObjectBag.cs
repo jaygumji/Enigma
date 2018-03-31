@@ -7,20 +7,23 @@ using System.Collections.Generic;
 namespace Enigma
 {
     /// <summary>
-    /// A bag of stateBag
+    /// A bag of objects
     /// </summary>
-    public class StateBag : IReadOnlyStateBag
+    public class ObjectBag : IReadOnlyObjectBag
     {
 
-        public static IReadOnlyStateBag Empty { get; } = new StateBag();
+        /// <summary>
+        /// An empty bag
+        /// </summary>
+        public static IReadOnlyObjectBag Empty { get; } = new ObjectBag();
 
 
         private readonly Dictionary<string, object> _values;
 
         /// <summary>
-        /// Creates a new instance of <see cref="StateBag"/>
+        /// Creates a new instance of <see cref="ObjectBag"/>
         /// </summary>
-        public StateBag()
+        public ObjectBag()
         {
             _values = new Dictionary<string, object>();
         }
@@ -79,7 +82,7 @@ namespace Enigma
             var name = typeof(T).FullName;
 
             if (!_values.TryGetValue(name, out var untypedValue)) {
-                value = default(T);
+                value = default;
                 return false;
             }
 

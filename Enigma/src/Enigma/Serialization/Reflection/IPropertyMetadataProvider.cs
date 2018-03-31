@@ -9,6 +9,6 @@ namespace Enigma.Serialization.Reflection
     {
         uint GetIndexOf(PropertyInfo property);
         bool IsSerializable(PropertyInfo property);
-        void SetupArguments(StateBag args);
+        void SetupArguments(ObjectBag args);
     }
 }

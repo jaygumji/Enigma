@@ -5,5 +5,5 @@ C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.AssemblyInfo.cs
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.pdb
-C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.csprojResolveAssemblyReference.cache
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.AssemblyInfoInputs.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma\obj\Release\netstandard2.0\Enigma.csprojResolveAssemblyReference.cache

@@ -205,9 +205,9 @@ namespace Enigma.Serialization.Json
             var offset = _buffer.Position;
 
             do {
-                if ((_buffer.Length - offset) < _encoding.BinaryFormat.MaxSize) {
+                if ((_buffer.Length - offset) < _encoding.BinaryFormat.MaxSize*2) {
                     AppendString(b, offset);
-                    _buffer.RequestSpace(_encoding.BinaryFormat.MaxSize);
+                    _buffer.RequestSpace(_encoding.BinaryFormat.MaxSize*2);
                     offset = _buffer.Position;
                 }
                 if (IsNextCharacter(_encoding.Quote, offset)) {
@@ -267,7 +267,8 @@ namespace Enigma.Serialization.Json
         {
             var numberSize = _encoding.Zero.Length;
             _buffer.RequestSpace(16 * numberSize);
-            double n = 0, decMultiplier = 1;
+            ulong val = 0;
+            double dec = 0, decMultiplier = 1;
             byte next = 0;
             var isDecimal = false;
             var isNegative = false;
@@ -282,17 +283,21 @@ namespace Enigma.Serialization.Json
                 }
 
                 if (isDecimal) {
+                    dec = dec * 10 + next;
                     decMultiplier *= 10;
-                    n += next / decMultiplier;
                 }
                 else {
-                    n = n * 10 + next;
+                    val = val * 10 + next;
                 }
             }
-            if (isNegative) {
-                n *= -1;
+            decimal number = val;
+            if (isDecimal && dec > 0) {
+                number += (decimal)(dec / decMultiplier);
             }
-            return new JsonNumber(n);
+            if (isNegative) {
+                number *= -1;
+            }
+            return new JsonNumber(number);
         }
 
         private JsonArray ReadArray(bool expectStartToken)

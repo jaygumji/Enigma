@@ -5,9 +5,9 @@ namespace Enigma.Serialization.Json
 {
     public struct JsonNumber : IJsonNode
     {
-        public double? Value { get; }
+        public decimal? Value { get; }
 
-        public JsonNumber(double? value)
+        public JsonNumber(decimal? value)
         {
             Value = value;
         }

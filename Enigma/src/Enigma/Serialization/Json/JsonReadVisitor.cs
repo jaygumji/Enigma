@@ -101,6 +101,9 @@ namespace Enigma.Serialization.Json
                                 throw UnexpectedJsonException.From("assignment token", _buffer, _encoding);
                             }
                             literal = _reader.ReadLiteral();
+                            if (literal == JsonLiteral.Null) {
+                                return JsonNull.Instance;
+                            }
                             if (literal == JsonLiteral.ObjectBegin) {
                                 var child = new JsonObject();
                                 _parents.Push(new JsonReadLevel(child));
@@ -114,6 +117,9 @@ namespace Enigma.Serialization.Json
                                 throw UnexpectedJsonException.From("assignment token", _buffer, _encoding);
                             }
                             literal = _reader.ReadLiteral();
+                            if (literal == JsonLiteral.Null) {
+                                return JsonNull.Instance;
+                            }
                             if (literal == JsonLiteral.ArrayBegin) {
                                 _parents.Push(ArrayLevel);
                                 return ArrayLevel.Node;
@@ -207,20 +213,20 @@ namespace Enigma.Serialization.Json
             _parents.Pop();
         }
 
-        private bool TryVisitNumber<T>(VisitArgs args, Func<double?, T> converter, out T value)
+        private bool TryVisitNumber<T>(VisitArgs args, Func<decimal?, T> converter, out T value)
         {
             var node = ParseUntilFound(args);
             if (node is JsonUndefined) {
-                value = default(T);
+                value = default;
                 return false;
             }
             if (node.IsNull) {
-                value = default(T);
+                value = default;
                 return true;
             }
 
             if (node is JsonString str) {
-                var parsedNumber = double.Parse(str.Value);
+                var parsedNumber = decimal.Parse(str.Value);
                 value = converter.Invoke(parsedNumber);
                 return true;
             }
@@ -309,7 +315,7 @@ namespace Enigma.Serialization.Json
 
         public bool TryVisitValue(VisitArgs args, out double? value)
         {
-            return TryVisitNumber(args, v => v, out value);
+            return TryVisitNumber(args, v => (double?)v, out value);
         }
 
         public bool TryVisitValue(VisitArgs args, out decimal? value)

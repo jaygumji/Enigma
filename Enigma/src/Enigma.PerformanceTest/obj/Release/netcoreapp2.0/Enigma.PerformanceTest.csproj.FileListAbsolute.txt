@@ -13,3 +13,4 @@ C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.PerformanceTest\obj\Release\netcor
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.PerformanceTest\obj\Release\netcoreapp2.0\Enigma.PerformanceTest.dll
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.PerformanceTest\obj\Release\netcoreapp2.0\Enigma.PerformanceTest.pdb
 C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.PerformanceTest\obj\Release\netcoreapp2.0\Enigma.PerformanceTest.AssemblyInfoInputs.cache
+C:\Dev\Current\Repos\Enigma\Enigma\src\Enigma.PerformanceTest\obj\Release\netcoreapp2.0\Enigma.PerformanceTest.csproj.CopyComplete

@@ -5,11 +5,11 @@
     <AssemblyName>Enigma.PerformanceTest</AssemblyName>
     <OutputType>Exe</OutputType>
     <PackageId>Enigma.PerformanceTest</PackageId>
-    <RuntimeFrameworkVersion>1.0.4</RuntimeFrameworkVersion>
-    <PackageTargetFallback>$(PackageTargetFallback);dnxcore50</PackageTargetFallback>
+    <RuntimeFrameworkVersion>2.0.6</RuntimeFrameworkVersion>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <StartupObject>Enigma.PerformanceTest.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,7 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="protobuf-net" Version="2.1.0" />
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.13" />
+    <PackageReference Include="protobuf-net" Version="2.3.7" />
   </ItemGroup>
 
 </Project>

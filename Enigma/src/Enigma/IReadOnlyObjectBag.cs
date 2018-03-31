@@ -3,7 +3,10 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 namespace Enigma
 {
-    public interface IReadOnlyStateBag
+    /// <summary>
+    /// A bag of objects
+    /// </summary>
+    public interface IReadOnlyObjectBag
     {
 
         /// <summary>

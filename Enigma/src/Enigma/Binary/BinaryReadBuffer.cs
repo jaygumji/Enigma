@@ -46,7 +46,7 @@ namespace Enigma.Binary
             }
             Position = 0;
 
-            Length = sizeLeft
+            Length = Size - sizeLeft
                      + Stream.Read(Buffer, copyOffset, Size - copyOffset);
         }
 

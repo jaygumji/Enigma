@@ -1,15 +1,13 @@
 ﻿/* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Enigma.Test.Fakes.Entities;
 using Enigma.Testing.Fakes.Entities;
-using Xunit;
 
-namespace Enigma.Test.Serialization.Json
+namespace Enigma.PerformanceTest.Fakes.Entities
 {
     public class JsonDataBlock
     {
@@ -89,45 +87,6 @@ namespace Enigma.Test.Serialization.Json
                 }
             };
         }
-
-        public void AssertEqualTo(JsonDataBlock expected)
-        {
-            Assert.Equal(expected.Id, Id);
-            Assert.Equal(expected.Int16, Int16);
-            Assert.Equal(expected.Int32, Int32);
-            Assert.Equal(expected.Int64, Int64);
-            Assert.Equal(expected.UInt16, UInt16);
-            Assert.Equal(expected.UInt32, UInt32);
-            Assert.Equal(expected.UInt64, UInt64);
-            Assert.Equal(expected.Single, Single);
-            Assert.Equal(expected.Double, Double);
-            Assert.Equal(expected.Decimal, Decimal);
-            Assert.Equal(expected.TimeSpan, TimeSpan);
-            Assert.Equal(expected.DateTime, DateTime);
-            Assert.Equal(expected.String, String);
-            Assert.Equal(expected.Boolean, Boolean);
-            Assert.Equal(expected.Byte, Byte);
-            Assert.True(expected.Blob.SequenceEqual(Blob));
-
-            Assert.True(expected.Messages.SequenceEqual(Messages));
-            Assert.True(expected.Stamps.SequenceEqual(Stamps));
-
-            Assert.NotNull(Relation);
-            Assert.Equal(expected.Relation.Id, Relation.Id);
-            Assert.Equal(expected.Relation.Name, Relation.Name);
-            Assert.Equal(expected.Relation.Description, Relation.Description);
-            Assert.Equal(expected.Relation.Value, Relation.Value);
-            Assert.Null(DummyRelation);
-
-            Assert.True(expected.IndexedValues.Keys.SequenceEqual(IndexedValues.Keys));
-            Assert.True(expected.IndexedValues.Values.SequenceEqual(IndexedValues.Values));
-
-            Assert.NotNull(Categories);
-            Assert.Equal(3, Categories.Count);
-            Assert.True(expected.Categories.Keys.SequenceEqual(Categories.Keys));
-            Assert.True(expected.Categories.Values.SequenceEqual(Categories.Values));
-        }
-
 
     }
 }
